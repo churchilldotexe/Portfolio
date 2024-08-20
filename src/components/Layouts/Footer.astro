@@ -1,0 +1,53 @@
+---
+import { FaLinkedin, FaSquareFacebook, FaSquareGithub, FaSquareXTwitter } from "react-icons/fa6";
+
+const SOCIAL_LINKS = {
+  facebook: "https://facebook.com/churchilljay",
+  github: "https://github.com/Churchillexe",
+  twitter: "https://x.com/ChurchillJay3",
+  linkedin: "https://www.linkedin.com/in/churchill-jay-sungcados-90b49a29a/",
+} as const;
+---
+
+<footer class="fixed bottom-0 right-1/2 flex -translate-y-0 translate-x-1/2 gap-4 text-2xl">
+  <a
+    href={SOCIAL_LINKS.facebook}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="transition-all duration-500 hover:-translate-y-2
+                    hover:scale-125 focus:-translate-y-2
+                    focus:scale-125 focus:outline-none active:animate-bounce"
+  >
+    <FaSquareFacebook />
+  </a>
+  <a
+    href={SOCIAL_LINKS.github}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="transition-all duration-500 hover:-translate-y-2
+                    hover:scale-125 focus:-translate-y-2
+                    focus:scale-125 focus:outline-none active:animate-bounce"
+  >
+    <FaSquareGithub />
+  </a>
+  <a
+    href={SOCIAL_LINKS.twitter}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="transition-all duration-500 hover:-translate-y-2
+                    hover:scale-125 focus:-translate-y-2
+                    focus:scale-125 focus:outline-none active:animate-bounce"
+  >
+    <FaSquareXTwitter />
+  </a>
+  <a
+    href={SOCIAL_LINKS.linkedin}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="transition-all duration-500 hover:-translate-y-2
+                    hover:scale-125 focus:-translate-y-2
+                    focus:scale-125 focus:outline-none active:animate-bounce"
+  >
+    <FaLinkedin />
+  </a>
+</footer>

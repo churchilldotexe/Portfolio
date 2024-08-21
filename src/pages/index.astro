@@ -4,27 +4,23 @@ import profileImg from "@/assets/profile.png";
 import { Image } from "astro:assets";
 ---
 
-<Layout title="Welcome to Astro.">
-  <main class="">
-    <section class="mx-auto w-fit p-6 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8">
-      <h1
-        class="text-3xl sm:col-start-2 sm:self-end
-                      sm:justify-self-start md:text-4xl"
-      >
-        Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
-      </h1>
-      <p
-        class="my-4 inline-block bg-rose-500 px-4 py-2 text-lg font-semibold
-                  text-gray-50 sm:col-start-1 sm:col-end-3
-                   sm:row-start-2 sm:self-start sm:text-end md:text-2xl"
-      >
-        A Font-End Developer
-      </p>
-      <Image
-        src={profileImg}
-        alt="profile picture for portfolio"
-        class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:w-5/6"
-      />
-    </section>
-  </main>
+<Layout title="HomePage.">
+  <section class="mx-auto w-fit p-6 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8">
+    <h1 class="text-3xl sm:col-start-2 sm:self-end
+         sm:justify-self-start md:text-4xl">
+      Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
+    </h1>
+    <p
+      class="my-4 inline-block bg-rose-500 px-4 py-2 text-lg font-semibold
+         text-gray-50 sm:col-start-1 sm:col-end-3
+         sm:row-start-2 sm:self-start sm:text-end md:text-2xl"
+    >
+      A Font-End Developer
+    </p>
+    <Image
+      src={profileImg}
+      alt="profile picture for portfolio"
+      class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:w-5/6"
+    />
+  </section>
 </Layout>

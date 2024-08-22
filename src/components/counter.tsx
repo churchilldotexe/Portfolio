@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
+import profileImg from "@/assets/profile.png";
 
-export default function Counter() {
+type CounterProps = ComponentProps<"div">;
+
+export default function Counter({ children, ...props }: CounterProps) {
   const [count, setCount] = useState<number>(0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" {...props}>
       <h2>Count: {count} </h2>
       <button
         className=" size-full rounded bg-rose-500 px-4 py-2"
@@ -12,6 +15,7 @@ export default function Counter() {
       >
         add
       </button>
+      {children}
     </div>
   );
 }

@@ -1,9 +1,7 @@
 ---
-import { BiLogoNetlify } from "react-icons/bi";
+import ProjectCard from "@/components/ProjectCard.astro";
 import Layout from "../../layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
-import { FaSquareGithub } from "react-icons/fa6";
-import { Image } from "astro:assets";
 
 const projectArr = [
   { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
@@ -18,34 +16,14 @@ const projectArr = [
 <Layout title="Projects">
   <section class="grid grid-cols-3 gap-4 p-4">
     {
-      projectArr.map((project) => (
-        <div class="p-4 shadow-elevate-dark backdrop-blur">
-          <Image class="rounded-lg" src={project.profileImg} alt="sample page" />
-          <h3 class="mb-2 mt-4 text-xl font-bold capitalize">{project.projectName}</h3>
-          <p class="mb-2 leading-6">{project.description}</p>
-          <div class="flex items-center gap-8">
-            <a
-              href="#"
-              target="_blank"
-              class="flex items-center justify-start gap-2 text-lg
-                     transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
-                     active:animate-ping"
-            >
-              <FaSquareGithub />
-              repository
-            </a>
-            <a
-              href="#"
-              target="_blank"
-              class="flex items-center justify-start gap-2 text-lg
-                     transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
-                     active:animate-ping"
-            >
-              <BiLogoNetlify />
-              live site
-            </a>
-          </div>
-        </div>
+      projectArr.map(({ id, profileImg, projectName, description }) => (
+        <ProjectCard
+          description={description}
+          projectName={projectName}
+          profileImg={profileImg}
+          projectName={projectName}
+          id={id}
+        />
       ))
     }
   </section>

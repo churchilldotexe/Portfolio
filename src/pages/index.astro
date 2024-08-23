@@ -3,13 +3,48 @@ import Layout from "@/layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
 import { Image } from "astro:assets";
 import ProjectCard from "@/components/ProjectCard.astro";
+import { CircleChevronRight, CircleChevronLeft } from "lucide-react";
 
 const project = [
   { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
-  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
-  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
+  { id: 1, profileImg, projectName: "Project 2", description: "Project description" },
+  { id: 1, profileImg, projectName: "Project 3", description: "Project description" },
 ];
 ---
+
+<script>
+  let initialRotation = 0;
+
+  const controller = new AbortController();
+  document.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target as HTMLElement;
+      const buttonId = target.closest("button")?.id;
+      const projectCount = target.closest("button")?.dataset.length || "0";
+      const currentRotationDeg = 360 / Number(projectCount);
+      const style = document.documentElement.style;
+
+      if (buttonId === "go-next") {
+        initialRotation -= currentRotationDeg;
+        style.setProperty("--current-rotation-value", `${initialRotation}deg`);
+        console.log(initialRotation);
+      }
+
+      if (buttonId === "go-prev") {
+        initialRotation += currentRotationDeg;
+        style.setProperty("--current-rotation-value", `${initialRotation}deg`);
+
+        console.log(initialRotation);
+      }
+    },
+    { signal: controller.signal }
+  );
+
+  document.addEventListener("astro:before-swap", () => {
+    controller.abort();
+  });
+</script>
 
 <Layout title="HomePage">
   <section class="flex size-full flex-col items-center justify-between gap-4">
@@ -31,42 +66,62 @@ const project = [
         class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:w-5/6"
       />
     </article>
-    <aside class="grow">
+    <aside class="grid grow place-items-center">
       <div
-        class="custom-div grid overflow-hidden md:overflow-visible"
-        style=`--quantity:${project.length}`
+        class="group w-[125%] overflow-hidden border border-blue-500 backdrop-blur-lg md:w-[150%] md:overflow-visible"
       >
-        {
-          project.map((value, index) => (
-            <ProjectCard
-              cardId={value.id}
-              projectName={value.projectName}
-              description={value.description}
-              profileImg={value.profileImg}
-              class="custom-item [grid-area:1/1]"
-              style={`--position:${index}`}
-            />
-          ))
-        }
+        <button
+          id="go-prev"
+          class="absolute left-0 z-10 h-full w-fit border border-red-500"
+          data-length={project.length}><CircleChevronLeft /></button
+        >
+        <button
+          id="go-next"
+          class="absolute right-0 z-10 h-full w-fit border border-red-500"
+          data-length={project.length}><CircleChevronRight /></button
+        >
+        <div
+          class="custom-div grid place-items-center overflow-visible group-hover:bg-green-500 md:overflow-visible"
+          style=`--quantity:${project.length}`
+        >
+          {
+            project.map((value, index) => (
+              <ProjectCard
+                cardId={value.id}
+                projectName={value.projectName}
+                description={value.description}
+                profileImg={value.profileImg}
+                class="custom-item bg-background [grid-area:1/1]"
+                style={`--position:${index + 1}`}
+              />
+            ))
+          }
+        </div>
       </div>
     </aside>
   </section>
 </Layout>
 
 <style>
+  @property --current-rotation-value {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+  }
   .custom-div {
     transform-style: preserve-3d;
-    transform: perspective(1800px);
+    transition: transform 0.55s ease-in-out;
+    transform: perspective(1800px) rotateY(var(--current-rotation-value));
   }
   .custom-item {
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-      translateZ(350px);
+      translateZ(350px) scaleX(0.8) scaleY(0.8);
   }
 
   @media (min-width: 1024px) {
     .custom-item {
       transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-        translateZ(450px);
+        translateZ(450px) scaleX(0.8) scaleY(0.8);
     }
   }
 </style>

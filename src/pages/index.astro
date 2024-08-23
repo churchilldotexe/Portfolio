@@ -3,85 +3,70 @@ import Layout from "@/layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
 import { Image } from "astro:assets";
 import ProjectCard from "@/components/ProjectCard.astro";
-import Counter from "@/components/counter";
 
-const project = { id: 1, profileImg, projectName: "Project 1", description: "Project description" };
+const project = [
+  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
+  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
+  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
+];
 ---
 
-<Layout title="HomePage.">
-  <section class="mx-auto w-fit gap-4 p-6 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8">
-    <h1 class="text-3xl sm:col-start-2 sm:self-end
+<Layout title="HomePage">
+  <section class="flex size-full flex-col items-center justify-between gap-4">
+    <article class="w-fit grow gap-4 p-6 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8">
+      <h1 class="text-3xl sm:col-start-2 sm:self-end
             sm:justify-self-start md:text-4xl">
-      Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
-    </h1>
-    <p
-      class="my-4 inline-block bg-rose-500 px-4 py-2 text-lg font-semibold
+        Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
+      </h1>
+      <p
+        class="my-4 inline-block bg-rose-500 py-2 text-lg font-semibold
             text-gray-50 sm:col-start-1 sm:col-end-3
             sm:row-start-2 sm:self-start sm:text-end md:text-2xl"
-    >
-      A Font-End Developer
-    </p>
-    <Image
-      src={profileImg}
-      alt="profile picture for portfolio"
-      class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:w-5/6"
-    />
-    <div class="relative size-full border">
-      <div
-        class="customdiv absolute left-1/2 top-5 size-full -translate-x-1/2"
-        style="--quantity: 4"
       >
-        <ProjectCard
-          description={project.description}
-          projectName={project.projectName}
-          profileImg={project.profileImg}
-          projectName={project.projectName}
-          cardId={project.id}
-          class="customItem absolute inset-0 size-fit bg-background"
-          style="--position: 1"
-        />
-
-        <ProjectCard
-          description={project.description}
-          projectName={project.projectName}
-          profileImg={project.profileImg}
-          projectName={project.projectName}
-          cardId={project.id}
-          class="customItem absolute inset-0 size-fit bg-background"
-          style="--position: 2"
-        />
-
-        <ProjectCard
-          description={project.description}
-          projectName={project.projectName}
-          profileImg={project.profileImg}
-          projectName={project.projectName}
-          cardId={project.id}
-          class="customItem absolute inset-0 size-fit bg-background"
-          style="--position: 3"
-        />
-
-        <ProjectCard
-          description={project.description}
-          projectName={project.projectName}
-          profileImg={project.profileImg}
-          projectName={project.projectName}
-          cardId={project.id}
-          class="customItem absolute inset-0 size-fit bg-background"
-          style="--position: 4"
-        />
+        A Font-End Developer
+      </p>
+      <Image
+        src={profileImg}
+        alt="profile picture for portfolio"
+        class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:w-5/6"
+      />
+    </article>
+    <aside class="grow">
+      <div
+        class="custom-div grid overflow-hidden md:overflow-visible"
+        style=`--quantity:${project.length}`
+      >
+        {
+          project.map((value, index) => (
+            <ProjectCard
+              cardId={value.id}
+              projectName={value.projectName}
+              description={value.description}
+              profileImg={value.profileImg}
+              class="custom-item [grid-area:1/1]"
+              style={`--position:${index}`}
+            />
+          ))
+        }
       </div>
-    </div>
+    </aside>
   </section>
 </Layout>
 
 <style>
-  .customdiv {
+  .custom-div {
     transform-style: preserve-3d;
-    transform: perspective(1000px);
+    transform: perspective(1800px);
   }
-  .customItem {
+  .custom-item {
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-      translateZ(350px) rotateX(0deg);
+      translateZ(350px);
+  }
+
+  @media (min-width: 1024px) {
+    .custom-item {
+      transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+        translateZ(450px);
+    }
   }
 </style>

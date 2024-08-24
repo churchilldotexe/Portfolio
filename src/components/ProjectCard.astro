@@ -11,11 +11,23 @@ type Props = {
   description: string;
 } & HTMLAttributes<"div">;
 
-const { description, projectName, profileImg, id, class: className, ...props } = Astro.props;
+const {
+  description,
+  projectName,
+  profileImg,
+  id,
+  class: className,
+  "class:list": classList,
+  ...props
+} = Astro.props;
 ---
 
 <div
-  class:list={["p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark", className]}
+  class:list={[
+    "p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark",
+    className,
+    classList,
+  ]}
   {...props}
 >
   <Image class="rounded-lg" src={profileImg} alt="sample page" />

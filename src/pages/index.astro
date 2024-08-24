@@ -27,16 +27,12 @@ const project = [
 
       if (buttonId === "go-next") {
         initialRotation -= currentRotationDeg;
-        style.setProperty("--current-rotation-value", `${initialRotation}deg`);
-        console.log(initialRotation);
       }
-
       if (buttonId === "go-prev") {
         initialRotation += currentRotationDeg;
-        style.setProperty("--current-rotation-value", `${initialRotation}deg`);
-
-        console.log(initialRotation);
       }
+
+      style.setProperty("--current-rotation-value", `${initialRotation}deg`);
     },
     { signal: controller.signal }
   );
@@ -68,20 +64,22 @@ const project = [
     </article>
     <aside class="grid grow place-items-center">
       <div
-        class="group w-[125%] overflow-hidden border border-blue-500 backdrop-blur-lg md:w-[150%] md:overflow-visible"
+        class="group w-[110%] overflow-hidden backdrop-blur-lg sm:w-[125%] md:w-[130%] md:overflow-visible lg:w-[140%]"
       >
         <button
           id="go-prev"
-          class="absolute left-0 z-10 h-full w-fit border border-red-500"
-          data-length={project.length}><CircleChevronLeft /></button
+          class="absolute left-0 z-10 hidden h-full w-fit border p-1 backdrop-blur-md active:scale-95 group-hover:block group-focus-visible:block hocus-visible:outline hocus-visible:outline-1 md:p-2 lg:p-4"
+          data-length={project.length}
+          ><CircleChevronLeft className=" hocus-visible:scale-110 md:size-8" /></button
         >
         <button
           id="go-next"
-          class="absolute right-0 z-10 h-full w-fit border border-red-500"
-          data-length={project.length}><CircleChevronRight /></button
+          class="absolute right-0 z-10 hidden h-full w-fit border p-1 backdrop-blur-md active:scale-95 group-hover:block group-focus-visible:block hocus-visible:outline hocus-visible:outline-1 md:p-2 lg:p-4"
+          data-length={project.length}
+          ><CircleChevronRight className="hocus-visible:scale-110 md:size-8" /></button
         >
         <div
-          class="custom-div grid place-items-center overflow-visible group-hover:bg-green-500 md:overflow-visible"
+          class:list={" custom-div grid place-items-center"}
           style=`--quantity:${project.length}`
         >
           {
@@ -91,7 +89,9 @@ const project = [
                 projectName={value.projectName}
                 description={value.description}
                 profileImg={value.profileImg}
-                class="custom-item bg-background [grid-area:1/1]"
+                class:list={[
+                  "relative custom-item  bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
+                ]}
                 style={`--position:${index + 1}`}
               />
             ))

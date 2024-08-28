@@ -1,10 +1,54 @@
 ---
+const pathname = Astro.url.pathname;
 
+const pageLinks = [
+  {
+    href: "/",
+    name: "Home",
+  },
+  {
+    href: "/projects",
+    name: "Projects",
+  },
+  {
+    href: "/blog",
+    name: "Blog",
+  },
+  {
+    href: "/about",
+    name: "About",
+  },
+  {
+    href: "/contact",
+    name: "Contact",
+  },
+];
 ---
 
-<nav class="flex justify-end gap-5 p-4">
-  <a href=".">Home</a>
-  <a href="projects">Projects</a>
-  <a href="about">About</a>
-  <a href="contact">Contact</a>
+<nav class="relative flex w-full items-center justify-between p-2">
+  <div class="hidden text-muted hover:underline md:block">
+    <a href="dashboard">&larr; dashboard </a>
+  </div>
+  <ul class="flex w-fit rounded-md px-4 shadow-elevate-light dark:shadow-elevate-dark">
+    {
+      pageLinks.map((link) => (
+        <li
+          class:list={[
+            "[flex-1] min-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform ",
+            {
+              "relative rounded-t-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset":
+                pathname === `${link.href}`,
+            },
+            {
+              "before:content-[''] before:absolute before:inset-0": pathname === `${link.href}`,
+            },
+          ]}
+        >
+          <a href={link.href} class="inline-block w-full">
+            {link.name}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </nav>

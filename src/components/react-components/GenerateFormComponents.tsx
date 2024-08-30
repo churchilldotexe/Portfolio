@@ -228,7 +228,6 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
     ref
   ) {
     const { error } = useErrorContext();
-
     const { textAreaStyles } = popUpPosition({
       position,
       variant: errorMessageVariant,

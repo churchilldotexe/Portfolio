@@ -4,7 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="Welcome to Dashboard ">
-  <section class="flex size-full min-h-dvh flex-col items-center justify-center gap-4">
-    <ProjectForm />
+  <section class="flex size-full flex-col items-center justify-center gap-4">
+    <ProjectForm client:load />
   </section>
 </Layout>

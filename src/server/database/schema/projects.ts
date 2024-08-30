@@ -2,30 +2,34 @@ import { index, pgTable, serial, timestamp, uuid, varchar } from "drizzle-orm/pg
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import users from "./users";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 const projects = pgTable(
   "projects",
   {
     id: serial("id").primaryKey(),
-    name: varchar("name", { length: 255 }).unique().notNull(),
-    description: varchar("description", { length: 255 }).unique().notNull(),
+    uuid: uuid("uuid")
+      .default(sql`gen_random_uuid()`)
+      .unique(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: varchar("description", { length: 255 }).notNull(),
     repoUrl: varchar("repo_url", { length: 255 }).notNull(),
     liveUrl: varchar("live_url", { length: 255 }).notNull(),
     imageUrl: varchar("image_url", { length: 255 }).notNull(),
-    userId: uuid("userId")
+    imageKey: varchar("image_key", { length: 255 }).notNull(),
+    userUuid: uuid("user_uuid")
       .notNull()
-      .references(() => users.uuid),
+      .references(() => users.uuid, { onDelete: "cascade", onUpdate: "cascade" }),
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
   },
   (table) => ({
-    userIdIndex: index().on(table.userId),
+    userUuidIndex: index().on(table.userUuid),
   })
 );
 
 export const projectRelations = relations(projects, ({ one }) => ({
-  user: one(users, { fields: [projects.userId], references: [users.uuid] }),
+  user: one(users, { fields: [projects.userUuid], references: [users.uuid] }),
 }));
 
 export const insertProjectsSchema = createInsertSchema(projects);

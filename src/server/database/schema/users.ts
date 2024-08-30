@@ -8,7 +8,9 @@ const users = pgTable(
   "users",
   {
     id: serial("id").primaryKey(),
-    uuid: uuid("uuid").default(sql`gen_random_uuid()`),
+    uuid: uuid("uuid")
+      .default(sql`gen_random_uuid()`)
+      .unique(),
     userName: varchar("user_name", { length: 255 }).unique().notNull(),
     email: varchar("email", { length: 255 }).unique().notNull(),
     displayName: varchar("display_name", { length: 255 }).notNull(),

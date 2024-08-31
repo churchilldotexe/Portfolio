@@ -1,8 +1,7 @@
 import { index, pgTable, serial, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
-import users from "./users";
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 const projects = pgTable(
   "projects",
@@ -17,20 +16,14 @@ const projects = pgTable(
     liveUrl: varchar("live_url", { length: 255 }).notNull(),
     imageUrl: varchar("image_url", { length: 255 }).notNull(),
     imageKey: varchar("image_key", { length: 255 }).notNull(),
-    userUuid: uuid("user_uuid")
-      .notNull()
-      .references(() => users.uuid, { onDelete: "cascade", onUpdate: "cascade" }),
+    userId: varchar("user_id").notNull(),
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
   },
   (table) => ({
-    userUuidIndex: index().on(table.userUuid),
+    userIdIndex: index().on(table.userId),
   })
 );
-
-export const projectRelations = relations(projects, ({ one }) => ({
-  user: one(users, { fields: [projects.userUuid], references: [users.uuid] }),
-}));
 
 export const insertProjectsSchema = createInsertSchema(projects);
 export type InsertProjectTypes = z.infer<typeof insertProjectsSchema>;

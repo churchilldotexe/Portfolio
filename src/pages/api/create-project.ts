@@ -1,15 +1,23 @@
-import { projectFormSchema, type CreateProjectPostType, type ProjectFormTypes } from "@/lib/schema";
+import { projectFormSchema, type CreateProjectPostType } from "@/lib/schema";
+import { uploadProjectUseCase } from "@/server/use-case/project";
 import type { APIRoute } from "astro";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const formData = await request.formData();
 
-  const rawData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
-  if (rawData.success === false) {
-    console.error(rawData.error.formErrors.fieldErrors, "error from submit");
-    const { image, liveSite, name, repository, description } = rawData.error.formErrors.fieldErrors;
+  const auth = locals.auth();
+  const userId = auth.userId;
+  if (userId === null) {
+    auth.redirectToSignIn();
+  }
+  console.log(userId, "userid");
+  const parsedData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (parsedData.success === false) {
+    const { image, liveSite, name, repository, description } =
+      parsedData.error.formErrors.fieldErrors;
+
     return new Response(
       JSON.stringify({
         description: description?.[0],
@@ -21,6 +29,15 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 400 }
     );
   }
+  const { description, name, image, liveSite: liveUrl, repository: repoUrl } = parsedData.data;
+  await uploadProjectUseCase({
+    image,
+    name,
+    liveUrl,
+    repoUrl,
+    description,
+    userId: auth.userId as string,
+  });
 
   return new Response(
     JSON.stringify({

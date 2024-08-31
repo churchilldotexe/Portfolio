@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1725041684294,
-      "tag": "0000_closed_emma_frost",
+      "when": 1725122080239,
+      "tag": "0000_open_iron_monger",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1725042959924,
-      "tag": "0001_breezy_nightshade",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1725043086486,
-      "tag": "0002_majestic_gamma_corps",
+      "when": 1725122160613,
+      "tag": "0001_wooden_chronomancer",
       "breakpoints": true
     }
   ]

@@ -15,7 +15,7 @@ import {
   useContext,
   useState,
 } from "react";
-import type { ZodRawShape, z } from "zod";
+import { z, type ZodRawShape } from "zod";
 import {
   type Position,
   type ValidationMessageVariant,
@@ -66,7 +66,27 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
     if (inputSchema === undefined) {
       return;
     }
-    const validatedFile = inputSchema.safeParse(files ?? value);
+
+    let valueToValidate: unknown;
+
+    if (files) {
+      // Determine the expected type based on the schema
+      if (inputSchema instanceof z.ZodArray) {
+        // If the schema expects an array of files
+        valueToValidate = Array.from(files);
+      } else if (inputSchema instanceof z.ZodEffects) {
+        // If the schema expects a single File
+        valueToValidate = files[0] || null;
+      } else {
+        // Default to FileList if the schema isn't specific
+        valueToValidate = files;
+      }
+    } else {
+      valueToValidate = value;
+    }
+
+    const validatedFile = inputSchema.safeParse(valueToValidate);
+    // const validatedFile = inputSchema.safeParse(value ?? files);
     if (validatedFile.success === false) {
       if (validatedFile.error.formErrors.formErrors[0] !== undefined) {
         setError((prev) => ({
@@ -111,6 +131,10 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
     ) => {
       e.preventDefault();
       const inputType = e.target.type;
+      let file;
+      if (e.target.files) {
+        file = Array.from(e.target.files)[0];
+      }
 
       if (inputType === "file") {
         validateInput({
@@ -118,6 +142,7 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
           name: e.target.name,
           value: e.target.value,
           files: e.target.files,
+          file,
         });
       } else if (inputType === "checkbox" || inputType === "radio") {
         if (e.target.checked) {

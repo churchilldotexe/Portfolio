@@ -12,6 +12,10 @@ jobs:
 
     env:
       DRIZZLE_DATABASE_URL: ${{ secrets.DRIZZLE_DATABASE_URL }}
+      PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      UPLOADTHING_SECRET: ${{ secrets.UPLOADTHING_SECRET }}
+      UPLOADTHING_APP_ID: ${{ secrets.UPLOADTHING_APP_ID }}
 
     steps:
       - uses: actions/checkout@v3

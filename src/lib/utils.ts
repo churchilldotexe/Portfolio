@@ -1,7 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
-import type { Validator } from "react";
 import { twMerge } from "tailwind-merge";
-import { ZodError, type ZodRawShape, type z } from "zod";
+import { type z } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -16,7 +15,7 @@ export async function fetcher<T extends z.ZodTypeAny>(
     .then(async (res) => {
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(`${res.status}: ${res.statusText}. ${data}`);
+        throw new Error(`${res.status}: ${res.statusText}. ${data.message}`);
       }
 
       return res;

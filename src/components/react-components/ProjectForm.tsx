@@ -1,16 +1,16 @@
-import {
-  projectPostSchema,
-  projectFormSchema,
-  type CreateProjectPostType,
-  type ProjectFormTypes,
-} from "@/lib/schema";
+import { projectPostSchema, projectFormSchema, type CreateProjectPostType } from "@/lib/schema";
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type ComponentProps, type ElementRef, type FormEvent } from "react";
+import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/astro/react";
+import { ACCEPTED_FILE_TYPE } from "@/lib/constants";
+import { ImagePlus } from "lucide-react";
 
 export const prerender = false;
 
 const { Form, Input, ErrorMessage } = GenerateFormComponents({ schema: projectFormSchema });
+
+type ProjectFormProps = ComponentProps<typeof Form>;
 
 const PROJECT_INPUT_DATA = [
   {
@@ -27,8 +27,9 @@ const PROJECT_INPUT_DATA = [
   },
 ] as const;
 
-export default function ProjectForm() {
+export default function ProjectForm({ children, ...props }: ProjectFormProps) {
   const [responseMessage, setResponseMessage] = useState("");
+  const [objectUrls, setObjectUrls] = useState<string[]>([]);
   const [formErrorMessage, setFormErrorMessage] = useState<CreateProjectPostType>({
     name: "",
     repository: "",
@@ -37,14 +38,30 @@ export default function ProjectForm() {
     image: "",
   });
 
+  const handleImageChange = (fileList: FileList | null) => {
+    if (fileList === null) {
+      return;
+    }
+
+    const files = Array.from(fileList);
+    const newUrls = files.map((file) => URL.createObjectURL(file));
+    setObjectUrls((prevUrls) => {
+      for (const url of prevUrls) {
+        URL.revokeObjectURL(url);
+      }
+      return newUrls;
+    });
+  };
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
-    const rawData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
-    if (rawData.success === false) {
-      console.error(rawData.error.formErrors.fieldErrors, "error from submit");
+    const parsedData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
+    if (parsedData.success === false) {
       const { image, liveSite, name, repository, description } =
-        rawData.error.formErrors.fieldErrors;
+        parsedData.error.formErrors.fieldErrors;
+
+      console.error(parsedData.error.errors);
       setFormErrorMessage({
         image: image?.[0],
         liveSite: liveSite?.[0],
@@ -63,7 +80,7 @@ export default function ProjectForm() {
     if (data instanceof Error) {
       throw new Error(`${data.name}. ${data.cause}. ${data.message}`);
     }
-
+    console.log(data.message);
     if (data.message) {
       (event.target as HTMLFormElement).reset();
       setResponseMessage(data.message);
@@ -76,19 +93,33 @@ export default function ProjectForm() {
       method="POST"
       encType="multipart/form-data"
       onSubmit={submit}
+      {...props}
     >
-      <fieldset className="w-full relative">
-        <Input name="image" id="image" type="file" className="sr-only" />
+      <fieldset>
+        <legend className="sr-only">Image Upload</legend>
+        <label className="relative cursor-pointer" htmlFor="imageFile">
+          {objectUrls.length > 0 && <img src={objectUrls[0]} alt="project preview" />}
 
-        <label
-          htmlFor="image"
-          className="w-full relative cursor-pointer p-1 bg-foreground text-background rounded"
-        >
-          Upload Image
+          <div>
+            <ImagePlus />
+          </div>
+
+          <span className="sr-only">Select Image</span>
+          <Input
+            id="imageFile"
+            className="sr-only"
+            name="image"
+            type="file"
+            accept={ACCEPTED_FILE_TYPE.join(",")}
+            onChange={(e) => {
+              handleImageChange(e.target.files);
+            }}
+            required
+          />
+          <ErrorMessage useDefaultStyling={false} name="image">
+            {formErrorMessage["image"]}
+          </ErrorMessage>
         </label>
-        <ErrorMessage useDefaultStyling={false} name="image">
-          {formErrorMessage["image"]}
-        </ErrorMessage>
       </fieldset>
 
       {PROJECT_INPUT_DATA.map(({ label, name }) => (
@@ -139,7 +170,15 @@ export default function ProjectForm() {
           {formErrorMessage["description"]}
         </ErrorMessage>
       </fieldset>
-      <button type="submit">submit</button>
+      <SignedOut>
+        {/* <button type="submit">submit</button> */}
+        <SignInButton />
+      </SignedOut>
+
+      <SignedIn>
+        <button type="submit">submit</button>
+      </SignedIn>
+      {children}
       {responseMessage && <p>{responseMessage}</p>}
     </Form>
   );

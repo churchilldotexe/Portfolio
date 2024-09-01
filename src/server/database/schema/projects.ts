@@ -1,4 +1,4 @@
-import { index, pgTable, serial, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, serial, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import { sql } from "drizzle-orm";
@@ -11,6 +11,7 @@ const projects = pgTable(
       .default(sql`gen_random_uuid()`)
       .unique(),
     name: varchar("name", { length: 255 }).notNull(),
+    isFeatured: boolean("is_featured").notNull().default(false),
     description: varchar("description", { length: 255 }).notNull(),
     repoUrl: varchar("repo_url", { length: 255 }).notNull(),
     liveUrl: varchar("live_url", { length: 255 }).notNull(),

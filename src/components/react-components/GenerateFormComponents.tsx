@@ -86,7 +86,6 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
     }
 
     const validatedFile = inputSchema.safeParse(valueToValidate);
-    // const validatedFile = inputSchema.safeParse(value ?? files);
     if (validatedFile.success === false) {
       if (validatedFile.error.formErrors.formErrors[0] !== undefined) {
         setError((prev) => ({
@@ -142,7 +141,6 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
           name: e.target.name,
           value: e.target.value,
           files: e.target.files,
-          file,
         });
       } else if (inputType === "checkbox" || inputType === "radio") {
         if (e.target.checked) {

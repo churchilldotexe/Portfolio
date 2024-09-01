@@ -1,16 +1,14 @@
 import { projectPostSchema, projectFormSchema, type CreateProjectPostType } from "@/lib/schema";
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
-import { useRef, useState, type ComponentProps, type ElementRef, type FormEvent } from "react";
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/astro/react";
+import { useState, type FormEvent } from "react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/astro/react";
 import { ACCEPTED_FILE_TYPE } from "@/lib/constants";
 import { ImagePlus } from "lucide-react";
 
 export const prerender = false;
 
 const { Form, Input, ErrorMessage } = GenerateFormComponents({ schema: projectFormSchema });
-
-type ProjectFormProps = ComponentProps<typeof Form>;
 
 const PROJECT_INPUT_DATA = [
   {
@@ -27,7 +25,7 @@ const PROJECT_INPUT_DATA = [
   },
 ] as const;
 
-export default function ProjectForm({ children, ...props }: ProjectFormProps) {
+export default function ProjectForm() {
   const [responseMessage, setResponseMessage] = useState("");
   const [objectUrls, setObjectUrls] = useState<string[]>([]);
   const [formErrorMessage, setFormErrorMessage] = useState<CreateProjectPostType>({
@@ -80,7 +78,6 @@ export default function ProjectForm({ children, ...props }: ProjectFormProps) {
     if (data instanceof Error) {
       throw new Error(`${data.name}. ${data.cause}. ${data.message}`);
     }
-    console.log(data.message);
     if (data.message) {
       (event.target as HTMLFormElement).reset();
       setResponseMessage(data.message);
@@ -93,7 +90,6 @@ export default function ProjectForm({ children, ...props }: ProjectFormProps) {
       method="POST"
       encType="multipart/form-data"
       onSubmit={submit}
-      {...props}
     >
       <fieldset>
         <legend className="sr-only">Image Upload</legend>
@@ -171,14 +167,12 @@ export default function ProjectForm({ children, ...props }: ProjectFormProps) {
         </ErrorMessage>
       </fieldset>
       <SignedOut>
-        {/* <button type="submit">submit</button> */}
         <SignInButton />
       </SignedOut>
 
       <SignedIn>
         <button type="submit">submit</button>
       </SignedIn>
-      {children}
       {responseMessage && <p>{responseMessage}</p>}
     </Form>
   );

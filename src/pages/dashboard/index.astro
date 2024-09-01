@@ -1,15 +1,10 @@
 ---
-export const prerender = false;
 import ProjectForm from "@/components/react-components/ProjectForm";
 import Layout from "../../layouts/Layout.astro";
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/astro/react";
 ---
 
 <Layout title="Welcome to Dashboard ">
   <section class="flex size-full flex-col items-center justify-center gap-4">
-    <ProjectForm client:load>
-      <SignedIn client:load isStatic="false"><button type="submit"></button></SignedIn>
-      <SignedOut client:load isStatic="false"><button type="submit"></button></SignedOut>
-    </ProjectForm>
+    <ProjectForm client:load />
   </section>
 </Layout>

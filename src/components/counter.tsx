@@ -1,5 +1,4 @@
 import { useState, type ComponentProps } from "react";
-import profileImg from "@/assets/profile.png";
 
 type CounterProps = ComponentProps<"div">;
 

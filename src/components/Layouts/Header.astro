@@ -1,8 +1,6 @@
 ---
 export const prerender = false;
-const pathname = Astro.url.pathname.endsWith("/")
-  ? Astro.url.pathname.slice(0, -1)
-  : Astro.url.pathname;
+const pathname = Astro.url.pathname;
 
 const pageLinks = [
   {
@@ -10,19 +8,19 @@ const pageLinks = [
     name: "Home",
   },
   {
-    href: "/projects",
+    href: "/projects/",
     name: "Projects",
   },
   {
-    href: "/blog",
+    href: "/blog/",
     name: "Blog",
   },
   {
-    href: "/about",
+    href: "/about/",
     name: "About",
   },
   {
-    href: "/contact",
+    href: "/contact/",
     name: "Contact",
   },
 ];

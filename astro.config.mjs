@@ -21,5 +21,14 @@ export default defineConfig({
       minify: false,
     },
   },
+  server: {
+    proxy: {
+      "/auth": {
+        target: "https://clerk.churchillexe.pages.dev",
+        changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/auth/, ""),
+      },
+    },
+  },
+  security: { checkOrigin: true },
 });
-

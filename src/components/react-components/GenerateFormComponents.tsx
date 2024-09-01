@@ -130,10 +130,6 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
     ) => {
       e.preventDefault();
       const inputType = e.target.type;
-      let file;
-      if (e.target.files) {
-        file = Array.from(e.target.files)[0];
-      }
 
       if (inputType === "file") {
         validateInput({

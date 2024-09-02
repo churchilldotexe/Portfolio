@@ -24,7 +24,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@uploadthing/react": "^6.7.2",
-    "astro": "^4.14.3",
+    "astro": "^4.15.2",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",

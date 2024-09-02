@@ -2,7 +2,9 @@
 export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 
-const clientId = import.meta.env.CLIENT_ID ?? process.env.CLIENT_ID;
+// Use a runtime config approach
+const runtimeConfig = Astro.locals.runtime.env;
+const clientId = runtimeConfig.CLIENT_ID;
 
 const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}`;
 ---

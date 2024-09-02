@@ -2,7 +2,9 @@
 export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 
-const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${import.meta.env.CLIENT_ID}`;
+const clientId = import.meta.env.CLIENT_ID ?? process.env.CLIENT_ID;
+
+const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}`;
 ---
 
 <Layout title="About Me">

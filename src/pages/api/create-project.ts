@@ -7,6 +7,8 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request, locals }) => {
   const formData = await request.formData();
 
+  // FIX: this after you setup the auth
+
   const auth = locals.auth();
   const userId = auth.userId;
   if (userId === null) {

@@ -2,7 +2,6 @@ import { projectPostSchema, projectFormSchema, type CreateProjectPostType } from
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
 import { useState, type FormEvent } from "react";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/astro/react";
 import { ACCEPTED_FILE_TYPE } from "@/lib/constants";
 import { ImagePlus } from "lucide-react";
 
@@ -166,13 +165,13 @@ export default function ProjectForm() {
           {formErrorMessage["description"]}
         </ErrorMessage>
       </fieldset>
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
-
-      <SignedIn>
-        <button type="submit">submit</button>
-      </SignedIn>
+      {/* <SignedOut> */}
+      {/*   <SignInButton /> */}
+      {/* </SignedOut> */}
+      {/**/}
+      {/* <SignedIn> */}
+      {/*   <button type="submit">submit</button> */}
+      {/* </SignedIn> */}
       {responseMessage && <p>{responseMessage}</p>}
     </Form>
   );

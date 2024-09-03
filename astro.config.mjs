@@ -1,6 +1,5 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
-import clerk from "@clerk/astro";
 import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
 
@@ -11,7 +10,7 @@ export default defineConfig({
       enabled: true,
     },
   }),
-  integrations: [tailwind(), react(), clerk()],
+  integrations: [tailwind(), react()],
   output: "hybrid",
   vite: {
     ssr: {

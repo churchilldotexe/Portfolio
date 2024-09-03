@@ -1,16 +1,10 @@
 ---
 export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
-
-// Use a runtime config approach
-const runtimeConfig = Astro.locals.runtime.env;
-const clientId = runtimeConfig.CLIENT_ID;
-
-const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}`;
 ---
 
 <Layout title="About Me">
-  <a href={url}> github signin</a>
+  <a href="/api/redirect"> github signin</a>
 </Layout>
 
 <style>

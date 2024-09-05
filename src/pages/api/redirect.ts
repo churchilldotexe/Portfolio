@@ -25,34 +25,44 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
 
   const clientId = env.CLIENT_ID ?? import.meta.env.CLIENT_ID;
 
-  // to prevent redirect loop and request spam
-  const identifier =
-    request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip") ?? clientId;
-  const { success } = await ratelimit.limit(identifier);
+  try {
+    const identifier =
+      request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip") ?? clientId;
+    const { success } = await ratelimit.limit(identifier);
 
-  if (!success) {
-    return new Response(
-      JSON.stringify({
-        message: "Rate Limit reach Please wait for another 10mins",
-      }),
-      { status: 429 }
-    );
+    if (!success) {
+      return new Response(
+        JSON.stringify({
+          message: "Rate Limit reach Please wait for another 10mins",
+        }),
+        { status: 429 }
+      );
+    }
+
+    const jWTstate = await signAccessToken({ state });
+
+    const isProd = env.PROD ?? import.meta.env.PROD;
+    const domain = isProd ? "churchillexe.pages.dev" : "";
+    cookies.set("state", jWTstate, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 600,
+      path: "/",
+      secure: isProd,
+      domain,
+    });
+
+    const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&state=${state}`;
+
+    return redirect(url, 302);
+  } catch (e) {
+    if (e instanceof Error) {
+      console.error(e);
+      return new Response(JSON.stringify({ error: `${e.name}:${e.cause}. ${e.message} ` }), {
+        status: 500,
+      });
+    }
   }
 
-  const jWTstate = await signAccessToken({ state });
-
-  const isProd = env.PROD ?? import.meta.env.PROD;
-  const domain = isProd ? "churchillexe.pages.dev" : "";
-  cookies.set("state", jWTstate, {
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 600,
-    path: "/",
-    secure: isProd,
-    domain,
-  });
-
-  const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&state=${state}`;
-
-  return redirect(url, 302);
+  return redirect("/dashboard", 302);
 };

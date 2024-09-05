@@ -3,6 +3,7 @@ import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
 
+// https://astro.build/config
 export default defineConfig({
   prefetch: true,
   adapter: cloudflare({
@@ -11,16 +12,11 @@ export default defineConfig({
     },
   }),
   integrations: [tailwind(), react()],
-  output: "server",
+  output: "hybrid",
   vite: {
     ssr: {
-      external: ["node:crypto"],
+      external: ["node:buffer"],
       noExternal: ["@upstash/redis"],
-    },
-    resolve: {
-      alias: {
-        crypto: "crypto-browserify",
-      },
     },
     build: {
       minify: false,

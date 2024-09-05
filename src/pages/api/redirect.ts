@@ -1,9 +1,9 @@
-export const prerender = false;
-
 import { state } from "@/lib/utils";
 import { ratelimit } from "@/server/ratelimitter";
 import { signAccessToken } from "@/server/use-case/auth/token-use-cases";
 import type { APIRoute } from "astro";
+
+export const prerender = false;
 
 /**
  * Creating an State for the user and signing it to Cookies

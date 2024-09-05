@@ -21,9 +21,7 @@ export const prerender = false;
  */
 
 export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Promise<Response> => {
-  const { env } = locals.runtime;
-
-  const clientId = env.CLIENT_ID ?? import.meta.env.CLIENT_ID;
+  const clientId = import.meta.env.CLIENT_ID;
 
   try {
     const identifier =
@@ -42,7 +40,7 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
     const state = randomBytes(32).toString("hex");
     const jWTstate = await signAccessToken({ state });
 
-    const isProd = env.PROD ?? import.meta.env.PROD;
+    const isProd = import.meta.env.PROD;
     const domain = isProd ? "churchillexe.pages.dev" : "";
     cookies.set("state", jWTstate, {
       httpOnly: true,

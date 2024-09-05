@@ -3,7 +3,10 @@ import { Redis } from "@upstash/redis/cloudflare";
 
 // Create a new ratelimiter, that allows 10 requests per 10 seconds
 export const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
+  redis: Redis.fromEnv({
+    UPSTASH_REDIS_REST_URL: import.meta.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: import.meta.env.UPSTASH_REDIS_REST_TOKEN,
+  }),
   limiter: Ratelimit.slidingWindow(5, "60 s"),
   analytics: true,
   /**

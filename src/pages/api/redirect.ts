@@ -1,7 +1,9 @@
+export const prerender = false;
+
+import { state } from "@/lib/utils";
 import { ratelimit } from "@/server/ratelimitter";
 import { signAccessToken } from "@/server/use-case/auth/token-use-cases";
 import type { APIRoute } from "astro";
-import { randomBytes } from "crypto";
 
 /**
  * Creating an State for the user and signing it to Cookies
@@ -17,8 +19,6 @@ import { randomBytes } from "crypto";
  * @param {cookies,locals,redirect} - redirect for redirect, locals for env variable for cloudflare and cookies for signing HTTP-only cookie
  * @returns {Promise<Response>} - Redirects to login on failure, or to the callback URL on success
  */
-
-export const prerender = false;
 
 export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Promise<Response> => {
   const { env } = locals.runtime;
@@ -38,8 +38,6 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
       { status: 429 }
     );
   }
-
-  const state = randomBytes(32).toString("hex");
 
   const jWTstate = await signAccessToken({ state });
 

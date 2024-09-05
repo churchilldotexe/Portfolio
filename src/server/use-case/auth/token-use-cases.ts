@@ -1,5 +1,5 @@
 import { COOKIES_PROPERTIES, type COOKIES_PROPERTIES_TYPES } from "@/lib/constants";
-import type { AstroCookieGetOptions, AstroCookies } from "astro";
+import type { AstroCookies } from "astro";
 import { SignJWT, jwtVerify, decodeJwt } from "jose";
 
 const ACCESS_TOKEN_SECRET = new TextEncoder().encode(import.meta.env.ACCESS_TOKEN_SECRET);

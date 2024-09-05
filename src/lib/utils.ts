@@ -36,3 +36,23 @@ export async function fetcher<T extends z.ZodTypeAny>(
     });
   return data;
 }
+
+function getRandomBytes(length: number): Uint8Array {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return array;
+}
+
+// Usage:
+const randomBytes = getRandomBytes(16);
+export const state = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+
+// If you need it as a Buffer-like object:
+const bufferLike = {
+  toString: (encoding: string) => {
+    if (encoding === "hex") {
+      return state;
+    }
+    throw new Error("Unsupported encoding");
+  },
+};

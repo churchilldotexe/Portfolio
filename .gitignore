@@ -24,3 +24,4 @@ pnpm-debug.log*
 .idea/
 wrangler.toml
 .dev.vars
+.vercel/output

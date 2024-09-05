@@ -1,7 +1,7 @@
-import { state } from "@/lib/utils";
 import { ratelimit } from "@/server/ratelimitter";
 import { signAccessToken } from "@/server/use-case/auth/token-use-cases";
 import type { APIRoute } from "astro";
+import { randomBytes } from "node:crypto";
 
 export const prerender = false;
 
@@ -39,6 +39,7 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
       );
     }
 
+    const state = randomBytes(32).toString("hex");
     const jWTstate = await signAccessToken({ state });
 
     const isProd = env.PROD ?? import.meta.env.PROD;

@@ -1,11 +1,8 @@
-// import { clerkMiddleware, createRouteMatcher } from "@clerk/astro/server";
-//
-// const isProtectedRoute = createRouteMatcher(["/api(.*)"]);
-//
-// export const onRequest = clerkMiddleware((auth, context) => {
-//   const { redirectToSignIn, userId } = auth();
-//
-//   if (!userId && isProtectedRoute(context.request)) {
-//     return redirectToSignIn();
-//   }
-// });
+import { defineMiddleware } from "astro:middleware";
+import { getUserId } from "./server/use-case/auth/token-use-cases";
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  context.locals.userId = await getUserId(context.cookies);
+
+  return next();
+});

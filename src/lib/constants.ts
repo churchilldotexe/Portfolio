@@ -8,3 +8,10 @@ export const ACCEPTED_FILE_TYPE = [
   "image/webp",
   "image/bmp",
 ];
+
+export enum COOKIES_PROPERTIES {
+  STATE = "state",
+  USERID = "userId",
+}
+
+export type COOKIES_PROPERTIES_TYPES = `${COOKIES_PROPERTIES}`;

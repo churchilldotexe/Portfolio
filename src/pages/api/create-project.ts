@@ -4,17 +4,14 @@ import type { APIRoute } from "astro";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const formData = await request.formData();
 
-  // FIX: this after you setup the auth
-
-  const auth = locals.auth();
-  const userId = auth.userId;
-  if (userId === null) {
-    auth.redirectToSignIn();
+  const userId = locals.userId;
+  if (!userId) {
+    redirect("/api/redirect", 302);
   }
-  console.log(userId, "userid");
+
   const parsedData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
   if (parsedData.success === false) {
     const { image, liveSite, name, repository, description } =
@@ -31,6 +28,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       { status: 400 }
     );
   }
+
   const { description, name, image, liveSite: liveUrl, repository: repoUrl } = parsedData.data;
   await uploadProjectUseCase({
     image,
@@ -38,7 +36,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     liveUrl,
     repoUrl,
     description,
-    userId: auth.userId as string,
+    userId: userId as string,
   });
 
   return new Response(

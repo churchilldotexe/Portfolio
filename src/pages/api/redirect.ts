@@ -1,15 +1,60 @@
+import { ratelimit } from "@/server/ratelimitter";
+import { signAccessToken } from "@/server/use-case/auth/token-use-cases";
 import type { APIRoute } from "astro";
+import { randomBytes } from "crypto";
+
+/**
+ * Creating an State for the user and signing it to Cookies
+ *
+ * This endpoint supports  GET method and performs the following actions:
+ * 1. generate a crypto randombytes for unguessable string for security purposes
+ * 2. Generates a new access token for the state parameters and sets it as an HTTP-only cookie
+ * 3. Redirects to the github 0auth authorization
+ *
+ * Note: This endpoint has side effects (sets cookies) regardless of the HTTP method used.
+ * The GET method is maintained for compatibility with redirects and simple navigation.
+ *
+ * @param {cookies,locals,redirect} - redirect for redirect, locals for env variable for cloudflare and cookies for signing HTTP-only cookie
+ * @returns {Promise<Response>} - Redirects to login on failure, or to the callback URL on success
+ */
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ redirect, locals }) => {
+export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Promise<Response> => {
   const { env } = locals.runtime;
 
   const clientId = env.CLIENT_ID ?? import.meta.env.CLIENT_ID;
 
-  const url = `https://github.com/login/oauth/authorize?scope=user:email,read:user&client_id=${clientId}&state=imAstateOfYours`;
+  // to prevent redirect loop and request spam
+  const identifier =
+    request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip") ?? clientId;
+  const { success } = await ratelimit.limit(identifier);
 
-  // http://localhost:4321/?code=0ceb3578664246530667&state=imAstateOfYours
+  if (!success) {
+    return new Response(
+      JSON.stringify({
+        message: "Rate Limit reach Please wait for another 10mins",
+      }),
+      { status: 429 }
+    );
+  }
+
+  const state = randomBytes(32).toString("hex");
+
+  const jWTstate = await signAccessToken({ state });
+
+  const isProd = env.PROD ?? import.meta.env.PROD;
+  const domain = isProd ? "churchillexe.pages.dev" : "";
+  cookies.set("state", jWTstate, {
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 600,
+    path: "/",
+    secure: isProd,
+    domain,
+  });
+
+  const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&state=${state}`;
 
   return redirect(url, 302);
 };

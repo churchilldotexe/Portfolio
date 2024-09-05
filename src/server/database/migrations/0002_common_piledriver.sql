@@ -1,1 +1,0 @@
-ALTER TABLE "projects" ADD COLUMN "is_featured" boolean DEFAULT false NOT NULL;

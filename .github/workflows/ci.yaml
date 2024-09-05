@@ -16,6 +16,12 @@ jobs:
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       UPLOADTHING_SECRET: ${{ secrets.UPLOADTHING_SECRET }}
       UPLOADTHING_APP_ID: ${{ secrets.UPLOADTHING_APP_ID }}
+      ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+      REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_URL }}
 
     steps:
       - uses: actions/checkout@v3

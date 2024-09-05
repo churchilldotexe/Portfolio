@@ -13,9 +13,8 @@ export async function fetcher<T extends z.ZodTypeAny>(
 ) {
   const response = await fetch(url, init)
     .then(async (res) => {
-      const data = await res.json();
       if (!res.ok) {
-        throw new Error(`${res.status}: ${res.statusText}. ${data.message}`);
+        throw new Error(`${res.status}: ${res.statusText}.`);
       }
 
       return res;
@@ -26,7 +25,7 @@ export async function fetcher<T extends z.ZodTypeAny>(
 
   if (response instanceof Error) return response;
 
-  const rawData = await response
+  const data = await response
     .json()
     .then((resData) => {
       const parsedData = responseValidator.parse(resData) as z.infer<T>;
@@ -35,5 +34,5 @@ export async function fetcher<T extends z.ZodTypeAny>(
     .catch((e) => {
       return e instanceof Error ? e : new Error(e);
     });
-  return rawData;
+  return data;
 }

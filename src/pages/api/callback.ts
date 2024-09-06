@@ -1,18 +1,31 @@
-import { COOKIES_PROPERTIES } from "@/lib/constants";
+export const prerender = false;
+
+import { COOKIES_OPTIONS, COOKIES_PROPERTIES } from "@/lib/constants";
 import { ratelimit } from "@/server/ratelimitter";
 import { verifyAccessToken } from "@/server/use-case/auth/token-use-cases";
 import type { APIRoute } from "astro";
+import { z } from "zod";
 
 // TODO:
-// make sure to have a check for your scope params when you receive in case the user change it.
-// try REDIS for the in:memory unguessable state or do the http only cookie if you cant for the STATE
-// dont forget to remove the state from the HTTP ONLY COOKIES after authentication
 // check the database first if the user email/profile is already in the DB if already exist get the Refreshtoken
 // if no refresh token and/or invalid refresh token create a new one with a useridentifier (uuid perhaps )
 // then write the shortlived to the http only cookie
 // find out about the versioning that was mentioned
 
-export const prerender = false;
+const accessTokenSchema = z.object({
+  access_token: z.string().min(1),
+  token_type: z.string().min(1),
+  scope: z.string().min(1),
+});
+
+const responseReturn = (message: string, status: ResponseInit["status"]) => {
+  return new Response(
+    JSON.stringify({
+      message: message,
+    }),
+    { status }
+  );
+};
 
 export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Promise<Response> => {
   const githubUrl = new URL(request.url);
@@ -20,24 +33,18 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
   const stateParamsValue = githubUrl.searchParams.get("state");
 
   // to prevent redirect loop and request spam
-  const identifier =
-    request.headers.get("x-forwarded-for") ??
-    request.headers.get("cf-connecting-ip") ??
-    import.meta.env.CLIENT_ID;
+  const identifier = request.headers.get("X-Forwarded-For") ?? import.meta.env.CLIENT_ID;
+
   const { success } = await ratelimit.limit(identifier);
 
   if (!success) {
-    return new Response(
-      JSON.stringify({
-        message: "Rate Limit reach Please wait for another 10mins",
-      }),
-      { status: 429 }
-    );
+    return responseReturn("Rate Limit reach Please wait for another 10mins", 429);
   }
 
   const cookieValue = cookies.get(COOKIES_PROPERTIES.STATE)?.value;
   const verifiedCookie = await verifyAccessToken<{ state: string }>(cookieValue);
 
+  // for errors and redirect
   const logAndRedirect = (errorLogMessage: string): Response => {
     console.error(errorLogMessage);
     return redirect("/api/redirect", 302);
@@ -50,7 +57,7 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
 
   //to handle possible cross site attack redirect back to github auth
   if (stateParamsValue !== verifiedCookie.state) {
-    return logAndRedirect("invalid verifiedCookie");
+    return logAndRedirect("cookie mismatched verifiedCookie");
   }
 
   const response = await fetch("https://github.com/login/oauth/access_token", {
@@ -67,29 +74,26 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
   });
 
   if (!response.ok) {
-    throw new Error(`${response.status}: ${response.statusText}`);
+    return responseReturn(`${response.status}: ${response.statusText}`, 500);
   }
 
   //TODO: zod
-  const data = (await response.json()) as unknown as {
-    access_token: string;
-    token_type: string;
-    scope: string;
-  };
+  const data = (await response.json()) as unknown;
+  const parsedData = accessTokenSchema.parse(data);
 
   //to retry and get the correct scope and access_token
-  if (data.scope.toLowerCase() !== "user:email" || !data.access_token) {
-    return logAndRedirect("invalid verifiedCookie");
+  if (parsedData.scope.toLowerCase() !== "user:email" || !parsedData.access_token) {
+    return logAndRedirect("invalid access token and scope");
   }
 
   const userResponse = await fetch("https://api.github.com/user", {
     headers: {
-      Authorization: `${data.token_type} ${data.access_token}`,
+      Authorization: `${parsedData.token_type} ${parsedData.access_token}`,
     },
   });
 
   if (!userResponse.ok) {
-    throw new Error(`${userResponse.status}: ${userResponse.statusText}`);
+    return responseReturn(`${userResponse.status}: ${userResponse.statusText}`, 500);
   }
 
   //TODO: zod
@@ -97,27 +101,14 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
     email?: string;
     login: string;
     id: number;
-    avatar_url: string;
+    avatar_url?: string;
   };
 
   if (!userData.id) {
-    return new Response(
-      JSON.stringify({
-        message: "Unable to Authenticate the user",
-      }),
-      { status: 401 }
-    );
+    return responseReturn("Unable to Authenticate the user", 401);
   }
 
-  const isProd = import.meta.env.PROD;
-  const domain = isProd ? "churchillexe.pages.dev" : "";
-  cookies.delete(COOKIES_PROPERTIES.STATE, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: isProd,
-    domain,
-  });
+  cookies.delete(COOKIES_PROPERTIES.STATE, COOKIES_OPTIONS);
 
   return redirect("/dashboard", 302);
 };

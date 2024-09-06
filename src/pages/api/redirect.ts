@@ -1,3 +1,4 @@
+import { COOKIES_OPTIONS, COOKIES_PROPERTIES } from "@/lib/constants";
 import { ratelimit } from "@/server/ratelimitter";
 import { signAccessToken } from "@/server/use-case/auth/token-use-cases";
 import type { APIRoute } from "astro";
@@ -20,7 +21,7 @@ export const prerender = false;
  * @returns {Promise<Response>} - Redirects to login on failure, or to the callback URL on success
  */
 
-export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Promise<Response> => {
+export const GET: APIRoute = async ({ redirect, cookies, request }): Promise<Response> => {
   const clientId = import.meta.env.CLIENT_ID;
 
   try {
@@ -39,17 +40,7 @@ export const GET: APIRoute = async ({ redirect, locals, cookies, request }): Pro
 
     const state = randomBytes(32).toString("hex");
     const jWTstate = await signAccessToken({ state });
-
-    const isProd = import.meta.env.PROD;
-    const domain = isProd ? "churchillexe.pages.dev" : "";
-    cookies.set("state", jWTstate, {
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 600,
-      path: "/",
-      secure: isProd,
-      domain,
-    });
+    cookies.set(COOKIES_PROPERTIES.STATE, jWTstate, COOKIES_OPTIONS);
 
     const url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&state=${state}`;
 

@@ -6,7 +6,7 @@ export default defineConfig({
   out: "./src/server/database/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: import.meta.env.DRIZZLE_DATABASE_URL,
+    url: env.DRIZZLE_DATABASE_URL,
   },
   verbose: true,
   strict: true,

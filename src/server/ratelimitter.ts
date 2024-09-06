@@ -7,7 +7,7 @@ export const ratelimit = new Ratelimit({
     UPSTASH_REDIS_REST_URL: import.meta.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: import.meta.env.UPSTASH_REDIS_REST_TOKEN,
   }),
-  limiter: Ratelimit.slidingWindow(5, "60 s"),
+  limiter: Ratelimit.slidingWindow(5, "10 m"),
   analytics: true,
   /**
    * Optional prefix for the keys used in redis. This is useful if you want to share a redis

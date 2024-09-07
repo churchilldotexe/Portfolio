@@ -1,5 +1,5 @@
 {
-  "id": "ec0f4e4d-2b62-4c18-b58d-543ddafbfff1",
+  "id": "fb9350de-81ed-4556-81f0-27f81af22612",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -14,8 +14,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "uuid": {
-          "name": "uuid",
+        "project_id": {
+          "name": "project_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false,
@@ -100,30 +100,45 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "projects_project_id_index": {
+          "name": "projects_project_id_index",
+          "columns": [
+            {
+              "expression": "project_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "projects_user_id_users_uuid_fk": {
-          "name": "projects_user_id_users_uuid_fk",
+        "projects_user_id_users_userId_fk": {
+          "name": "projects_user_id_users_userId_fk",
           "tableFrom": "projects",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "uuid"
+            "userId"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "projects_uuid_unique": {
-          "name": "projects_uuid_unique",
+        "projects_project_id_unique": {
+          "name": "projects_project_id_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "uuid"
+            "project_id"
           ]
         }
       }
@@ -138,8 +153,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "uuid": {
-          "name": "uuid",
+        "userId": {
+          "name": "userId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false,
@@ -180,7 +195,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": 0
+          "default": 1
         },
         "created_at": {
           "name": "created_at",
@@ -198,11 +213,11 @@
         }
       },
       "indexes": {
-        "users_uuid_index": {
-          "name": "users_uuid_index",
+        "users_userId_index": {
+          "name": "users_userId_index",
           "columns": [
             {
-              "expression": "uuid",
+              "expression": "userId",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -217,11 +232,11 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_uuid_unique": {
-          "name": "users_uuid_unique",
+        "users_userId_unique": {
+          "name": "users_userId_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "uuid"
+            "userId"
           ]
         },
         "users_auth_id_unique": {

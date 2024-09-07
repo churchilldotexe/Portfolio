@@ -8,7 +8,7 @@ const projects = pgTable(
   "projects",
   {
     id: serial("id").primaryKey(),
-    uuid: uuid("uuid")
+    projectId: uuid("project_id")
       .default(sql`gen_random_uuid()`)
       .unique(),
     name: varchar("name", { length: 255 }).notNull(),
@@ -19,18 +19,19 @@ const projects = pgTable(
     imageUrl: varchar("image_url", { length: 255 }).notNull(),
     imageKey: varchar("image_key", { length: 255 }).notNull(),
     userId: uuid("user_id")
-      .references(() => users.uuid)
+      .references(() => users.userId, { onDelete: "cascade", onUpdate: "cascade" })
       .notNull(),
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
   },
   (table) => ({
     userIdIndex: index().on(table.userId),
+    projectIdIndex: index().on(table.projectId),
   })
 );
 
 export const projectRelations = relations(projects, ({ one }) => ({
-  user: one(users, { fields: [projects.userId], references: [users.uuid] }),
+  user: one(users, { fields: [projects.userId], references: [users.userId] }),
 }));
 
 export const insertProjectsSchema = createInsertSchema(projects);

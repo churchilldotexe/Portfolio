@@ -5,12 +5,12 @@ import { SignJWT, jwtVerify, decodeJwt } from "jose";
 const ACCESS_TOKEN_SECRET = new TextEncoder().encode(import.meta.env.ACCESS_TOKEN_SECRET);
 const REFRESH_TOKEN_SECRET = new TextEncoder().encode(import.meta.env.REFRESH_TOKEN_SECRET);
 
-export async function signAccessToken<T extends Record<string, string>>(
+export async function signAccessToken<T extends Record<string, unknown>>(
   signingPayload: T
 ): Promise<string> {
   const signedJWT = await new SignJWT(signingPayload)
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("10 mins")
+    .setExpirationTime("15 mins")
     .sign(ACCESS_TOKEN_SECRET);
 
   return signedJWT;
@@ -27,9 +27,9 @@ export async function verifyAccessToken<T extends Record<string, unknown>>(
   }
 }
 
-type RefreshTokenTypes = { userId: string; version: number };
+export type RefreshTokenTypes = { userId: string; version: number };
 
-export async function signRefreshToken({ version, userId }: RefreshTokenTypes) {
+export async function signRefreshToken({ version, userId }: RefreshTokenTypes): Promise<string> {
   const signedRefreshJWT = await new SignJWT({ userId, version })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("30 days")
@@ -58,7 +58,7 @@ export async function decodeToken<T extends Record<string, unknown>>(
 }
 
 export async function getUserId(cookies: AstroCookies) {
-  const userInfo = cookies.get(COOKIES_PROPERTIES.USERID)?.value as COOKIES_PROPERTIES_TYPES;
+  const userInfo = cookies.get(COOKIES_PROPERTIES.ACCESSTOKEN)?.value as COOKIES_PROPERTIES_TYPES;
   if (!userInfo) {
     return undefined;
   }

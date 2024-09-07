@@ -13,7 +13,7 @@ export const ACCEPTED_FILE_TYPE = [
 
 export enum COOKIES_PROPERTIES {
   STATE = "state",
-  USERID = "userId",
+  ACCESSTOKEN = "accessToken",
 }
 
 export type COOKIES_PROPERTIES_TYPES = `${COOKIES_PROPERTIES}`;

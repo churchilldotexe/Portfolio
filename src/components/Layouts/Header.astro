@@ -26,11 +26,40 @@ const pageLinks = [
 ];
 ---
 
-<nav class="relative flex w-full items-center justify-center p-2 md:justify-between">
-  <div class="hidden text-muted hover:underline md:block">
+<script>
+  let currScollPos: number = 0;
+
+  document.addEventListener("scroll", () => {
+    if (window.screen.width < 640) {
+      console.log(document.documentElement.scrollTop, "scrollTop");
+      const scrollTop = document.documentElement.scrollTop;
+      if (scrollTop > currScollPos) {
+        document.documentElement.style.setProperty("--translate-y", "-100px");
+        currScollPos = scrollTop;
+      } else {
+        document.documentElement.style.setProperty("--translate-y", "0");
+        currScollPos = scrollTop;
+      }
+    }
+  });
+</script>
+
+<!-- TODO: handle the mobile user. add the hide when scroll down and show when scroll up. add a side bar(burger button) if needed-->
+<nav
+  class:list={[
+    "-transition-90-custom sticky top-0 z-10 flex w-full items-center justify-center pt-2  ",
+    "md:justify-between  ",
+  ]}
+  id="nav"
+>
+  <div
+    class="hidden pl-4 text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))] hover:underline md:block"
+  >
     <a href="/dashboard">&larr; dashboard </a>
   </div>
-  <ul class="flex w-fit rounded-md px-4 shadow-elevate-light dark:shadow-elevate-dark">
+  <ul
+    class="flex w-fit rounded-md bg-background/85 px-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark"
+  >
     {
       pageLinks.map((link) => (
         <li
@@ -53,3 +82,18 @@ const pageLinks = [
     }
   </ul>
 </nav>
+
+<style>
+  @property --translate-y {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 0;
+  }
+
+  @media (max-width: 640px) {
+    .-transition-90-custom {
+      transition: transform 0.3s ease-in-out;
+      transform: translateY(var(--translate-y));
+    }
+  }
+</style>

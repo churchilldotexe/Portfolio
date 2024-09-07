@@ -31,7 +31,6 @@ const pageLinks = [
 
   document.addEventListener("scroll", () => {
     if (window.screen.width < 640) {
-      console.log(document.documentElement.scrollTop, "scrollTop");
       const scrollTop = document.documentElement.scrollTop;
       if (scrollTop > currScollPos) {
         document.documentElement.style.setProperty("--translate-y", "-100px");

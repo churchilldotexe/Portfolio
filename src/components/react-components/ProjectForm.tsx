@@ -24,7 +24,7 @@ const PROJECT_INPUT_DATA = [
   },
 ] as const;
 
-export default function ProjectForm() {
+export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [responseMessage, setResponseMessage] = useState("");
   const [objectUrls, setObjectUrls] = useState<string[]>([]);
   const [formErrorMessage, setFormErrorMessage] = useState<CreateProjectPostType>({
@@ -165,13 +165,12 @@ export default function ProjectForm() {
           {formErrorMessage["description"]}
         </ErrorMessage>
       </fieldset>
-      {/* <SignedOut> */}
-      {/*   <SignInButton /> */}
-      {/* </SignedOut> */}
-      {/**/}
-      {/* <SignedIn> */}
-      {/*   <button type="submit">submit</button> */}
-      {/* </SignedIn> */}
+      {isLoggedIn ? (
+        <button type="submit">submit</button>
+      ) : (
+        <a href="/api/redirect"> github signin</a>
+      )}
+
       {responseMessage && <p>{responseMessage}</p>}
     </Form>
   );

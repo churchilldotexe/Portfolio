@@ -8,9 +8,12 @@ import {
   decodeToken,
   signAccessToken,
   signRefreshToken,
+  verifyAccessToken,
   verifyRefreshToken,
 } from "./token-use-cases";
 import { ZodError } from "zod";
+import type { AstroCookies } from "astro";
+import { COOKIES_PROPERTIES } from "@/lib/constants";
 
 type ValidateUserType = {
   email?: string | null;
@@ -96,4 +99,13 @@ export async function refreshAccessToken(token: string) {
   });
 
   return signedAccessTokenJWT;
+}
+
+export async function getUserId(cookies: AstroCookies) {
+  const userInfo = cookies.get(COOKIES_PROPERTIES.ACCESSTOKEN)?.value;
+  const userId = await verifyAccessToken<AccessTokenTypes>(userInfo);
+  if (!userInfo) {
+    return undefined;
+  }
+  return userId?.userId;
 }

@@ -1,5 +1,3 @@
-import { COOKIES_PROPERTIES, type COOKIES_PROPERTIES_TYPES } from "@/lib/constants";
-import type { AstroCookies } from "astro";
 import { SignJWT, jwtVerify, decodeJwt } from "jose";
 
 const ACCESS_TOKEN_SECRET = new TextEncoder().encode(import.meta.env.ACCESS_TOKEN_SECRET);
@@ -56,14 +54,3 @@ export async function decodeToken<T extends Record<string, unknown>>(
     return;
   }
 }
-
-export async function getUserId(cookies: AstroCookies) {
-  const userInfo = cookies.get(COOKIES_PROPERTIES.ACCESSTOKEN)?.value as COOKIES_PROPERTIES_TYPES;
-  if (!userInfo) {
-    return undefined;
-  }
-  return userInfo;
-}
-
-// TODO: setup JWT write, verify and other stuff.
-// for Refresh token dont forget to add the refresh token versioning.. refer again in the vid for more info.

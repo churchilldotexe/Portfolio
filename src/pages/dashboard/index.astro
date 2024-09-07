@@ -1,10 +1,15 @@
 ---
+export const prerender = false;
+
 import ProjectForm from "@/components/react-components/ProjectForm";
 import Layout from "../../layouts/Layout.astro";
+const userId = Astro.locals.userId;
+
+const isLoggedIn = userId ? true : false;
 ---
 
 <Layout title="Welcome to Dashboard ">
   <section class="flex size-full flex-col items-center justify-center gap-4">
-    <ProjectForm client:load />
+    <ProjectForm client:load isLoggedIn={isLoggedIn} />
   </section>
 </Layout>

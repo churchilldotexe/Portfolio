@@ -13,8 +13,26 @@ const projectArr = [
 ];
 ---
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const projectDiv = document.getElementById("project-section");
+    if (projectDiv) {
+      projectDiv.addEventListener("mousemove", (event) => {
+        const x = event.x;
+        const y = event.y;
+
+        projectDiv.style.setProperty("--mouse-x", `${x}px`);
+        projectDiv.style.setProperty("--mouse-y", `${y}px`);
+      });
+    }
+  });
+</script>
+
 <Layout title="Projects">
-  <section class="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4 p-4">
+  <section
+    class="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4 p-4"
+    id="project-section"
+  >
     {
       projectArr.map(({ id, profileImg, projectName, description }) => (
         <ProjectCard
@@ -23,8 +41,32 @@ const projectArr = [
           profileImg={profileImg}
           projectName={projectName}
           cardId={id}
+          class:list="bg-radial"
         />
       ))
     }
   </section>
 </Layout>
+
+<style>
+  @property --mouse-x {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 50%;
+  }
+
+  @property --mouse-y {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 50%;
+  }
+
+  .bg-radial {
+    background-attachment: fixed;
+    background-image: radial-gradient(
+      10rem circle at var(--mouse-x) var(--mouse-y),
+      red,
+      transparent
+    );
+  }
+</style>

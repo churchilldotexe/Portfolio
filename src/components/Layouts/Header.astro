@@ -30,13 +30,14 @@ const pageLinks = [
   let currScollPos: number = 0;
 
   document.addEventListener("scroll", () => {
-    if (window.screen.width < 640) {
+    const nav = document.getElementById("nav");
+    if (nav && window.screen.width < 640) {
       const scrollTop = document.documentElement.scrollTop;
       if (scrollTop > currScollPos) {
-        document.documentElement.style.setProperty("--translate-y", "-100px");
+        nav.style.setProperty("--translate-y", "-100px");
         currScollPos = scrollTop;
       } else {
-        document.documentElement.style.setProperty("--translate-y", "0");
+        nav.style.setProperty("--translate-y", "0");
         currScollPos = scrollTop;
       }
     }
@@ -46,26 +47,24 @@ const pageLinks = [
 <!-- TODO: handle the mobile user. add the hide when scroll down and show when scroll up. add a side bar(burger button) if needed-->
 <nav
   class:list={[
-    "-transition-90-custom sticky top-0 z-10 flex w-full items-center justify-center pt-2  ",
-    "md:justify-between  ",
+    "-transition-90-custom sticky top-0 z-10 flex w-full items-center justify-center p-2",
+    "md:justify-between dark:shadow-elevate-dark shadow-elevate-light bg-background/85 backdrop-blur",
   ]}
   id="nav"
 >
   <div
-    class="hidden pl-4 text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))] hover:underline md:block"
+    class="hidden text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))] hover:underline md:block"
   >
     <a href="/dashboard">&larr; dashboard </a>
   </div>
-  <ul
-    class="flex w-fit rounded-md bg-background/85 px-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark"
-  >
+  <ul class="flex w-fit rounded-md px-4">
     {
       pageLinks.map((link) => (
         <li
           class:list={[
             "flex-1 max-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform ",
             {
-              "relative rounded-t-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset":
+              "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset":
                 pathname === `${link.href}`,
             },
             {

@@ -35,14 +35,20 @@ const projectArr = [
   >
     {
       projectArr.map(({ id, profileImg, projectName, description }) => (
-        <ProjectCard
-          description={description}
-          projectName={projectName}
-          profileImg={profileImg}
-          projectName={projectName}
-          cardId={id}
-          class:list="bg-radial"
-        />
+        <div
+          class:list={[
+            "rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
+          ]}
+        >
+          <ProjectCard
+            description={description}
+            projectName={projectName}
+            profileImg={profileImg}
+            projectName={projectName}
+            cardId={id}
+            class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+          />
+        </div>
       ))
     }
   </section>
@@ -51,22 +57,47 @@ const projectArr = [
 <style>
   @property --mouse-x {
     syntax: "<length>";
-    inherits: true;
+    inherits: false;
     initial-value: 50%;
   }
 
   @property --mouse-y {
     syntax: "<length>";
-    inherits: true;
+    inherits: false;
     initial-value: 50%;
   }
 
-  .bg-radial {
-    background-attachment: fixed;
-    background-image: radial-gradient(
-      10rem circle at var(--mouse-x) var(--mouse-y),
-      red,
-      transparent
-    );
+  @media (hover: hover) {
+    .bg-radial-front {
+      background-image: radial-gradient(
+        8rem circle at var(--mouse-x) var(--mouse-y),
+        hsl(var(--foreground) / 0.1),
+        hsl(var(--foreground) / 0.0125)
+      );
+    }
+
+    .bg-radial::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background-attachment: fixed;
+      background-image: radial-gradient(
+        circle at var(--mouse-x) var(--mouse-y),
+        hsl(var(--primary)),
+        transparent 10rem
+      );
+      pointer-events: none;
+      z-index: -1;
+    }
+  }
+
+  @media (hover: none) {
+    .bg-radial::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      z-index: -1;
+    }
   }
 </style>

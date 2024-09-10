@@ -2,6 +2,8 @@
 import { Image } from "astro:assets";
 import type { HTMLAttributes } from "astro/types";
 import { GithubIcon, VercelIcon } from "./svg/SocialIcons";
+import { Globe } from "lucide-react";
+import Dialog from "./react-components/Dialog";
 
 type Props = {
   cardId: number;
@@ -50,8 +52,9 @@ const {
                      transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
                      active:animate-ping"
     >
-      <VercelIcon className="size-6 fill-foreground" />
+      <Globe className="size-6 text-foreground " />
       live site
     </a>
+    <slot />
   </div>
 </div>

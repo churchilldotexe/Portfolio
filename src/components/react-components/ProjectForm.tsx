@@ -1,7 +1,7 @@
 import { projectPostSchema, projectFormSchema, type CreateProjectPostType } from "@/lib/schema";
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { ACCEPTED_FILE_TYPE } from "@/lib/constants";
 import { ImagePlus } from "lucide-react";
 
@@ -34,6 +34,7 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
     liveSite: "",
     image: "",
   });
+  const [isPending, startTransition] = useTransition();
 
   const handleImageChange = (fileList: FileList | null) => {
     if (fileList === null) {
@@ -168,7 +169,17 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
       {isLoggedIn ? (
         <button type="submit">submit</button>
       ) : (
-        <a href="/api/redirect"> github signin</a>
+        <a
+          href="/api/redirect"
+          onClick={(e) => {
+            e.preventDefault();
+            startTransition(() => {
+              // use fetch here to redirect the /api/redirect but cant since starttransition can only be synchronous
+            });
+          }}
+        >
+          github signin
+        </a>
       )}
 
       {responseMessage && <p>{responseMessage}</p>}

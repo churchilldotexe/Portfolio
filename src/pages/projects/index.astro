@@ -2,7 +2,7 @@
 import ProjectCard from "@/components/ProjectCard.astro";
 import Layout from "../../layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
-import Dialog from "@/components/react-components/Dialog";
+import { Dialog, DialogButton } from "@/components/react-components/Dialog";
 
 const projectArr = [
   { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
@@ -41,6 +41,15 @@ const projectArr = [
             "rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
           ]}
         >
+          <DialogButton client:load className="w-full">
+            <ProjectCard
+              description={description}
+              projectName={projectName}
+              profileImg={profileImg}
+              cardId={id}
+              class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+            />
+          </DialogButton>
           <Dialog className="backdrop:bg-background/50" client:load>
             <ProjectCard
               description={description}
@@ -48,7 +57,7 @@ const projectArr = [
               profileImg={profileImg}
               cardId={id}
               class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
-            ></ProjectCard>
+            />
           </Dialog>
         </div>
       ))

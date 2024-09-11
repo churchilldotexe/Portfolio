@@ -1,5 +1,5 @@
 import { atom } from "nanostores";
-import React, { useRef, useEffect, type ComponentProps, type ElementRef } from "react";
+import React, { useRef, useEffect, type ComponentProps, type ElementRef, useCallback } from "react";
 import { useStore } from "@nanostores/react";
 
 const dialogState = atom<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null });
@@ -21,7 +21,7 @@ export function DialogButton({
       history.back();
     } else {
       openDialog(dialogId);
-      history.pushState(null, "", "/contact");
+      history.pushState(null, "", `/projects/${dialogId}`);
     }
   };
 
@@ -34,19 +34,20 @@ export function DialogButton({
 
 // Dialog component
 export function Dialog({ children, id, ...props }: ComponentProps<"dialog"> & { id: string }) {
-  const dialogRef = useRef<ElementRef<"dialog">>(null);
   const { isOpen, id: openDialogId } = useStore(dialogState);
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (dialog) {
-      if (isOpen && openDialogId === id) {
-        dialog.showModal();
-      } else {
-        dialog.close();
+  const dialogRef = useCallback(
+    (node: HTMLDialogElement | null) => {
+      if (node) {
+        if (isOpen && openDialogId === id) {
+          node.showModal();
+        } else {
+          node.close();
+        }
       }
-    }
-  }, [isOpen, openDialogId, id]);
+    },
+    [isOpen, openDialogId, id]
+  );
 
   const handleDialogClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     if (e.currentTarget === e.target) {

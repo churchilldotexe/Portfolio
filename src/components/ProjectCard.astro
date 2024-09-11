@@ -5,39 +5,51 @@ import { GithubIcon } from "./svg/SocialIcons";
 import { Globe } from "lucide-react";
 
 type Props = {
-  cardId: number;
-  profileImg: ImageMetadata;
+  cardId: string;
+  profileImg: ImageMetadata["src"];
   projectName: string;
   description: string;
+  showDetails?: boolean;
+  repoUrl: string;
+  siteUrl: string;
 } & HTMLAttributes<"div">;
 
 const {
+  showDetails = false,
   description,
   projectName,
   profileImg,
   id,
+  repoUrl,
+  siteUrl,
   class: className,
   "class:list": classList,
   ...props
 } = Astro.props;
 ---
 
-<script></script>
-
 <div
   class:list={[
     "p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark",
+    { "gap-2": showDetails },
     className,
     classList,
   ]}
   {...props}
 >
-  <Image class="rounded-lg" src={profileImg} alt="sample page" />
-  <h3 class="mb-2 mt-4 text-xl font-bold capitalize">{projectName}</h3>
-  <p class="mb-2 leading-6">{description}</p>
+  <Image
+    class:list={["rounded-lg", { "md:w-[85%]": showDetails }]}
+    src={profileImg}
+    alt="sample page"
+    inferSize={true}
+  />
+  <h3 class:list={["mb-2 mt-4 text-xl font-bold capitalize", { "md:text-3xl": showDetails }]}>
+    {projectName}
+  </h3>
+  <p class:list={["mb-2 leading-6", { "md:text-md": showDetails }]}>{description}</p>
   <div class="flex items-center gap-8">
     <a
-      href="#"
+      href={repoUrl}
       target="_blank"
       class="flex items-center justify-start gap-2 text-lg
                      transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
@@ -47,7 +59,7 @@ const {
       repository
     </a>
     <a
-      href="#"
+      href={siteUrl}
       target="_blank"
       class="flex items-center justify-start gap-2 text-lg
                      transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
@@ -56,6 +68,5 @@ const {
       <Globe className="size-6 text-foreground " />
       live site
     </a>
-    <slot />
   </div>
 </div>

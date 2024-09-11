@@ -22,6 +22,7 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      USER_ID: ${{ secrets.USER_ID }}
 
     steps:
       - uses: actions/checkout@v3

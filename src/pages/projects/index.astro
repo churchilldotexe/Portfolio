@@ -3,8 +3,13 @@ import ProjectCard from "@/components/ProjectCard.astro";
 import Layout from "../../layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
 import { Dialog, DialogButton } from "@/components/react-components/Dialog";
+import { getAllProjects } from "@/server/use-case/project";
 
-const projectArr = [
+const project = await getAllProjects();
+
+console.log(project);
+
+export const projectArr = [
   { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
   { id: 2, profileImg, projectName: "Project 2", description: "Project description" },
   { id: 3, profileImg, projectName: "Project 3", description: "Project description" },
@@ -35,27 +40,31 @@ const projectArr = [
     id="project-section"
   >
     {
-      projectArr.map(({ id, profileImg, projectName, description }) => (
+      project.map(({ name, description, liveUrl, repoUrl, imageUrl, imageKey }) => (
         <div
           class:list={[
             "rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
           ]}
         >
-          <DialogButton client:load className="w-full">
+          <DialogButton client:load dialogId={imageKey} className="w-full">
             <ProjectCard
               description={description}
-              projectName={projectName}
-              profileImg={profileImg}
-              cardId={id}
+              repoUrl={repoUrl}
+              siteUrl={liveUrl}
+              projectName={name}
+              profileImg={imageUrl}
+              cardId={imageKey}
               class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
             />
           </DialogButton>
-          <Dialog className="backdrop:bg-background/50" client:load>
+          <Dialog className="backdrop:bg-background/50" id={imageKey} client:load>
             <ProjectCard
+              repoUrl={repoUrl}
+              siteUrl={liveUrl}
               description={description}
-              projectName={projectName}
-              profileImg={profileImg}
-              cardId={id}
+              projectName={name}
+              profileImg={imageUrl}
+              cardId={imageKey}
               class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
             />
           </Dialog>

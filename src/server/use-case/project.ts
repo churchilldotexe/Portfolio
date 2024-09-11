@@ -4,6 +4,7 @@ import { UTApi } from "uploadthing/server";
 import {
   getAllProjectsFromDB,
   getFeaturedProjectFromDB,
+  getMyProjectFromDb,
   uploadProjectToDB,
 } from "../data-access/project";
 
@@ -51,18 +52,26 @@ type GetProjectReturnedTypes = {
   repoUrl: string;
   liveUrl: string;
   imageUrl: string;
+  imageKey: string;
 };
 
 export async function getFeaturedProjectUseCase(): Promise<GetProjectReturnedTypes[]> {
-  const userId = "userid"; //prototype
+  const userId = import.meta.env.USER_ID;
 
   const featuredProject = await getFeaturedProjectFromDB(userId);
   return featuredProject;
 }
 
 export async function getAllProjects(): Promise<GetProjectReturnedTypes[]> {
-  const userId = "userid"; //prototype
+  const userId = import.meta.env.USER_ID;
 
   const featuredProject = await getAllProjectsFromDB(userId);
+  return featuredProject;
+}
+
+export async function getSpecificProjectUseCase(
+  imageKey: string | undefined
+): Promise<GetProjectReturnedTypes | undefined> {
+  const featuredProject = await getMyProjectFromDb(imageKey);
   return featuredProject;
 }

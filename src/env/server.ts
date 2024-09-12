@@ -10,6 +10,7 @@ export const env = createEnv({
     CLIENT_SECRET: z.string().min(1),
     ACCESS_TOKEN_SECRET: z.string().min(1),
     REFRESH_TOKEN_SECRET: z.string().min(1),
+    USER_ID: z.string().min(1),
   },
   runtimeEnv: process.env,
 });

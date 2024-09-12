@@ -1,0 +1,39 @@
+---
+export const prerender = false;
+
+import { getSpecificProjectUseCase } from "@/server/use-case/project";
+import Layout from "../../layouts/Layout.astro";
+import ProjectCard from "@/components/ProjectCard.astro";
+
+const { projectId } = Astro.params;
+
+const project = await getSpecificProjectUseCase(projectId);
+
+if (!project) {
+  return Astro.rewrite("/404");
+}
+---
+
+<script>
+  // will simulate MPA popstate which will reload the page instead
+  window.addEventListener("popstate", () => {
+    if (location.pathname.includes("projects")) {
+      location.reload();
+    }
+  });
+</script>
+
+<Layout title="My Project">
+  <section class="mx-auto max-w-3xl gap-4 shadow-elevate-light dark:shadow-elevate-dark">
+    <ProjectCard
+      repoUrl={project.repoUrl}
+      siteUrl={project.liveUrl}
+      description={project.description}
+      projectName={project.name}
+      profileImg={project.imageUrl}
+      cardId={project.imageUrl}
+      showDetails={true}
+      class:list="flex items-center justify-center flex-col w-full bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+    />
+  </section>
+</Layout>

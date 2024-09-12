@@ -6,9 +6,24 @@ import ProjectCard from "@/components/ProjectCard.astro";
 import { CircleChevronRight, CircleChevronLeft } from "lucide-react";
 
 const project = [
-  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
-  { id: 1, profileImg, projectName: "Project 2", description: "Project description" },
-  { id: 1, profileImg, projectName: "Project 3", description: "Project description" },
+  {
+    id: 1,
+    profileImg: "https://utfs.io/f/d5016ebf-5a5b-440e-b626-a5dadab0e057-23w7.jpg",
+    projectName: "Project 1",
+    description: "Project description",
+  },
+  {
+    id: 1,
+    profileImg: "https://utfs.io/f/d5016ebf-5a5b-440e-b626-a5dadab0e057-23w7.jpg",
+    projectName: "Project 2",
+    description: "Project description",
+  },
+  {
+    id: 1,
+    profileImg: "https://utfs.io/f/d5016ebf-5a5b-440e-b626-a5dadab0e057-23w7.jpg",
+    projectName: "Project 3",
+    description: "Project description",
+  },
 ];
 ---
 
@@ -85,7 +100,9 @@ const project = [
           {
             project.map((value, index) => (
               <ProjectCard
-                cardId={value.id}
+                repoUrl="http://as.com"
+                siteUrl="http://as.com"
+                cardId={value.id.toString()}
                 projectName={value.projectName}
                 description={value.description}
                 profileImg={value.profileImg}

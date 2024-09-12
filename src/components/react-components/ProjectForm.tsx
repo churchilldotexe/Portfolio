@@ -168,7 +168,7 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
       {isLoggedIn ? (
         <button type="submit">submit</button>
       ) : (
-        <a href="/api/redirect"> github signin</a>
+        <a href="/api/redirect">github signin</a>
       )}
 
       {responseMessage && <p>{responseMessage}</p>}

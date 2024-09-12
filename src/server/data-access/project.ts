@@ -25,7 +25,7 @@ export async function uploadProjectToDB(uploadData: InsertProjectTypes): Promise
 
 type GetProjectReturnedTypes = Pick<
   SelectProjectTypes,
-  "name" | "imageUrl" | "repoUrl" | "description" | "liveUrl"
+  "name" | "imageUrl" | "repoUrl" | "description" | "liveUrl" | "imageKey"
 >;
 
 export async function getFeaturedProjectFromDB(userId: string): Promise<GetProjectReturnedTypes[]> {
@@ -36,6 +36,7 @@ export async function getFeaturedProjectFromDB(userId: string): Promise<GetProje
       repoUrl: projects.repoUrl,
       liveUrl: projects.repoUrl,
       imageUrl: projects.imageUrl,
+      imageKey: projects.imageKey,
     })
     .from(projects)
     .where(and(eq(projects.userId, userId), eq(projects.isFeatured, true)))
@@ -52,10 +53,28 @@ export async function getAllProjectsFromDB(userId: string): Promise<GetProjectRe
       repoUrl: projects.repoUrl,
       liveUrl: projects.repoUrl,
       imageUrl: projects.imageUrl,
+      imageKey: projects.imageKey,
     })
     .from(projects)
     .where(eq(projects.userId, userId))
     .orderBy(projects.updatedAt);
 
+  return projectData;
+}
+
+export async function getMyProjectFromDb(
+  imageKey: string | undefined
+): Promise<GetProjectReturnedTypes | undefined> {
+  const projectData = await db.query.projects.findFirst({
+    columns: {
+      name: true,
+      description: true,
+      repoUrl: true,
+      liveUrl: true,
+      imageUrl: true,
+      imageKey: true,
+    },
+    where: (project, { eq }) => eq(project.imageKey, imageKey as string),
+  });
   return projectData;
 }

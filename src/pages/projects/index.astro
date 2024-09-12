@@ -1,19 +1,9 @@
 ---
 import ProjectCard from "@/components/ProjectCard.astro";
 import Layout from "../../layouts/Layout.astro";
-import profileImg from "@/assets/profile.png";
 import { getAllProjects } from "@/server/use-case/project";
 
 const project = await getAllProjects();
-
-export const projectArr = [
-  { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
-  { id: 2, profileImg, projectName: "Project 2", description: "Project description" },
-  { id: 3, profileImg, projectName: "Project 3", description: "Project description" },
-  { id: 4, profileImg, projectName: "Project 4", description: "Project description" },
-  { id: 5, profileImg, projectName: "Project 5", description: "Project description" },
-  { id: 6, profileImg, projectName: "Project 6", description: "Project description" },
-];
 ---
 
 <script>
@@ -21,6 +11,7 @@ export const projectArr = [
     const projectDiv = document.getElementById("project-section") as HTMLElement;
     if (projectDiv) {
       projectDiv.addEventListener("mousemove", (event) => {
+        const rect = projectDiv.getBoundingClientRect();
         const x = event.clientX;
         const y = event.clientY;
 
@@ -35,8 +26,14 @@ export const projectArr = [
           if (openButton) {
             const dialog = openButton.nextElementSibling as HTMLDialogElement;
             const dialogId = dialog.id;
+
             if (dialog && dialog.tagName === "DIALOG") {
               history.pushState(null, "", `/projects/${dialogId}`);
+
+              const rect = openButton.getBoundingClientRect();
+              dialog.style.setProperty("--click-x", `${rect.left}px`);
+              dialog.style.setProperty("--click-y", `${rect.top}px`);
+
               dialog.showModal();
             }
           }
@@ -50,6 +47,8 @@ export const projectArr = [
             target.closest("dialog")?.close();
             history.back();
           }
+          console.log(target.clientTop, "y");
+          console.log(target.clientLeft, "x");
         }
       });
     }
@@ -65,10 +64,10 @@ export const projectArr = [
       project.map(({ name, description, liveUrl, repoUrl, imageUrl, imageKey }) => (
         <div
           class:list={[
-            "  rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
+            "rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:hover:mix-blend-multiply after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
           ]}
         >
-          <button class="open-dialog">
+          <button class="btn-animate open-dialog size-full ">
             <ProjectCard
               description={description}
               repoUrl={repoUrl}
@@ -76,10 +75,13 @@ export const projectArr = [
               projectName={name}
               profileImg={imageUrl}
               cardId={imageKey}
-              class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+              class:list="  bg-radial-front hover:filter rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
             />
           </button>
-          <dialog id={imageKey}>
+          <dialog
+            id={imageKey}
+            class=" dialog-animate mx-auto max-w-3xl gap-4 rounded-md shadow-elevate-light backdrop:bg-background/15 backdrop:backdrop-blur-sm dark:shadow-elevate-dark"
+          >
             <ProjectCard
               description={description}
               repoUrl={repoUrl}
@@ -87,11 +89,12 @@ export const projectArr = [
               projectName={name}
               profileImg={imageUrl}
               cardId={imageKey}
-              class:list="  bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
-            />
-            <button id={imageKey} class="close-dialog">
-              close
-            </button>
+              class:list=" rounded-md bg-background bg-fixed shadow-none dark:shadow-none  gap-2"
+            >
+              <button id={imageKey} class="close-dialog self-start">
+                &larr; go back
+              </button>
+            </ProjectCard>
           </dialog>
         </div>
       ))
@@ -112,7 +115,29 @@ export const projectArr = [
     initial-value: 50%;
   }
 
+  @property --click-x {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 50%;
+  }
+
+  @property --click-y {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 50%;
+  }
+
   @media (hover: hover) {
+    .dialog-animate {
+      transition-property: translate scale;
+      transition-duration: 0.5s;
+      transition-timing-function: ease-in-out;
+      @starting-style {
+        translate: calc(var(--click-x) - 50%) calc(var(--click-y) - 50%);
+        scale: 0.5;
+      }
+    }
+
     .bg-radial-front {
       background-image: radial-gradient(
         8rem circle at var(--mouse-x) var(--mouse-y),

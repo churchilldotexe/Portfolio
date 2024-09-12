@@ -11,7 +11,6 @@ const project = await getAllProjects();
     const projectDiv = document.getElementById("project-section") as HTMLElement;
     if (projectDiv) {
       projectDiv.addEventListener("mousemove", (event) => {
-        const rect = projectDiv.getBoundingClientRect();
         const x = event.clientX;
         const y = event.clientY;
 

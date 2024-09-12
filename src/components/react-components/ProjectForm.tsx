@@ -1,7 +1,7 @@
 import { projectPostSchema, projectFormSchema, type CreateProjectPostType } from "@/lib/schema";
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
-import { useState, useTransition, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { ACCEPTED_FILE_TYPE } from "@/lib/constants";
 import { ImagePlus } from "lucide-react";
 

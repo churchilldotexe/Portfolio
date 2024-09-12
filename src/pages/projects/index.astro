@@ -2,12 +2,9 @@
 import ProjectCard from "@/components/ProjectCard.astro";
 import Layout from "../../layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
-import { Dialog, DialogButton } from "@/components/react-components/Dialog";
 import { getAllProjects } from "@/server/use-case/project";
 
 const project = await getAllProjects();
-
-console.log(project);
 
 export const projectArr = [
   { id: 1, profileImg, projectName: "Project 1", description: "Project description" },
@@ -21,14 +18,39 @@ export const projectArr = [
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const projectDiv = document.getElementById("project-section");
+    const projectDiv = document.getElementById("project-section") as HTMLElement;
     if (projectDiv) {
       projectDiv.addEventListener("mousemove", (event) => {
-        const x = event.x;
-        const y = event.y;
+        const x = event.clientX;
+        const y = event.clientY;
 
         projectDiv.style.setProperty("--mouse-x", `${x}px`);
         projectDiv.style.setProperty("--mouse-y", `${y}px`);
+      });
+
+      projectDiv.addEventListener("click", (event) => {
+        const target = event.target;
+        if (target instanceof Element) {
+          const openButton = target.closest(".open-dialog");
+          if (openButton) {
+            const dialog = openButton.nextElementSibling as HTMLDialogElement;
+            const dialogId = dialog.id;
+            if (dialog && dialog.tagName === "DIALOG") {
+              history.pushState(null, "", `/projects/${dialogId}`);
+              dialog.showModal();
+            }
+          }
+
+          if (target.closest(".close-dialog")) {
+            target.closest("dialog")?.close();
+            history.back();
+          }
+
+          if (target.tagName === "DIALOG") {
+            target.closest("dialog")?.close();
+            history.back();
+          }
+        }
       });
     }
   });
@@ -43,10 +65,10 @@ export const projectArr = [
       project.map(({ name, description, liveUrl, repoUrl, imageUrl, imageKey }) => (
         <div
           class:list={[
-            "rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
+            "  rounded-md after:rounded-md relative bg-fixed after:hover:bg-foreground/50 after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
           ]}
         >
-          <DialogButton client:load dialogId={imageKey} className="w-full">
+          <button class="open-dialog">
             <ProjectCard
               description={description}
               repoUrl={repoUrl}
@@ -56,18 +78,21 @@ export const projectArr = [
               cardId={imageKey}
               class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
             />
-          </DialogButton>
-          <Dialog className="backdrop:bg-background/50" id={imageKey} client:load>
+          </button>
+          <dialog id={imageKey}>
             <ProjectCard
+              description={description}
               repoUrl={repoUrl}
               siteUrl={liveUrl}
-              description={description}
               projectName={name}
               profileImg={imageUrl}
               cardId={imageKey}
-              class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+              class:list="  bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
             />
-          </Dialog>
+            <button id={imageKey} class="close-dialog">
+              close
+            </button>
+          </dialog>
         </div>
       ))
     }

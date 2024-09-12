@@ -30,7 +30,7 @@ const {
 
 <div
   class:list={[
-    "p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark",
+    "size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark",
     { "gap-2": showDetails },
     className,
     classList,
@@ -38,35 +38,40 @@ const {
   {...props}
 >
   <Image
-    class:list={["rounded-lg", { "md:w-[85%]": showDetails }]}
+    class:list={[
+      "rounded-lg size-full object-cover aspect-video object-center ",
+      { "md:w-[85%]": showDetails },
+    ]}
     src={profileImg}
     alt="sample page"
     inferSize={true}
   />
-  <h3 class:list={["mb-2 mt-4 text-xl font-bold capitalize", { "md:text-3xl": showDetails }]}>
-    {projectName}
-  </h3>
-  <p class:list={["mb-2 leading-6", { "md:text-md": showDetails }]}>{description}</p>
-  <div class="flex items-center gap-8">
-    <a
-      href={repoUrl}
-      target="_blank"
-      class="flex items-center justify-start gap-2 text-lg
+  <div>
+    <h3 class:list={["mb-2 mt-4 text-xl font-bold capitalize", { "md:text-3xl": showDetails }]}>
+      {projectName}
+    </h3>
+    <p class:list={["mb-2 leading-6", { "md:text-md": showDetails }]}>{description}</p>
+    <div class="flex items-center gap-8">
+      <a
+        href={repoUrl}
+        target="_blank"
+        class="flex items-center justify-start gap-2 text-lg
                      transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
                      active:animate-ping"
-    >
-      <GithubIcon className="size-6 fill-foreground" />
-      repository
-    </a>
-    <a
-      href={siteUrl}
-      target="_blank"
-      class="flex items-center justify-start gap-2 text-lg
+      >
+        <GithubIcon className="size-6 fill-foreground" />
+        repository
+      </a>
+      <a
+        href={siteUrl}
+        target="_blank"
+        class="flex items-center justify-start gap-2 text-lg
                      transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
                      active:animate-ping"
-    >
-      <Globe className="size-6 text-foreground " />
-      live site
-    </a>
+      >
+        <Globe className="size-6 text-foreground " />
+        live site
+      </a>
+    </div>
   </div>
 </div>

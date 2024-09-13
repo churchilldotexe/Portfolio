@@ -58,7 +58,7 @@ const project = [
 </script>
 
 <Layout title="HomePage">
-  <section class="flex size-full flex-col items-center justify-between gap-4">
+  <section class="flex size-full flex-col items-center justify-between gap-4 text-clip">
     <article class="w-fit grow gap-4 p-6 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8">
       <h1 class="text-3xl sm:col-start-2 sm:self-end
             sm:justify-self-start md:text-4xl">
@@ -74,10 +74,10 @@ const project = [
       <Image
         src={profileImg}
         alt="profile picture for portfolio"
-        class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:w-5/6"
+        class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:z-0 md:w-5/6"
       />
     </article>
-    <aside class="grid grow place-items-center">
+    <aside class="grid max-w-xl place-items-center md:w-4/5 2xl:w-full">
       <div
         class="group w-[110%] overflow-hidden backdrop-blur-lg sm:w-[125%] md:w-[130%] md:overflow-visible lg:w-[140%]"
       >

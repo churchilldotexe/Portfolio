@@ -3,6 +3,17 @@ import { Image } from "astro:assets";
 import type { HTMLAttributes } from "astro/types";
 import { GithubIcon } from "./svg/SocialIcons";
 import { Globe } from "lucide-react";
+import {
+  HTML5,
+  JavaScript,
+  TailwindCSS,
+  TypeScript,
+  PostgreSQL,
+  NextjsIcon,
+  SQLite,
+  CSS,
+  ReactIcon,
+} from "./svg/StacksIcons";
 
 type Props = {
   cardId: string;
@@ -47,32 +58,78 @@ const {
     alt="sample page"
     inferSize={true}
   />
-  <div>
+  <div class="w-full">
     <h3 class:list={["mb-2 mt-4 text-xl font-bold capitalize", { "md:text-3xl": showDetails }]}>
       {projectName}
     </h3>
     <p class:list={["mb-2 leading-6", { "md:text-md": showDetails }]}>{description}</p>
-    <div class="flex items-center gap-8">
+    <div class="flex w-full flex-wrap items-center justify-around gap-4">
       <a
         href={repoUrl}
         target="_blank"
-        class="flex items-center justify-start gap-2 text-lg
-                     transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
-                     active:animate-ping"
+        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
       >
-        <GithubIcon className="size-6 fill-foreground" />
+        <GithubIcon className="size-6 fill-foreground " />
         repository
       </a>
       <a
         href={siteUrl}
         target="_blank"
-        class="flex items-center justify-start gap-2 text-lg
-                     transition-all hover:scale-110 focus:border-b focus:border-red-600 focus:outline-none
-                     active:animate-ping"
+        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
       >
         <Globe className="size-6 text-foreground " />
         live site
       </a>
+      <div class="hover-siblings-animation flex items-center gap-2 *:size-6">
+        <a href="#">
+          <TypeScript />
+        </a>
+        <a href="#">
+          <JavaScript />
+        </a>
+        <a href="#">
+          <HTML5 />
+        </a>
+        <a href="#">
+          <TailwindCSS />
+        </a>
+        <a href="#">
+          <PostgreSQL />
+        </a>
+        <a href="#">
+          <NextjsIcon />
+        </a>
+        <a href="#">
+          <SQLite />
+        </a>
+        <a href="#">
+          <CSS />
+        </a>
+        <a href="#">
+          <ReactIcon />
+        </a>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+  @media (hover: hover) {
+    .hover-siblings-animation > *:hover {
+      transition: scale 200ms ease-in-out;
+      scale: 1.6;
+    }
+
+    .hover-siblings-animation > *:has(+ :hover),
+    .hover-siblings-animation > *:hover + * {
+      transition: scale 250ms ease-in-out 50ms;
+      z-index: -1;
+      scale: 1.3;
+    }
+
+    .hover-siblings-animation > *:has(~ :hover),
+    .hover-siblings-animation > *:hover ~ * {
+      filter: brightness(25%);
+    }
+  }
+</style>

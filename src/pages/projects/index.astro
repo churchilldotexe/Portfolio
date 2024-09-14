@@ -58,12 +58,12 @@ const project = await getAllProjects();
         ({ name, description, liveUrl, repoUrl, imageUrl, imageKey }) => (
           <div
             class:list={[
-              "rounded-md after:rounded-md relative bg-fixed   after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial hover:backdrop-grayscale",
+              "size-full rounded-md after:rounded-md relative bg-fixed after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial",
             ]}
           >
             <dialog
               id={imageKey}
-              class="dialog-animate  peer mx-auto  max-w-3xl gap-4 rounded-md shadow-elevate-light backdrop:bg-background/15 backdrop:backdrop-blur-sm  dark:shadow-elevate-dark"
+              class="dialog-animate max-w-3xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
             >
               <ProjectCard
                 description={description}
@@ -72,14 +72,14 @@ const project = await getAllProjects();
                 projectName={name}
                 profileImg={imageUrl}
                 cardId={imageKey}
-                class:list=" rounded-md bg-background bg-fixed shadow-none dark:shadow-none  gap-2"
+                class:list="rounded-md bg-background gap-2"
               >
                 <button id={imageKey} class="close-dialog self-start">
                   &larr; go back
                 </button>
               </ProjectCard>
             </dialog>
-            <button class=" btn-animate open-dialog size-full [transition-behavior:allow-discrete] active:scale-[.8] active:transition-transform ">
+            <button class="btn-animate open-dialog visible size-full [grid-area:1/1] active:scale-50 active:opacity-0 ">
               <ProjectCard
                 description={description}
                 repoUrl={repoUrl}
@@ -87,7 +87,7 @@ const project = await getAllProjects();
                 projectName={name}
                 profileImg={imageUrl}
                 cardId={imageKey}
-                class:list=" bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+                class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
               />
             </button>
           </div>
@@ -96,6 +96,8 @@ const project = await getAllProjects();
     }
   </section>
 </Layout>
+
+<!-- TODO: DIALOG EXIT ANIMATION-->
 
 <style>
   @property --mouse-x {
@@ -127,22 +129,33 @@ const project = await getAllProjects();
   }
 
   dialog[open] + .btn-animate {
-    display: none;
+    visibility: hidden;
+  }
+
+  dialog:not([open]) + .btn-animate {
+    transition-property: opacity transform;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
+    opacity: 100;
+    @starting-style {
+      opacity: 0;
+      scale: 0.5;
+    }
+  }
+
+  .dialog-animate {
+    transition-property: opacity scale;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+    scale: 1;
+    opacity: 1;
+    @starting-style {
+      scale: 0.5;
+      opacity: 0.8;
+    }
   }
 
   @media (hover: hover) {
-    .dialog-animate {
-      transition-property: opacity scale;
-      transition-duration: 0.3s;
-      transition-timing-function: ease-in-out;
-      scale: 1;
-      opacity: 1;
-      @starting-style {
-        scale: 0.8;
-        opacity: 0.8;
-      }
-    }
-
     .bg-radial-front {
       background-image: radial-gradient(
         8rem circle at var(--mouse-x) var(--mouse-y),
@@ -170,7 +183,6 @@ const project = await getAllProjects();
     content: "";
     position: absolute;
     inset: 0;
-    background-attachment: fixed;
     background-color: hsl(var(--background));
     pointer-events: none;
   }

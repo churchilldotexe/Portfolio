@@ -1,3 +1,4 @@
+import { JavaScript, NextjsIcon, ReactIcon, TypeScript } from "@/components/svg/StacksIcons";
 import type { AstroCookieSetOptions } from "astro";
 
 export const MAX_FILE_SIZE = 4 * 1024 * 1024;
@@ -26,3 +27,10 @@ export const COOKIES_OPTIONS: AstroCookieSetOptions = {
   path: "/",
   secure: isProd,
 } as const;
+
+export const TECH_STACKS = {
+  ReactIcon,
+  NextjsIcon,
+  JavaScript,
+  TypeScript,
+};

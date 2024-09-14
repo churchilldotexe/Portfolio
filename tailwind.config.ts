@@ -75,6 +75,8 @@ const config = {
   plugins: [
     plugin(({ addVariant }) => {
       addVariant("hocus-visible", ["&:hover", "&:focus:visible"]);
+      addVariant("hoverable", "@media (hover: hover)");
+      addVariant("not-hoverable", "@media (hover: none)");
     }),
   ],
 } satisfies Config;

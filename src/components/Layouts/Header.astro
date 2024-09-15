@@ -1,4 +1,6 @@
 ---
+import { Moon, Sun } from "lucide-react";
+
 export const prerender = false;
 const pathname = Astro.url.pathname;
 
@@ -26,48 +28,105 @@ const pageLinks = [
 ];
 ---
 
-<script>
-  let currScollPos: number = 0;
+<script is:inline>
+  function applyTheme() {
+    localStorage.theme === "dark"
+      ? document.documentElement.classList.add("dark")
+      : document.documentElement.classList.remove("dark");
+  }
 
-  document.addEventListener("scroll", () => {
-    const nav = document.getElementById("nav");
-    if (nav && window.screen.width < 640) {
-      const scrollTop = document.documentElement.scrollTop;
-      if (scrollTop > currScollPos) {
-        nav.style.setProperty("--translate-y", "-100px");
-        currScollPos = scrollTop;
-      } else {
-        nav.style.setProperty("--translate-y", "0");
-        currScollPos = scrollTop;
+  document.addEventListener("DOMContentLoaded", () => {
+    const theme = (() => {
+      if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+        return localStorage.getItem("theme");
       }
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      }
+      return "light";
+    })();
+
+    if (theme === "light") {
+      document.documentElement.classList.remove("dark");
+    } else {
+      document.documentElement.classList.add("dark");
     }
+
+    window.localStorage.setItem("theme", theme);
+
+    const handleToggleClick = () => {
+      const element = document.documentElement;
+      element.classList.toggle("dark");
+
+      const isDark = element.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    };
+
+    document.getElementById("themeToggle").onclick = handleToggleClick;
+
+    let currScollPos = 0;
+
+    document.addEventListener("scroll", () => {
+      const nav = document.getElementById("nav");
+      if (nav && window.screen.width < 640) {
+        const scrollTop = document.documentElement.scrollTop;
+        if (scrollTop > currScollPos) {
+          nav.style.setProperty("--translate-y", "-100px");
+          currScollPos = scrollTop;
+        } else {
+          nav.style.setProperty("--translate-y", "0");
+          currScollPos = scrollTop;
+        }
+      }
+    });
   });
+
+  document.addEventListener("astro:after-swap", applyTheme);
+  applyTheme();
 </script>
 
 <nav
   class:list={[
     "-transition-90-custom sticky top-0 z-10 flex w-full items-center justify-center p-2",
-    "md:justify-between dark:shadow-elevate-dark shadow-elevate-light bg-background/85 backdrop-blur",
+    "md:justify-between dark:shadow-elevate-dark shadow-elevate-light bg-background/85 backdrop-blur ",
   ]}
   id="nav"
 >
   <div
-    class="hidden text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))] hover:underline md:block"
+    class="flex items-center gap-6 text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))] hover:underline"
   >
-    <a href="/dashboard">&larr; dashboard </a>
+    <a
+      class="hidden md:block"
+      href="/dashboard"
+      class:list={[
+        "",
+        {
+          "text-primary backdrop-blur-[3px] [text-shadow:1px_1px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black]":
+            pathname === "/dashboard",
+        },
+      ]}
+      >&larr; dashboard
+    </a>
+    <button id="themeToggle"
+      ><Sun className="dark:hidden" /><Moon className="hidden dark:block" />
+    </button>
   </div>
   <ul class="flex w-fit rounded-md px-4">
     {
       pageLinks.map((link) => (
         <li
           class:list={[
-            "flex-1 max-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform ",
+            "flex-1 max-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform tracking-wide",
             {
               "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset":
                 pathname === `${link.href}`,
             },
             {
               "before:content-[''] before:absolute before:inset-0": pathname === `${link.href}`,
+            },
+            {
+              "text-primary backdrop-blur-[3px]  dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black] [text-shadow:.5px_.5px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] ":
+                pathname === `${link.href}`,
             },
           ]}
         >

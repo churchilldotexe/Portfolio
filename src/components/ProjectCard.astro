@@ -115,16 +115,26 @@ const {
 
 <style>
   @media (hover: hover) {
-    .hover-siblings-animation > *:hover {
+    .hover-siblings-animation * {
       transition: scale 200ms ease-in-out;
-      scale: 1.6;
+      position: relative;
+    }
+
+    .hover-siblings-animation > *:hover {
+      padding: 2px;
+      scale: 1.8;
     }
 
     .hover-siblings-animation > *:has(+ :hover),
     .hover-siblings-animation > *:hover + * {
-      transition: scale 250ms ease-in-out 50ms;
       z-index: -1;
       scale: 1.3;
+    }
+
+    .hover-siblings-animation > *:has(+ * + :hover),
+    .hover-siblings-animation > *:hover + * + * {
+      z-index: -1;
+      scale: 1.1;
     }
 
     .hover-siblings-animation > *:has(~ :hover),

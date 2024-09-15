@@ -63,7 +63,7 @@ const project = await getAllProjects();
           >
             <dialog
               id={imageKey}
-              class="dialog-animate max-w-3xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
+              class="dialog-animate peer max-w-3xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
             >
               <ProjectCard
                 description={description}
@@ -74,12 +74,17 @@ const project = await getAllProjects();
                 cardId={imageKey}
                 class:list="rounded-md bg-background gap-2"
               >
-                <button id={imageKey} class="close-dialog self-start">
+                <button id={imageKey} class:list={["close-dialog self-start"]}>
                   &larr; go back
                 </button>
               </ProjectCard>
             </dialog>
-            <button class="btn-animate open-dialog visible size-full [grid-area:1/1] active:scale-50 active:opacity-0 ">
+            <button
+              class:list={[
+                "btn-animate open-dialog visible size-full  ",
+                "peer-open:scale-50  transition-[visibility_transform_opacity]  duration-300 peer-open:invisible peer-open:opacity-0 ",
+              ]}
+            >
               <ProjectCard
                 description={description}
                 repoUrl={repoUrl}
@@ -96,8 +101,6 @@ const project = await getAllProjects();
     }
   </section>
 </Layout>
-
-<!-- TODO: DIALOG EXIT ANIMATION-->
 
 <style>
   @property --mouse-x {
@@ -128,25 +131,15 @@ const project = await getAllProjects();
     background-color: hsl(var(--foreground));
   }
 
-  dialog[open] + .btn-animate {
-    visibility: hidden;
-  }
-
-  dialog:not([open]) + .btn-animate {
-    transition-property: opacity transform;
-    transition-duration: 300ms;
-    transition-timing-function: ease-in-out;
-    opacity: 100;
-    @starting-style {
-      opacity: 0;
-      scale: 0.5;
-    }
-  }
-
   .dialog-animate {
-    transition-property: opacity scale;
-    transition-duration: 0.3s;
+    transition-property: display opacity scale;
+    transition-duration: 180ms;
     transition-timing-function: ease-in-out;
+    transition-behavior: allow-discrete;
+    scale: 0.5;
+  }
+
+  .dialog-animate[open] {
     scale: 1;
     opacity: 1;
     @starting-style {

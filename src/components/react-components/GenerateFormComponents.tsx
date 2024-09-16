@@ -14,11 +14,7 @@ import {
   useState,
 } from "react";
 import { z, type ZodRawShape } from "zod";
-import {
-  type Position,
-  type ValidationMessageVariant,
-  popUpPosition,
-} from "./generateFormComponentsStyles.ts";
+import styles from "./formStyles.module.css";
 
 type FormComponentType<T extends z.ZodObject<ZodRawShape>> = {
   schema: T;
@@ -228,8 +224,8 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
   type ErrorMessagePropType = {
     name: Keys;
     useDefaultStyling?: boolean;
-    position?: Position;
-    errorMessageVariant?: ValidationMessageVariant;
+    position?: "topMiddle" | "bottomMiddle" | "topLeft" | "bottomLeft";
+    errorMessageVariant?: "error" | "warning";
     children?: ReactNode;
   } & HTMLAttributes<HTMLDivElement>;
 
@@ -239,24 +235,23 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
       errorMessageVariant = "error",
       useDefaultStyling = true,
       name,
+      className,
       children,
       ...props
     },
     ref
   ) {
     const { error } = useErrorContext();
-    const { textAreaStyles } = popUpPosition({
-      position,
-      variant: errorMessageVariant,
-    });
 
-    return useDefaultStyling ? (
-      <div ref={ref} {...props}>
-        {error[name] ?? children}
-      </div>
-    ) : (
+    const errorMessageClasses = useDefaultStyling
+      ? [styles.errorMessage, styles[position], styles[errorMessageVariant], className]
+          .filter(Boolean)
+          .join(" ")
+      : className;
+
+    return (
       Boolean(error[name] ?? children) && (
-        <div ref={ref} style={textAreaStyles.divStyle} {...props}>
+        <div ref={ref} className={errorMessageClasses} {...props}>
           {error[name] !== undefined ? error[name] : children}
         </div>
       )

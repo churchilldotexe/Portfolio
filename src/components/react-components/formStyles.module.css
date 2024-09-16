@@ -1,0 +1,82 @@
+.errorMessage {
+  width: fit-content;
+  grid-area: 1/1;
+  justify-self: center;
+  align-self: center;
+  position: absolute;
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0)
+  );
+  backdrop-filter: blur(4px);
+  padding: 0.1em 0.5em;
+  border-radius: 5px;
+  z-index: 1;
+  box-shadow: 0 8px 6px 0 rgba(0, 0, 0, 0.37);
+  min-height: 0.5em;
+}
+
+.errorMessage::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  backdrop-filter: blur(4px);
+  background: inherit;
+  clip-path: polygon(12% 35%, 52% 76%, 87% 32%, 71% 33%, 52% 56%, 26% 33%);
+}
+
+.errorMessage.error {
+  color: #ef4444;
+}
+
+.errorMessage.warning {
+  color: #d97706;
+}
+
+.topMiddle {
+  bottom: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.topMiddle::before {
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bottomMiddle {
+  top: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bottomMiddle::before {
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.topLeft {
+  bottom: 90%;
+  justify-self: start;
+}
+
+.topLeft::before {
+  bottom: -50%;
+  left: 0;
+  border-radius: 0 5px;
+}
+
+.bottomLeft {
+  top: 90%;
+  justify-self: start;
+}
+
+.bottomLeft::before {
+  top: -3px;
+  left: 0;
+  border-radius: 0 5px;
+}

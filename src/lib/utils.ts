@@ -36,3 +36,13 @@ export async function fetcher<T extends z.ZodTypeAny>(
     });
   return data;
 }
+
+export function removeArrayItem<T>(value: T, arr: T[]): T[] {
+  if (arr.length === 0) return [...arr];
+
+  const set = new Set(arr);
+  if (!set.has(value)) return [...arr];
+  set.delete(value);
+
+  return Array.from(set);
+}

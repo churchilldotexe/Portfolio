@@ -244,10 +244,10 @@ export function GenerateFormComponents<T extends z.ZodObject<ZodRawShape>>({
     const { error } = useErrorContext();
 
     const errorMessageClasses = useDefaultStyling
-      ? [styles.errorMessage, styles[position], styles[errorMessageVariant], className]
+      ? className
+      : [styles.errorMessage, styles[position], styles[errorMessageVariant], className]
           .filter(Boolean)
-          .join(" ")
-      : className;
+          .join(" ");
 
     return (
       Boolean(error[name] ?? children) && (

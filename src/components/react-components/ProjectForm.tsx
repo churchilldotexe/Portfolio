@@ -2,7 +2,7 @@ import { projectPostSchema, projectFormSchema, type CreateProjectPostType } from
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
 import { useState, type FormEvent } from "react";
-import { ACCEPTED_FILE_TYPE } from "@/lib/constants";
+import { ACCEPTED_FILE_TYPE, type TechStackNamesTypes } from "@/lib/constants";
 import { ImagePlus } from "lucide-react";
 import { Select } from "./Select";
 
@@ -30,7 +30,7 @@ const PROJECT_INPUT_DATA = [
 export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [responseMessage, setResponseMessage] = useState("");
   const [objectUrls, setObjectUrls] = useState<string[]>([]);
-  const [selectValues, setSelectValues] = useState<string[]>([]);
+  const [selectValues, setSelectValues] = useState<TechStackNamesTypes[]>([]);
   const [formErrorMessage, setFormErrorMessage] = useState<CreateProjectPostType>({
     name: "",
     repository: "",
@@ -58,7 +58,11 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
-    const parsedData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
+    const stacks = formData.get("stacks")?.toString().split(",");
+    const parsedData = projectFormSchema.safeParse({
+      ...Object.fromEntries(formData.entries()),
+      stacks,
+    });
     if (parsedData.success === false) {
       const { image, liveSite, name, repository, description, stacks } =
         parsedData.error.formErrors.fieldErrors;
@@ -96,47 +100,6 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
       encType="multipart/form-data"
       onSubmit={submit}
     >
-      <div className="flex gap-2">
-        <fieldset>
-          <legend className="sr-only">Image Upload</legend>
-          <label className="relative cursor-pointer" htmlFor="imageFile">
-            {objectUrls.length > 0 && <img src={objectUrls[0]} alt="project preview" />}
-
-            <div>
-              <ImagePlus />
-            </div>
-
-            <span className="sr-only">Select Image</span>
-            <Input
-              id="imageFile"
-              className="sr-only"
-              name="image"
-              type="file"
-              accept={ACCEPTED_FILE_TYPE.join(",")}
-              onChange={(e) => {
-                handleImageChange(e.target.files);
-              }}
-              required
-            />
-            <ErrorMessage useDefaultStyling={false} name="image">
-              {formErrorMessage["image"]}
-            </ErrorMessage>
-          </label>
-        </fieldset>
-
-        <fieldset>
-          <legend className="sr-only">Technology Stacks</legend>
-          <Input type="hidden" name="stacks" value={selectValues} />
-
-          {/* TODO: 
-            - [x] Create a values in an array in a state 
-            - [x] pass it on the onchange and values to the input 
-            - [] pass the state to the Select and the change */}
-
-          <Select selectValues={selectValues} setSelectValues={setSelectValues} />
-        </fieldset>
-      </div>
-
       {PROJECT_INPUT_DATA.map(({ label, name }) => (
         <fieldset className="relative w-full" key={name}>
           <Input
@@ -185,11 +148,53 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
           {formErrorMessage["description"]}
         </ErrorMessage>
       </fieldset>
-      {isLoggedIn ? (
-        <button type="submit">submit</button>
-      ) : (
-        <a href="/api/redirect">github signin</a>
-      )}
+
+      <div className="flex justify-between items-center  ">
+        {isLoggedIn ? (
+          <button type="submit">submit</button>
+        ) : (
+          <a href="/api/redirect">github signin</a>
+        )}
+
+        <div className="flex gap-4">
+          <fieldset>
+            <legend className="sr-only">Image Upload</legend>
+            <label className="relative cursor-pointer" htmlFor="imageFile">
+              {objectUrls.length > 0 && <img src={objectUrls[0]} alt="project preview" />}
+
+              <div>
+                <ImagePlus />
+              </div>
+
+              <span className="sr-only">Select Image</span>
+              <Input
+                id="imageFile"
+                className="sr-only"
+                name="image"
+                type="file"
+                accept={ACCEPTED_FILE_TYPE.join(",")}
+                onChange={(e) => {
+                  handleImageChange(e.target.files);
+                }}
+                required
+              />
+              <ErrorMessage useDefaultStyling={false} name="image">
+                {formErrorMessage["image"]}
+              </ErrorMessage>
+            </label>
+          </fieldset>
+
+          <fieldset className="relative">
+            <legend className="sr-only">Technology Stacks</legend>
+            <Input type="hidden" name="stacks" value={selectValues} />
+
+            <Select selectValues={selectValues} setSelectValues={setSelectValues} />
+            <ErrorMessage useDefaultStyling={false} name="stacks" position="topMiddle">
+              {formErrorMessage["stacks"]}
+            </ErrorMessage>
+          </fieldset>
+        </div>
+      </div>
 
       {responseMessage && <p>{responseMessage}</p>}
     </Form>

@@ -1,71 +1,117 @@
 import { TECH_STACKS, type TechStackNamesTypes } from "@/lib/constants";
 import { cn, removeArrayItem } from "@/lib/utils";
-import type { MouseEvent, KeyboardEvent } from "react";
+import {
+  type MouseEvent,
+  type KeyboardEvent,
+  useState,
+  type ElementRef,
+  useRef,
+  useCallback,
+} from "react";
 
 type SelectProps = {
   selectValues: TechStackNamesTypes[];
   setSelectValues: React.Dispatch<React.SetStateAction<TechStackNamesTypes[]>>;
 };
 
-// TODO:
-// - [x] use details html instead for another accessibility feature
-// - [ ] design the details div to make it like a dropdown
-// - [ ] the summary must show the selected value as a button so it can be closed on click and on keypress(enter)
-// - [ ] use the includes method to check if the selected value is already in the array if it is marked/remove in the list
-//       -- if not add it in the array of list
-
 export function Select({ selectValues, setSelectValues }: SelectProps) {
-  const handleRemoveSelectValue = (
-    event: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>,
-    value: TechStackNamesTypes
-  ) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const detailsRef = useRef<ElementRef<"details">>(null);
+  const divRef = useRef<ElementRef<"div">>(null);
+
+  const dropDownNavigation = useCallback((index: number) => {
+    if (divRef.current) {
+      const buttons = divRef.current.querySelectorAll("button:not([aria-hidden='true'])");
+      (buttons[index] as HTMLButtonElement)?.focus();
+    }
+  }, []);
+
+  const handleDropDownKeyDown = (event: KeyboardEvent, index: number) => {
     event.stopPropagation();
-    if (event instanceof KeyboardEvent) {
-      switch (event.code) {
-        case "Enter":
-          setSelectValues((prevArr) => removeArrayItem(value, prevArr));
-          break;
-      }
-    } else {
-      setSelectValues((prevArr) => removeArrayItem(value, prevArr));
+    const buttons = divRef.current?.querySelectorAll("button:not([aria-hidden='true'])") || [];
+    const currentIndex = Array.from(buttons).findIndex(
+      (button) => button === document.activeElement
+    );
+
+    switch (event.code) {
+      case "ArrowUp":
+        event.preventDefault();
+        const prevIdx = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
+        dropDownNavigation(prevIdx);
+        break;
+      case "ArrowDown":
+        event.preventDefault();
+        const nextIdx = (currentIndex + 1) % buttons.length;
+        dropDownNavigation(nextIdx);
+        break;
+      case "Escape":
+        setIsOpen(false);
+        break;
     }
   };
 
+  const handleRemoveSelectValue = (
+    event: MouseEvent<HTMLButtonElement>,
+    value: TechStackNamesTypes
+  ) => {
+    event.stopPropagation();
+    setSelectValues((prevArr) => removeArrayItem(value, prevArr));
+  };
+
   return (
-    <details className="list-none relative">
-      <summary className="flex gap-2 w-full max-w-sm min-h-fit border p-2">
-        {selectValues.map((val) => (
-          <button
-            key={val}
-            type="button"
-            onClick={(e) => {
-              handleRemoveSelectValue(e, val);
-            }}
-            onKeyDown={(e) => {
-              handleRemoveSelectValue(e, val);
-            }}
-          >
-            {val}
-          </button>
-        ))}
+    <details
+      ref={detailsRef}
+      className="list-none relative"
+      open={isOpen}
+      onToggle={(e) => {
+        if (e.currentTarget.open) {
+          dropDownNavigation(0);
+        }
+        setIsOpen(e.currentTarget.open);
+      }}
+    >
+      <summary className="flex gap-2 w-full max-w-sm min-h-fit border p-2 cursor-pointer">
+        {selectValues.length > 0 ? (
+          selectValues.map((val) => (
+            <button
+              key={val}
+              className="border group px-2 hocus-visible:border-destructive grow "
+              type="button"
+              onClick={(e) => handleRemoveSelectValue(e, val)}
+            >
+              {val}{" "}
+              <span className=" group-hover:text-destructive group-focus-visible:text-destructive ">
+                &times;
+              </span>
+            </button>
+          ))
+        ) : (
+          <span>Select tech stacks</span>
+        )}
       </summary>
 
-      <div
-        className={cn("absolute top-[calc(100%+2em)] flex flex-col gap-1 items-center", {
-          hidden: selectValues.length === TECH_STACKS.length,
-        })}
-      >
-        {TECH_STACKS.map((value) => {
+      <div ref={divRef} className="absolute top-[calc(100%+2em)] flex flex-col gap-1 items-center">
+        {TECH_STACKS.map((value, index) => {
           const isIncluded = selectValues.includes(value.stackName);
 
           return (
             <button
+              key={value.stackName}
               type="button"
-              className={cn("", { hidden: isIncluded })}
+              className={cn("focus:text-primary", { " hidden pointer-events-none": isIncluded })}
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectValues((val) => [...val, value.stackName]);
+                dropDownNavigation(index + 1);
+                // TODO: try
+                // -[ ] - when adding the value to the list exchange the button's index to another node/button
+                //       - references to try, when you query select all you have a list of the nodes try exchanging the nodes there
+                //       - try tracking the length of the exchanged one. so its gonna be like :
+                //           - length of the diff of the selectvalue and the constant value so you can track the last index or the remaining index
               }}
+              onKeyDown={(e) => handleDropDownKeyDown(e, index)}
+              aria-hidden={isIncluded}
+              tabIndex={isIncluded ? -1 : 0}
             >
               {value.stackName}
             </button>

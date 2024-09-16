@@ -121,7 +121,7 @@ export const GET: APIRoute = async ({ redirect, cookies, request }): Promise<Res
     cookies.set(COOKIES_PROPERTIES.ACCESSTOKEN, accessToken, COOKIES_OPTIONS);
     cookies.delete(COOKIES_PROPERTIES.STATE, COOKIES_OPTIONS);
 
-    return redirect("/dashboard", 302);
+    return redirect("/dashboard?login=success", 302);
   } catch (e) {
     if (e instanceof Error) {
       responseReturn(`${e.name}: ${e.cause}. ${e.message}. ${e.stack}`, 500);

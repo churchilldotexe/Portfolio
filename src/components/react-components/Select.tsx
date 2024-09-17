@@ -70,7 +70,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         setIsOpen(e.currentTarget.open);
       }}
     >
-      <summary className="flex gap-2 w-full max-w-sm min-h-fit border p-2 cursor-pointer">
+      <summary className="flex gap-2 w-full max-w-sm min-h-fit border p-2  overflow-x-auto">
         {selectValues.length > 0 ? (
           selectValues.map((val) => (
             <button
@@ -94,7 +94,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         ref={divRef}
         className="absolute top-[calc(100%+2em)] flex flex-col gap-1 items-center border"
       >
-        {TECH_STACKS.map((value, index) => {
+        {TECH_STACKS.map((value) => {
           const isIncluded = selectValues.includes(value.stackName);
 
           return (
@@ -105,10 +105,13 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectValues((val) => [...val, value.stackName]);
-                handleDropDownKeyDown({
-                  code: "ArrowDown",
-                  preventDefault: () => {},
-                } as KeyboardEvent);
+
+                const target = e.target as HTMLButtonElement;
+                if (target.nextElementSibling) {
+                  (target.nextElementSibling as HTMLElement).focus();
+                } else {
+                  dropDownNavigation(0);
+                }
               }}
               onKeyDown={(e) => handleDropDownKeyDown(e)}
               aria-hidden={isIncluded}

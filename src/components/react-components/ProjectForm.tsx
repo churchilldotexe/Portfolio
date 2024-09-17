@@ -100,6 +100,7 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
       encType="multipart/form-data"
       onSubmit={submit}
     >
+      {objectUrls.length > 0 && <img src={objectUrls[0]} alt="project preview" />}
       {PROJECT_INPUT_DATA.map(({ label, name }) => (
         <fieldset className="relative w-full" key={name}>
           <Input
@@ -150,51 +151,47 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
       </fieldset>
 
       <div className="flex justify-between items-center  ">
-        {isLoggedIn ? (
-          <button type="submit">submit</button>
-        ) : (
-          <a href="/api/redirect">github signin</a>
-        )}
+        <fieldset>
+          <legend className="sr-only">Image Upload</legend>
+          <label className="relative cursor-pointer" htmlFor="imageFile">
+            <div>
+              <ImagePlus />
+            </div>
 
-        <div className="flex gap-4">
-          <fieldset>
-            <legend className="sr-only">Image Upload</legend>
-            <label className="relative cursor-pointer" htmlFor="imageFile">
-              {objectUrls.length > 0 && <img src={objectUrls[0]} alt="project preview" />}
-
-              <div>
-                <ImagePlus />
-              </div>
-
-              <span className="sr-only">Select Image</span>
-              <Input
-                id="imageFile"
-                className="sr-only"
-                name="image"
-                type="file"
-                accept={ACCEPTED_FILE_TYPE.join(",")}
-                onChange={(e) => {
-                  handleImageChange(e.target.files);
-                }}
-                required
-              />
-              <ErrorMessage useDefaultStyling={false} name="image">
-                {formErrorMessage["image"]}
-              </ErrorMessage>
-            </label>
-          </fieldset>
-
-          <fieldset className="relative">
-            <legend className="sr-only">Technology Stacks</legend>
-            <Input type="hidden" name="stacks" value={selectValues} />
-
-            <Select selectValues={selectValues} setSelectValues={setSelectValues} />
-            <ErrorMessage useDefaultStyling={false} name="stacks" position="topMiddle">
-              {formErrorMessage["stacks"]}
+            <span className="sr-only">Select Image</span>
+            <Input
+              id="imageFile"
+              className="sr-only"
+              name="image"
+              type="file"
+              accept={ACCEPTED_FILE_TYPE.join(",")}
+              onChange={(e) => {
+                handleImageChange(e.target.files);
+              }}
+              required
+            />
+            <ErrorMessage useDefaultStyling={false} name="image">
+              {formErrorMessage["image"]}
             </ErrorMessage>
-          </fieldset>
-        </div>
+          </label>
+        </fieldset>
+
+        <fieldset className="relative">
+          <legend className="sr-only">Technology Stacks</legend>
+          <Input type="hidden" name="stacks" value={selectValues} />
+
+          <Select selectValues={selectValues} setSelectValues={setSelectValues} />
+          <ErrorMessage useDefaultStyling={false} name="stacks" position="topMiddle">
+            {formErrorMessage["stacks"]}
+          </ErrorMessage>
+        </fieldset>
       </div>
+
+      {isLoggedIn ? (
+        <button type="submit">submit</button>
+      ) : (
+        <a href="/api/redirect">github signin</a>
+      )}
 
       {responseMessage && <p>{responseMessage}</p>}
     </Form>

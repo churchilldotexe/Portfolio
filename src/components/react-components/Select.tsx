@@ -26,7 +26,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
     }
   }, []);
 
-  const handleDropDownKeyDown = (event: KeyboardEvent, index: number) => {
+  const handleDropDownKeyDown = (event: KeyboardEvent) => {
     event.stopPropagation();
     const buttons = divRef.current?.querySelectorAll("button:not([aria-hidden='true'])") || [];
     const currentIndex = Array.from(buttons).findIndex(
@@ -75,7 +75,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
           selectValues.map((val) => (
             <button
               key={val}
-              className="border group px-2 hocus-visible:border-destructive grow "
+              className="border group px-2 hocus-visible:border-destructive min-w-fit"
               type="button"
               onClick={(e) => handleRemoveSelectValue(e, val)}
             >
@@ -90,7 +90,10 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         )}
       </summary>
 
-      <div ref={divRef} className="absolute top-[calc(100%+2em)] flex flex-col gap-1 items-center">
+      <div
+        ref={divRef}
+        className="absolute top-[calc(100%+2em)] flex flex-col gap-1 items-center border"
+      >
         {TECH_STACKS.map((value, index) => {
           const isIncluded = selectValues.includes(value.stackName);
 
@@ -102,14 +105,12 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectValues((val) => [...val, value.stackName]);
-                dropDownNavigation(index + 1);
-                // TODO: try
-                // -[ ] - when adding the value to the list exchange the button's index to another node/button
-                //       - references to try, when you query select all you have a list of the nodes try exchanging the nodes there
-                //       - try tracking the length of the exchanged one. so its gonna be like :
-                //           - length of the diff of the selectvalue and the constant value so you can track the last index or the remaining index
+                handleDropDownKeyDown({
+                  code: "ArrowDown",
+                  preventDefault: () => {},
+                } as KeyboardEvent);
               }}
-              onKeyDown={(e) => handleDropDownKeyDown(e, index)}
+              onKeyDown={(e) => handleDropDownKeyDown(e)}
               aria-hidden={isIncluded}
               tabIndex={isIncluded ? -1 : 0}
             >

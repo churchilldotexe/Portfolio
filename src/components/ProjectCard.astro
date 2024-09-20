@@ -3,19 +3,7 @@ import { Image } from "astro:assets";
 import type { HTMLAttributes } from "astro/types";
 import { GithubIcon } from "./svg/SocialIcons";
 import { Globe } from "lucide-react";
-import {
-  DrizzleIcon,
-  AstroIcon,
-  HTML5,
-  JavaScript,
-  TailwindCSS,
-  TypeScript,
-  PostgreSQL,
-  NextjsIcon,
-  SQLite,
-  CSS,
-  ReactIcon,
-} from "./svg/StacksIcons";
+import { TECH_STACKS } from "@/lib/constants";
 
 type Props = {
   cardId: string;
@@ -40,6 +28,25 @@ const {
   ...props
 } = Astro.props;
 ---
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const stacksDiv = document.getElementById("stack-div");
+
+    stacksDiv?.addEventListener("click", (e) => {
+      const anchor = (e.target as HTMLElement).closest("#stack-div a");
+      if (anchor) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const href = anchor.getAttribute("href");
+        if (href) {
+          window.open(href, "_blank");
+        }
+      }
+    });
+  });
+</script>
 
 <div
   class:list={[
@@ -82,40 +89,14 @@ const {
         <Globe className="size-6 text-foreground " />
         live site
       </a>
-      <div class="hover-siblings-animation flex items-center gap-2 *:size-6">
-        <a href="#">
-          <TypeScript />
-        </a>
-        <a href="#">
-          <JavaScript />
-        </a>
-        <a href="#">
-          <HTML5 />
-        </a>
-        <a href="#">
-          <TailwindCSS />
-        </a>
-        <a href="#">
-          <PostgreSQL />
-        </a>
-        <a href="#">
-          <NextjsIcon />
-        </a>
-        <a href="#">
-          <SQLite />
-        </a>
-        <a href="#">
-          <CSS />
-        </a>
-        <a href="#">
-          <ReactIcon />
-        </a>
-        <a href="#">
-          <AstroIcon />
-        </a>
-        <a href="#">
-          <DrizzleIcon />
-        </a>
+      <div id="stack-div" class="hover-siblings-animation flex items-center gap-2 *:size-6">
+        {
+          TECH_STACKS.map(({ href, Logo }) => (
+            <a class="anchor-stacks" href={href} target="_blank" rel="noopener noreferrer">
+              <Logo />
+            </a>
+          ))
+        }
       </div>
     </div>
   </div>

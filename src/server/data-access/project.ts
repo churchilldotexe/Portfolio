@@ -8,10 +8,7 @@ import projects, {
   type SelectProjectTypes,
 } from "../database/schema/projects";
 import { z, ZodError } from "zod";
-import stacks, {
-  insertTechStacksSchema,
-  type SelectTechStacksTypes,
-} from "../database/schema/stacks";
+import stacks, { insertTechStacksSchema } from "../database/schema/stacks";
 
 export async function uploadProjectToDB(uploadData: InsertProjectTypes): Promise<string> {
   const parsedUploadData = insertProjectsSchema.safeParse(uploadData);

@@ -4,27 +4,9 @@ import profileImg from "@/assets/profile.png";
 import { Image } from "astro:assets";
 import ProjectCard from "@/components/ProjectCard.astro";
 import { CircleChevronRight, CircleChevronLeft } from "lucide-react";
+import { getFeaturedProjectUseCase } from "@/server/use-case/project";
 
-const project = [
-  {
-    id: 1,
-    profileImg: "https://utfs.io/f/d5016ebf-5a5b-440e-b626-a5dadab0e057-23w7.jpg",
-    projectName: "Project 1",
-    description: "Project description",
-  },
-  {
-    id: 1,
-    profileImg: "https://utfs.io/f/d5016ebf-5a5b-440e-b626-a5dadab0e057-23w7.jpg",
-    projectName: "Project 2",
-    description: "Project description",
-  },
-  {
-    id: 1,
-    profileImg: "https://utfs.io/f/d5016ebf-5a5b-440e-b626-a5dadab0e057-23w7.jpg",
-    projectName: "Project 3",
-    description: "Project description",
-  },
-];
+const project = await getFeaturedProjectUseCase();
 ---
 
 <script>
@@ -106,12 +88,13 @@ const project = [
           {
             project.map((value, index) => (
               <ProjectCard
-                repoUrl="http://as.com"
-                siteUrl="http://as.com"
-                cardId={value.id.toString()}
-                projectName={value.projectName}
+                techstackArr={value.techStacks}
+                repoUrl={value.repoUrl}
+                siteUrl={value.liveUrl}
+                cardId={value.imageKey}
+                projectName={value.name}
                 description={value.description}
-                profileImg={value.profileImg}
+                profileImg={value.imageUrl}
                 class:list={[
                   "relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
                 ]}

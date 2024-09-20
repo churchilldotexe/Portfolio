@@ -26,7 +26,7 @@ export const ACCEPTED_FILE_TYPE = [
 
 export enum COOKIES_PROPERTIES {
   STATE = "state",
-  ACCESSTOKEN = "myAccessToken",
+  ACCESSTOKEN = "userInfoToken",
 }
 
 export type COOKIES_PROPERTIES_TYPES = `${COOKIES_PROPERTIES}`;
@@ -44,57 +44,57 @@ export const TECH_STACKS = [
   {
     stackName: "React",
     href: "https://react.dev/",
-    logo: ReactIcon,
+    Logo: ReactIcon,
   },
   {
     stackName: "Nextjs",
     href: "https://nextjs.org/",
-    logo: NextjsIcon,
+    Logo: NextjsIcon,
   },
   {
     stackName: "Drizzle",
     href: "https://orm.drizzle.team/",
-    logo: DrizzleIcon,
+    Logo: DrizzleIcon,
   },
   {
     stackName: "JavaScript",
     href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
-    logo: JavaScript,
+    Logo: JavaScript,
   },
   {
     stackName: "Astro",
     href: "https://docs.astro.build/en/getting-started/",
-    logo: AstroIcon,
+    Logo: AstroIcon,
   },
   {
     stackName: "CSS",
     href: "https://developer.mozilla.org/en-US/docs/Web/CSS",
-    logo: CSS,
+    Logo: CSS,
   },
   {
     stackName: "HTML",
     href: "https://developer.mozilla.org/en-US/docs/Web/HTML",
-    logo: HTML5,
+    Logo: HTML5,
   },
   {
     stackName: "SQLite",
     href: "https://www.sqlite.org/index.html",
-    logo: SQLite,
+    Logo: SQLite,
   },
   {
     stackName: "PostgreSQL",
     href: "https://www.postgresql.org/",
-    logo: PostgreSQL,
+    Logo: PostgreSQL,
   },
   {
     stackName: "TailwindCSS",
     href: "https://tailwindcss.com/",
-    logo: TailwindCSS,
+    Logo: TailwindCSS,
   },
   {
     stackName: "TypeScript",
     href: "https://www.typescriptlang.org/docs/",
-    logo: TypeScript,
+    Logo: TypeScript,
   },
 ] as const;
 

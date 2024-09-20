@@ -8,7 +8,7 @@ export async function signAccessToken<T extends Record<string, unknown>>(
 ): Promise<string> {
   const signedJWT = await new SignJWT(signingPayload)
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("15 mins")
+    .setExpirationTime("30 mins")
     .sign(ACCESS_TOKEN_SECRET);
 
   return signedJWT;

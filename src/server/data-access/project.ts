@@ -7,20 +7,56 @@ import projects, {
   type InsertProjectTypes,
   type SelectProjectTypes,
 } from "../database/schema/projects";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
+import stacks, { insertTechStacksSchema } from "../database/schema/stacks";
 
-export async function uploadProjectToDB(uploadData: InsertProjectTypes): Promise<void> {
+export async function uploadProjectToDB(uploadData: InsertProjectTypes): Promise<string> {
   const parsedUploadData = insertProjectsSchema.safeParse(uploadData);
 
   if (parsedUploadData.success === false) {
     throw new ZodError(parsedUploadData.error.errors);
   }
 
-  const { userId, description, imageUrl, imageKey, repoUrl, liveUrl, name } = parsedUploadData.data;
+  const { userId, description, imageUrl, imageKey, repoUrl, liveUrl, name, isFeatured } =
+    parsedUploadData.data;
 
-  await db
+  const uploadProject = await db
     .insert(projects)
-    .values({ name, liveUrl, repoUrl, imageKey, imageUrl, description, userId });
+    .values({ name, liveUrl, repoUrl, imageKey, imageUrl, description, userId, isFeatured })
+    .returning({ projectId: projects.projectId });
+
+  const [project] = uploadProject;
+
+  if (!project) {
+    throw new Error("Unable to upload your Proect, Please try again");
+  }
+
+  // projectId auto generated uuid always defined as long as upload success
+  return project.projectId as string;
+}
+
+const uploadStacksSchema = insertTechStacksSchema.extend({
+  name: z.array(z.string().min(1)),
+});
+
+export async function uploadTechStacksToDb(
+  techStacksArr: string[],
+  projectId: string
+): Promise<void> {
+  const parsedUploadData = uploadStacksSchema.safeParse({
+    name: techStacksArr,
+    projectId,
+  });
+  if (parsedUploadData.success === false) {
+    throw new ZodError(parsedUploadData.error.errors);
+  }
+
+  const valuesToInsert = parsedUploadData.data.name.map((techStacks) => ({
+    name: techStacks,
+    projectId: parsedUploadData.data.projectId,
+  }));
+
+  await db.insert(stacks).values(valuesToInsert);
 }
 
 type GetProjectReturnedTypes = Pick<

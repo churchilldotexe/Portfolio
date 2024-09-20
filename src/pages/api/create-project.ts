@@ -8,13 +8,18 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const formData = await request.formData();
 
   const userId = locals.userId;
-  if (!userId) {
+  if (typeof userId !== "string") {
     redirect("/api/redirect", 302);
   }
 
-  const parsedData = projectFormSchema.safeParse(Object.fromEntries(formData.entries()));
+  const stacks = formData.get("stacks")?.toString().split(",");
+  const parsedData = projectFormSchema.safeParse({
+    ...Object.fromEntries(formData.entries()),
+    stacks,
+  });
+
   if (parsedData.success === false) {
-    const { image, liveSite, name, repository, description } =
+    const { image, liveSite, name, repository, description, stacks, addToFeatured } =
       parsedData.error.formErrors.fieldErrors;
 
     return new Response(
@@ -24,12 +29,23 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
         liveSite: liveSite?.[0],
         image: image?.[0],
         name: name?.[0],
+        stacks: stacks?.[0],
+        addToFeatured: addToFeatured?.[0],
       } as CreateProjectPostType),
       { status: 400 }
     );
   }
 
-  const { description, name, image, liveSite: liveUrl, repository: repoUrl } = parsedData.data;
+  const {
+    description,
+    name,
+    image,
+    liveSite: liveUrl,
+    repository: repoUrl,
+    addToFeatured,
+    stacks: techStacks,
+  } = parsedData.data;
+
   await uploadProjectUseCase({
     image,
     name,
@@ -37,6 +53,8 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
     repoUrl,
     description,
     userId: userId as string,
+    techStacksArr: techStacks,
+    isFeatured: addToFeatured,
   });
 
   return new Response(

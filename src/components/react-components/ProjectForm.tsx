@@ -102,6 +102,7 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
         return prevUrl.filter((url) => URL.revokeObjectURL(url));
       });
 
+      setSelectValues([]);
       setIsFormPending(false);
       setResponseMessage(data.message);
     }

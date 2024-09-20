@@ -8,6 +8,13 @@
       "when": 1725689034512,
       "tag": "0000_complete_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1726837692133,
+      "tag": "0001_ancient_captain_cross",
+      "breakpoints": true
     }
   ]
 }

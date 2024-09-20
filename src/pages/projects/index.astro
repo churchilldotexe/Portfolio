@@ -50,54 +50,54 @@ const project = await getAllProjects();
 
 <Layout title="Projects">
   <section
-    class="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4 p-4"
+    class="grid grid-cols-[repeat(auto-fit,minmax(500px,1fr))] gap-4 p-4"
     id="project-section"
   >
     {
-      [...project, ...project, ...project].map(
-        ({ name, description, liveUrl, repoUrl, imageUrl, imageKey }) => (
-          <div
+      project.map(({ name, description, liveUrl, repoUrl, imageUrl, imageKey, techStacks }) => (
+        <div
+          class:list={[
+            "size-full rounded-md after:rounded-md relative bg-fixed after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial",
+          ]}
+        >
+          <dialog
+            id={imageKey}
+            class="dialog-animate peer max-w-3xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
+          >
+            <ProjectCard
+              techstackArr={techStacks}
+              description={description}
+              repoUrl={repoUrl}
+              siteUrl={liveUrl}
+              projectName={name}
+              profileImg={imageUrl}
+              cardId={imageKey}
+              class:list="rounded-md bg-background gap-2"
+            >
+              <button id={imageKey} class:list={["close-dialog self-start"]}>
+                &larr; go back
+              </button>
+            </ProjectCard>
+          </dialog>
+          <button
             class:list={[
-              "size-full rounded-md after:rounded-md relative bg-fixed after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial",
+              "btn-animate open-dialog visible size-full  ",
+              "peer-open:scale-50  transition-[visibility_transform_opacity]  duration-300 peer-open:invisible peer-open:opacity-0 ",
             ]}
           >
-            <dialog
-              id={imageKey}
-              class="dialog-animate peer max-w-3xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
-            >
-              <ProjectCard
-                description={description}
-                repoUrl={repoUrl}
-                siteUrl={liveUrl}
-                projectName={name}
-                profileImg={imageUrl}
-                cardId={imageKey}
-                class:list="rounded-md bg-background gap-2"
-              >
-                <button id={imageKey} class:list={["close-dialog self-start"]}>
-                  &larr; go back
-                </button>
-              </ProjectCard>
-            </dialog>
-            <button
-              class:list={[
-                "btn-animate open-dialog visible size-full  ",
-                "peer-open:scale-50  transition-[visibility_transform_opacity]  duration-300 peer-open:invisible peer-open:opacity-0 ",
-              ]}
-            >
-              <ProjectCard
-                description={description}
-                repoUrl={repoUrl}
-                siteUrl={liveUrl}
-                projectName={name}
-                profileImg={imageUrl}
-                cardId={imageKey}
-                class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
-              />
-            </button>
-          </div>
-        )
-      )
+            <ProjectCard
+              techstackArr={techStacks}
+              description={description}
+              repoUrl={repoUrl}
+              siteUrl={liveUrl}
+              projectName={name}
+              profileImg={imageUrl}
+              cardId={imageKey}
+              class:list="bg-radial-front rounded-md bg-background bg-fixed shadow-none dark:shadow-none"
+            />
+          </button>
+        </div>
+      ))
     }
   </section>
 </Layout>

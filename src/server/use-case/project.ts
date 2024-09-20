@@ -6,6 +6,7 @@ import {
   getFeaturedProjectFromDB,
   getMyProjectFromDb,
   uploadProjectToDB,
+  uploadTechStacksToDb,
 } from "../data-access/project";
 
 export const utapi = new UTApi({ apiKey: import.meta.env.UPLOADTHING_SECRET });
@@ -17,6 +18,8 @@ type UploadProjectUseCaseTypes = {
   repoUrl: string;
   description: string;
   userId: string;
+  techStacksArr: string[];
+  isFeatured: boolean;
 };
 
 export async function uploadProjectUseCase({
@@ -26,16 +29,17 @@ export async function uploadProjectUseCase({
   name,
   image,
   userId,
+  techStacksArr,
+  isFeatured,
 }: UploadProjectUseCaseTypes) {
   const imageFile = await utapi.uploadFiles(image);
-
   if (imageFile.error) {
     throw new Error(`${imageFile.error}`);
   }
 
   const { url: imageUrl, key: imageKey } = imageFile.data;
 
-  await uploadProjectToDB({
+  const projectId = await uploadProjectToDB({
     name,
     liveUrl,
     repoUrl,
@@ -43,7 +47,10 @@ export async function uploadProjectUseCase({
     imageUrl,
     description,
     userId,
+    isFeatured,
   });
+
+  await uploadTechStacksToDb(techStacksArr, projectId);
 }
 
 type GetProjectReturnedTypes = {
@@ -53,6 +60,7 @@ type GetProjectReturnedTypes = {
   liveUrl: string;
   imageUrl: string;
   imageKey: string;
+  techStacks: string[];
 };
 
 export async function getFeaturedProjectUseCase(): Promise<GetProjectReturnedTypes[]> {

@@ -3,8 +3,17 @@ export const prerender = false;
 
 import ProjectForm from "@/components/react-components/ProjectForm";
 import Layout from "../../layouts/Layout.astro";
+import { COOKIES_PROPERTIES } from "@/lib/constants";
+import { refreshAccessToken } from "@/server/use-case/auth";
 const userId = Astro.locals.userId;
 
+if (!userId) {
+  const userToken = Astro.cookies.get(COOKIES_PROPERTIES.ACCESSTOKEN)?.value;
+  // if no token from cookies = not logged in
+  if (userToken) {
+    await refreshAccessToken(userToken);
+  }
+}
 const isLoggedIn = userId ? true : false;
 ---
 

@@ -3,6 +3,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import { relations, sql } from "drizzle-orm";
 import users from "./users";
+import techStacks from "./stacks";
 
 const projects = pgTable(
   "projects",
@@ -30,8 +31,9 @@ const projects = pgTable(
   })
 );
 
-export const projectRelations = relations(projects, ({ one }) => ({
+export const projectRelations = relations(projects, ({ one, many }) => ({
   user: one(users, { fields: [projects.userId], references: [users.userId] }),
+  techStacks: many(techStacks),
 }));
 
 export const insertProjectsSchema = createInsertSchema(projects);

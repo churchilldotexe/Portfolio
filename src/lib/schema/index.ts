@@ -14,7 +14,8 @@ export const projectFormSchema = z.object({
   description: z.string().min(1, "description is required"),
   repository: z.string().min(1, "repository is required").url("Please provide a proper url"),
   liveSite: z.string().min(1, "liveSite is required").url("Please provide a proper url"),
-  stacks: z.array(z.string().min(1)),
+  stacks: z.array(z.string().min(1, "Please select at least 1 tech")),
+  addToFeatured: z.string().default("").pipe(z.coerce.boolean()),
 });
 
 export type ProjectFormTypes = z.infer<typeof projectFormSchema>;

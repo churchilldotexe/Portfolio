@@ -41,7 +41,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
   }, []);
 
   const smoothScroll = (direction: "left" | "right") => {
-    let scrollXValue = 50;
+    let scrollXValue = 100;
 
     if (scrollContainerRef.current) {
       const currentScroll = scrollContainerRef.current.scrollLeft;
@@ -70,12 +70,12 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
     );
 
     switch (event.code) {
-      case "ArrowUp":
+      case "ArrowLeft":
         event.preventDefault();
         const prevIdx = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
         dropDownNavigation(prevIdx);
         break;
-      case "ArrowDown":
+      case "ArrowRight":
         event.preventDefault();
         const nextIdx = (currentIndex + 1) % buttons.length;
         dropDownNavigation(nextIdx);
@@ -97,7 +97,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
   return (
     <details
       ref={detailsRef}
-      className="list-none relative hoverable:hocus-visible:outline hoverable:hocus-visible:outline-primary"
+      className="list-none relative hoverable:hocus-visible:outline-1 hoverable:hocus-visible:outline hoverable:hocus-visible:outline-primary"
       open={isOpen}
       onToggle={(e) => {
         if (e.currentTarget.open) {
@@ -109,31 +109,28 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         e.target.open = false;
       }}
     >
-      <summary className="flex gap-2 w-full items-center max-w-xs sm:max-w-md min-h-fit border pr-2 cursor-pointer relative">
+      <summary className="grid grid-cols-[1fr,auto,auto] gap-2 items-center border pr-2 cursor-pointer relative">
         <div
           ref={scrollContainerRef}
-          className=" flex gap-2 overflow-x-auto snap-x snap-mandatory px-5 py-2 scroll-py-4 [scrollbar-width:none] cursor-default scroll-smooth "
+          className="w-full flex overscroll-x-contain gap-2 overflow-x-auto items-center justify-center snap-x snap-mandatory py-2 px-4 scroll-py-4  cursor-default scroll-smooth "
         >
           {selectValues.length > 0 ? (
             selectValues.map((val) => (
               <button
                 key={val}
                 className={cn(
-                  "stacks-btn border group px-2 hoverable:hocus-visible:border-destructive not-hoverable:border-destructive min-w-fit snap-center  "
+                  " border group px-2 hoverable:hocus-visible:border-destructive not-hoverable:border-destructive snap-center"
                 )}
                 type="button"
                 onClick={(e) => handleRemoveSelectValue(e, val)}
                 onKeyDown={(e) => {
                   if (e.code === "ArrowDown") {
-                    // setIsOpen((prev) => !prev);
-                    if (detailsRef.current) {
-                      detailsRef.current.open = true;
-                    }
+                    setIsOpen((prev) => !prev);
                   }
                 }}
               >
                 {val}
-                <span className=" hoverable:group-hover:text-destructive not-hoverable:text-destructive hoverable:group-focus-visible:text-destructive ">
+                <span className="pl-2 hoverable:group-hover:text-destructive not-hoverable:text-destructive hoverable:group-focus-visible:text-destructive ">
                   &times;
                 </span>
               </button>
@@ -171,7 +168,10 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         <span
           className={cn(
             "relative translate-y-1/4 border-4 border-transparent border-t-foreground hoverable:hocus-visible:border-t-primary ",
-            { "border-b-primary -translate-y-1/4 border-t-transparent ": isOpen }
+            {
+              "border-b-primary -translate-y-1/4 border-t-transparent hoverable:hocus-visible:border-b-primary hoverable:hocus-visible:border-t-transparent":
+                isOpen,
+            }
           )}
         ></span>
       </summary>
@@ -179,7 +179,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
       <div
         ref={divRef}
         className={cn(
-          "absolute top-[calc(100%+.5em)] w-full flex flex-col gap-1 items-center border",
+          "absolute top-[calc(100%+.5em)] z-10 w-full flex items-center gap-2 p-1 flex-wrap min-h-fit border backdrop-blur bg-background/90",
           { hidden: TECH_STACKS.length === selectValues.length }
         )}
       >
@@ -187,34 +187,39 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
           const isIncluded = selectValues.includes(value.stackName);
 
           return (
-            <button
-              key={value.stackName}
-              type="button"
-              className={cn("div-btn focus:text-primary", {
-                " hidden pointer-events-none": isIncluded,
-              })}
-              onClick={(e) => {
-                setSelectValues((val) => [...val, value.stackName]);
-                e.stopPropagation();
-                const target = e.target as HTMLButtonElement;
-                // so that the button focus stays on the list of buttons
-                if (target.nextElementSibling instanceof HTMLElement) {
-                  target.nextElementSibling.focus();
-                } else {
-                  dropDownNavigation(0);
-                }
-              }}
-              onBlur={() => {
-                if (TECH_STACKS.length === selectValues.length) {
-                  setIsOpen(false);
-                }
-              }}
-              onKeyDown={(e) => handleDropDownKeyDown(e)}
-              aria-hidden={isIncluded}
-              tabIndex={isIncluded ? -1 : 0}
-            >
-              {value.stackName}
-            </button>
+            <>
+              <button
+                key={value.stackName}
+                type="button"
+                className={cn(
+                  "border focus:text-primary w-fit grow px-2 py-1 hoverable:hover:text-rose-300 ",
+                  {
+                    " hidden pointer-events-none": isIncluded,
+                  }
+                )}
+                onClick={(e) => {
+                  setSelectValues((val) => [...val, value.stackName]);
+                  e.stopPropagation();
+                  const target = e.target as HTMLButtonElement;
+                  // so that the button focus stays on the list of buttons
+                  if (target.nextElementSibling instanceof HTMLElement) {
+                    target.nextElementSibling.focus();
+                  } else {
+                    dropDownNavigation(0);
+                  }
+                }}
+                onBlur={() => {
+                  if (TECH_STACKS.length === selectValues.length) {
+                    setIsOpen(false);
+                  }
+                }}
+                onKeyDown={(e) => handleDropDownKeyDown(e)}
+                aria-hidden={isIncluded}
+                tabIndex={isIncluded ? -1 : 0}
+              >
+                {value.stackName}
+              </button>
+            </>
           );
         })}
       </div>

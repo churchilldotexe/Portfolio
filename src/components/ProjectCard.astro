@@ -13,6 +13,7 @@ type Props = {
   showDetails?: boolean;
   repoUrl: string;
   siteUrl: string;
+  techstackArr: string[];
 } & HTMLAttributes<"div">;
 
 const {
@@ -23,10 +24,13 @@ const {
   id,
   repoUrl,
   siteUrl,
+  techstackArr,
   class: className,
   "class:list": classList,
   ...props
 } = Astro.props;
+
+const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.includes(stack.stackName));
 ---
 
 <script>
@@ -91,7 +95,7 @@ const {
       </a>
       <div id="stack-div" class="hover-siblings-animation flex items-center gap-2 *:size-6">
         {
-          TECH_STACKS.map(({ href, Logo }) => (
+          techStacksArrFiltered.map(({ href, Logo }) => (
             <a class="anchor-stacks" href={href} target="_blank" rel="noopener noreferrer">
               <Logo />
             </a>

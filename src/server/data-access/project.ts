@@ -67,8 +67,6 @@ type GetProjectReturnedTypes = Pick<
   "name" | "imageUrl" | "repoUrl" | "description" | "liveUrl" | "imageKey"
 > & { techStacks: string[] };
 
-// TODO: connect the stacks table data to necessary getters
-
 export async function getFeaturedProjectFromDB(userId: string): Promise<GetProjectReturnedTypes[]> {
   const featuredProjectData = await db
     .select({

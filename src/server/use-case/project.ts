@@ -60,6 +60,7 @@ type GetProjectReturnedTypes = {
   liveUrl: string;
   imageUrl: string;
   imageKey: string;
+  techStacks: string[];
 };
 
 export async function getFeaturedProjectUseCase(): Promise<GetProjectReturnedTypes[]> {

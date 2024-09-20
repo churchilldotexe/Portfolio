@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import db from "../database";
 import projects, {
   insertProjectsSchema,
@@ -8,7 +8,10 @@ import projects, {
   type SelectProjectTypes,
 } from "../database/schema/projects";
 import { z, ZodError } from "zod";
-import stacks, { insertTechStacksSchema } from "../database/schema/stacks";
+import stacks, {
+  insertTechStacksSchema,
+  type SelectTechStacksTypes,
+} from "../database/schema/stacks";
 
 export async function uploadProjectToDB(uploadData: InsertProjectTypes): Promise<string> {
   const parsedUploadData = insertProjectsSchema.safeParse(uploadData);
@@ -62,7 +65,9 @@ export async function uploadTechStacksToDb(
 type GetProjectReturnedTypes = Pick<
   SelectProjectTypes,
   "name" | "imageUrl" | "repoUrl" | "description" | "liveUrl" | "imageKey"
->;
+> & { techStacks: string[] };
+
+// TODO: connect the stacks table data to necessary getters
 
 export async function getFeaturedProjectFromDB(userId: string): Promise<GetProjectReturnedTypes[]> {
   const featuredProjectData = await db
@@ -70,12 +75,24 @@ export async function getFeaturedProjectFromDB(userId: string): Promise<GetProje
       name: projects.name,
       description: projects.description,
       repoUrl: projects.repoUrl,
-      liveUrl: projects.repoUrl,
+      liveUrl: projects.liveUrl,
       imageUrl: projects.imageUrl,
       imageKey: projects.imageKey,
+      techStacks: sql<string[]>`array_agg(distinct ${stacks.name})`,
     })
     .from(projects)
     .where(and(eq(projects.userId, userId), eq(projects.isFeatured, true)))
+    .leftJoin(stacks, eq(projects.projectId, stacks.projectId))
+    .groupBy(
+      projects.name,
+      projects.description,
+      projects.repoUrl,
+      projects.liveUrl,
+      projects.imageUrl,
+      projects.imageKey,
+      projects.createdAt,
+      projects.updatedAt
+    )
     .orderBy(projects.createdAt);
 
   return featuredProjectData;
@@ -90,9 +107,21 @@ export async function getAllProjectsFromDB(userId: string): Promise<GetProjectRe
       liveUrl: projects.repoUrl,
       imageUrl: projects.imageUrl,
       imageKey: projects.imageKey,
+      techStacks: sql<string[]>`array_agg(distinct ${stacks.name})`,
     })
     .from(projects)
     .where(eq(projects.userId, userId))
+    .leftJoin(stacks, eq(projects.projectId, stacks.projectId))
+    .groupBy(
+      projects.name,
+      projects.description,
+      projects.repoUrl,
+      projects.liveUrl,
+      projects.imageUrl,
+      projects.imageKey,
+      projects.createdAt,
+      projects.updatedAt
+    )
     .orderBy(projects.updatedAt);
 
   return projectData;
@@ -101,16 +130,31 @@ export async function getAllProjectsFromDB(userId: string): Promise<GetProjectRe
 export async function getMyProjectFromDb(
   imageKey: string | undefined
 ): Promise<GetProjectReturnedTypes | undefined> {
-  const projectData = await db.query.projects.findFirst({
-    columns: {
-      name: true,
-      description: true,
-      repoUrl: true,
-      liveUrl: true,
-      imageUrl: true,
-      imageKey: true,
-    },
-    where: (project, { eq }) => eq(project.imageKey, imageKey as string),
-  });
+  const [projectData] = await db
+    .select({
+      name: projects.name,
+      description: projects.description,
+      repoUrl: projects.repoUrl,
+      liveUrl: projects.repoUrl,
+      imageUrl: projects.imageUrl,
+      imageKey: projects.imageKey,
+      techStacks: sql<string[]>`array_agg(distinct ${stacks.name})`,
+    })
+    .from(projects)
+    .where(eq(projects.imageKey, imageKey as string))
+    .leftJoin(stacks, eq(projects.projectId, stacks.projectId))
+    .groupBy(
+      projects.name,
+      projects.description,
+      projects.repoUrl,
+      projects.liveUrl,
+      projects.imageUrl,
+      projects.imageKey,
+      projects.createdAt,
+      projects.updatedAt
+    )
+    .orderBy(projects.updatedAt)
+    .limit(1);
+
   return projectData;
 }

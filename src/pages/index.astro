@@ -10,38 +10,30 @@ const project = await getFeaturedProjectUseCase();
 ---
 
 <script>
-  let initialRotation = 0;
-
-  const controller = new AbortController();
-  document.addEventListener(
-    "click",
-    (event) => {
+  document.addEventListener("DOMContentLoaded", () => {
+    let initialRotation = 0;
+    document.addEventListener("click", (event) => {
       const target = event.target as HTMLElement;
       const buttonId = target.closest("button")?.id;
       const projectCount = target.closest("button")?.dataset.length || "0";
-      const currentRotationDeg = 360 / Number(projectCount);
+      const currentRotationDeg = 360 / parseInt(projectCount, 10);
       const style = document.documentElement.style;
 
-      if (buttonId === "go-next") {
+      if (buttonId === "next") {
         initialRotation -= currentRotationDeg;
       }
-      if (buttonId === "go-prev") {
+      if (buttonId === "prev") {
         initialRotation += currentRotationDeg;
       }
 
       style.setProperty("--current-rotation-value", `${initialRotation}deg`);
-    },
-    { signal: controller.signal }
-  );
-
-  document.addEventListener("astro:before-swap", () => {
-    controller.abort();
+    });
   });
 </script>
 
 <Layout title="HomePage">
-  <section class="flex size-full flex-col items-center justify-between gap-4 text-clip">
-    <article class="w-fit grow gap-4 p-6 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8 xl:p-2">
+  <section class="flex size-full flex-col items-center justify-between gap-8 text-clip md:gap-4">
+    <article class="w-fit gap-4 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8 xl:p-2">
       <h1 class="text-3xl sm:col-start-2 sm:self-end
             sm:justify-self-start md:text-4xl">
         Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
@@ -59,21 +51,31 @@ const project = await getFeaturedProjectUseCase();
         class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:z-0 md:w-5/6"
       />
     </article>
-    <aside class="grid max-w-xl place-items-center px-4 md:w-4/5 2xl:w-full">
-      <div
-        class="group w-[110%] overflow-hidden backdrop-blur-lg sm:w-[125%] md:w-[130%] md:overflow-visible lg:w-[140%]"
-      >
+    <aside class="relative flex max-w-xl grow flex-col items-center justify-center px-4">
+      <div class="absolute bottom-[calc(100%-1em)] md:top-0">
+        <h2
+          class:list={[
+            "relative text-5xl md:text-7xl font-bold text-primary",
+            "after:absolute after:font-bold after:inset-0 after:content-[attr(data-title)] after:z-10 after:[-webkit-text-stroke:2px_hsl(var(--foreground))] after:[text-stroke:2px_hsla(var(--foreground))] after:text-transparent ",
+          ]}
+          data-title="Featured"
+        >
+          Featured
+        </h2>
+      </div>
+      <div class="group overflow-hidden md:overflow-visible">
         <button
-          id="go-prev"
+          id="prev"
           class:list={[
             "absolute left-0 top-1/2 z-10 h-1/4 w-fit -translate-y-1/2 border p-1 backdrop-blur-md active:scale-95 md:p-2 lg:p-4",
+            "",
             "group-hover:block group-focus-visible:block hocus-visible:outline hocus-visible:outline-1 hoverable:hidden ",
           ]}
           data-length={project.length}
           ><CircleChevronLeft className=" hocus-visible:scale-110 md:size-8" /></button
         >
         <button
-          id="go-next"
+          id="next"
           class:list={[
             "absolute right-0 top-1/2 z-10 h-1/4 w-fit -translate-y-1/2 border p-1 backdrop-blur-md active:scale-95 md:p-2 lg:p-4",
             "group-hover:block group-focus-visible:block hocus-visible:outline hocus-visible:outline-1 hoverable:hidden",
@@ -82,7 +84,7 @@ const project = await getFeaturedProjectUseCase();
           ><CircleChevronRight className="hocus-visible:scale-110 md:size-8" /></button
         >
         <div
-          class:list={" custom-div grid place-items-center"}
+          class:list={" size-full custom-div grid place-items-center"}
           style=`--quantity:${project.length}`
         >
           {
@@ -124,10 +126,23 @@ const project = await getFeaturedProjectUseCase();
       translateZ(350px) scaleX(0.8) scaleY(0.8);
   }
 
+  @media (min-width: 768px) {
+    .custom-item {
+      transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+        translateZ(250px) scaleX(0.7) scaleY(0.7);
+    }
+  }
   @media (min-width: 1024px) {
     .custom-item {
       transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-        translateZ(450px) scaleX(0.8) scaleY(0.8);
+        translateZ(400px) scaleX(0.7) scaleY(0.7);
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .custom-item {
+      transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+        translateZ(450px) scaleX(0.7) scaleY(0.7);
     }
   }
 </style>

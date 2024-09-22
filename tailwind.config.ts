@@ -73,6 +73,7 @@ const config = {
     },
   },
   plugins: [
+    require("@tailwindcss/typography"),
     plugin(({ addVariant }) => {
       addVariant("hocus-visible", ["&:hover", "&:focus:visible"]);
       addVariant("hoverable", "@media (hover: hover)");

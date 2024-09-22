@@ -26,6 +26,20 @@ const pageLinks = [
     name: "Contact",
   },
 ];
+
+const isRouteActive = (linkHref: string, currentPath: string): boolean => {
+  if (linkHref === "/") {
+    // Special case for home page
+    return currentPath === "/";
+  }
+
+  // Split both the link href and current path into segments
+  const linkParts = linkHref.split("/").filter(Boolean);
+  const pathParts = currentPath.split("/").filter(Boolean);
+
+  // Check if all parts of the link href match the beginning of the current path
+  return linkParts.every((part, index) => pathParts[index] === part);
+};
 ---
 
 <script is:inline>
@@ -85,7 +99,6 @@ const pageLinks = [
   applyTheme();
 </script>
 
-<!-- TODO: make the sub page show. -->
 <nav
   class:list={[
     "-transition-90-custom sticky top-0 z-10 flex w-full items-center justify-center p-2",
@@ -119,15 +132,14 @@ const pageLinks = [
           class:list={[
             "flex-1 max-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform tracking-wide",
             {
-              "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset":
-                pathname === `${link.href}`,
+              "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset text-primary backdrop-blur-[3px]  dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black] [text-shadow:.5px_.5px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] ":
+                isRouteActive(link.href, pathname),
             },
             {
-              "before:content-[''] before:absolute before:inset-0": pathname === `${link.href}`,
-            },
-            {
-              "text-primary backdrop-blur-[3px]  dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black] [text-shadow:.5px_.5px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] ":
-                pathname === `${link.href}`,
+              "before:content-[''] before:absolute before:inset-0": isRouteActive(
+                link.href,
+                pathname
+              ),
             },
           ]}
         >

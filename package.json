@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",
+    "@astrojs/mdx": "^3.1.7",
     "@astrojs/react": "^3.6.2",
     "@astrojs/tailwind": "^5.1.0",
     "@astrojs/vercel": "^7.8.0",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.1",
+    "@tailwindcss/typography": "^0.5.15",
     "@types/crypto-js": "^4.2.2",
     "@typescript-eslint/parser": "^8.2.0",
     "drizzle-kit": "^0.24.2",

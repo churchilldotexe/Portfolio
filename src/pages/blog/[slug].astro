@@ -1,0 +1,41 @@
+---
+import Prose from "@/components/Prose.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+export const getStaticPaths = async () => {
+  const posts = await getCollection("posts");
+
+  return posts.map((item) => {
+    return {
+      params: {
+        slug: item.slug,
+      },
+      props: { item },
+    };
+  });
+};
+
+const { item } = Astro.props;
+const { Content } = await item.render();
+---
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const backId = document.getElementById("back-btn");
+    backId?.addEventListener("click", () => {
+      history.back();
+    });
+  });
+</script>
+
+<Layout title="My blog">
+  <Prose>
+    <button
+      id="back-btn"
+      class="absolute left-2 top-0 text-3xl backdrop-blur-[3px] transition-[text-shadow] duration-700 hover:text-primary hover:[text-shadow:1px_1px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] dark:hover:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black]"
+      >&larr;</button
+    >
+    <Content />
+  </Prose>
+</Layout>

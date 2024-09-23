@@ -119,7 +119,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
               <button
                 key={val}
                 className={cn(
-                  " border group px-2 hoverable:hocus-visible:border-destructive not-hoverable:border-destructive snap-center"
+                  "border group px-2 hoverable:hocus-visible:border-destructive not-hoverable:border-destructive snap-center"
                 )}
                 type="button"
                 onClick={(e) => handleRemoveSelectValue(e, val)}
@@ -167,7 +167,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         <span className=" p-[1px] my-1 self-stretch bg-muted " />
         <span
           className={cn(
-            "relative translate-y-1/4 border-4 border-transparent border-t-foreground hoverable:hocus-visible:border-t-primary ",
+            " relative translate-y-1/4 border-4 border-transparent border-t-foreground hoverable:hocus-visible:border-t-primary ",
             {
               "border-b-primary -translate-y-1/4 border-t-transparent hoverable:hocus-visible:border-b-primary hoverable:hocus-visible:border-t-transparent":
                 isOpen,
@@ -179,7 +179,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
       <div
         ref={divRef}
         className={cn(
-          "absolute top-[calc(100%+.5em)] z-10 w-full flex items-center gap-2 p-1 flex-wrap min-h-fit border backdrop-blur bg-background/90",
+          "absolute top-[calc(100%+.5em)] z-10 w-full flex items-center gap-2 p-1 flex-wrap min-h-fit border backdrop-blur bg-background/90  ",
           { hidden: TECH_STACKS.length === selectValues.length }
         )}
       >

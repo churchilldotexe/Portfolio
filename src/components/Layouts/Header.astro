@@ -135,12 +135,6 @@ const isRouteActive = (linkHref: string, currentPath: string): boolean => {
               "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset text-primary backdrop-blur-[3px]  dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black] [text-shadow:.5px_.5px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] ":
                 isRouteActive(link.href, pathname),
             },
-            {
-              "before:content-[''] before:absolute before:inset-0": isRouteActive(
-                link.href,
-                pathname
-              ),
-            },
           ]}
         >
           <a href={link.href} class="inline-block w-full" data-astro-prefetch>

@@ -15,7 +15,7 @@ if (!project) {
 ---
 
 <script>
-  // will simulate MPA popstate which will reload the page instead
+  // will simulate Multi Page App popstate which will reload the page instead
   window.addEventListener("popstate", () => {
     if (location.pathname.includes("projects")) {
       location.reload();

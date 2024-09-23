@@ -57,7 +57,8 @@ const project = await getAllProjects();
       project.map(({ name, description, liveUrl, repoUrl, imageUrl, imageKey, techStacks }) => (
         <div
           class:list={[
-            "size-full rounded-md after:rounded-md relative bg-fixed after:shadow-elevate-light after:dark:shadow-elevate-dark bg-radial",
+            "size-full rounded-md  relative bg-fixed",
+            "after:rounded-md after:hover:shadow-elevate-light after:hover:dark:shadow-elevate-dark bg-radial after:border after:border-border before:rounded-md after:transition-shadow after:duration-500",
           ]}
         >
           <dialog
@@ -72,9 +73,10 @@ const project = await getAllProjects();
               projectName={name}
               profileImg={imageUrl}
               cardId={imageKey}
+              showDetails={true}
               class:list="rounded-md bg-background gap-2"
             >
-              <button id={imageKey} class:list={["close-dialog self-start"]}>
+              <button id={imageKey} class:list={["close-dialog self-start z-[1]"]}>
                 &larr; go back
               </button>
             </ProjectCard>
@@ -125,10 +127,6 @@ const project = await getAllProjects();
     syntax: "<length>";
     inherits: false;
     initial-value: 50%;
-  }
-
-  .bg-radial:hover::after {
-    background-color: hsl(var(--foreground));
   }
 
   .dialog-animate {

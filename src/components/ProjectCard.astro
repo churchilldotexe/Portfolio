@@ -54,53 +54,76 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
 
 <div
   class:list={[
-    " size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground",
-    { "gap-2": showDetails },
+    "group relative size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground",
     className,
     classList,
   ]}
   {...props}
 >
   <slot />
-  <Image
+
+  <div
     class:list={[
-      "size-full rounded-lg object-cover aspect-video object-center",
-      { "md:w-[85%]": showDetails },
+      "absolute left-1/2 top-0 grid w-full -translate-x-1/2 grid-rows-[0fr] opacity-0 backdrop-blur transition-[opacity_grid-template-rows] duration-500 group-hover:grid-rows-[1fr] group-hover:opacity-100",
+      {
+        "grid-rows-1 opacity-100  static ": showDetails,
+      },
     ]}
-    src={profileImg}
-    alt="sample page"
-    inferSize={true}
-  />
-  <div class="w-full">
-    <h3 class:list={["mb-2 mt-4 text-xl font-bold capitalize", { "md:text-3xl": showDetails }]}>
+  >
+    <h3 class:list={["overflow-hidden text-center text-xl font-bold capitalize"]}>
       {projectName}
     </h3>
-    <p class:list={["mb-2 leading-6", { "md:text-md": showDetails }]}>{description}</p>
-    <div class="flex w-full flex-wrap items-center justify-around gap-4">
-      <a
-        href={repoUrl}
-        target="_blank"
-        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
-      >
-        <GithubIcon className="size-6 fill-foreground " />
-        repository
-      </a>
-      <a
-        href={siteUrl}
-        target="_blank"
-        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
-      >
-        <Globe className="size-6 text-foreground " />
-        live site
-      </a>
-      <div id="stack-div" class="hover-siblings-animation flex items-center gap-2 *:size-6">
-        {
-          techStacksArrFiltered.map(({ href, Logo }) => (
-            <a class="anchor-stacks" href={href} target="_blank" rel="noopener noreferrer">
-              <Logo />
-            </a>
-          ))
-        }
+  </div>
+
+  <div class="size-fit">
+    <Image
+      class:list={["size-full rounded-lg object-cover aspect-video object-center"]}
+      src={profileImg}
+      alt="sample page"
+      inferSize={true}
+    />
+  </div>
+
+  <div
+    class:list={[
+      "absolute bottom-0 left-0 grid w-full grid-rows-[0fr] opacity-0 backdrop-blur transition-[grid-template-rows_opacity] duration-500",
+      "hoverable:group-hover:grid-rows-[1fr] hoverable:group-hover:opacity-100 not-hoverable:grid-rows-1",
+      { "grid-rows-1 opacity-100": showDetails },
+    ]}
+  >
+    <div
+      class:list={[
+        "overflow-hidden group-hover:overflow-visible",
+        { "overflow-visible": showDetails },
+      ]}
+    >
+      <p class="mb-2 leading-6">{description}</p>
+      <div class="flex w-full flex-wrap items-center justify-around gap-4">
+        <a
+          href={repoUrl}
+          target="_blank"
+          class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+        >
+          <GithubIcon className="size-6 fill-foreground " />
+          repository
+        </a>
+        <a
+          href={siteUrl}
+          target="_blank"
+          class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+        >
+          <Globe className="size-6 text-foreground " />
+          live site
+        </a>
+        <div id="stack-div" class="hover-siblings-animation flex items-center gap-2 *:size-6">
+          {
+            techStacksArrFiltered.map(({ href, Logo }) => (
+              <a href={href} target="_blank" rel="noopener noreferrer">
+                <Logo />
+              </a>
+            ))
+          }
+        </div>
       </div>
     </div>
   </div>
@@ -108,19 +131,21 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
 
 <style>
   @media (hover: hover) {
-    .hover-siblings-animation * {
+    .hover-siblings-animation > * {
       transition: scale 200ms ease-in-out;
       position: relative;
+      filter: grayscale(1);
     }
 
     .hover-siblings-animation > *:hover {
       padding: 2px;
       scale: 2;
+      filter: grayscale(0);
     }
 
     .hover-siblings-animation > *:has(~ :hover),
     .hover-siblings-animation > *:hover ~ * {
-      filter: brightness(25%);
+      filter: brightness(25%) grayscale(1);
     }
   }
 </style>

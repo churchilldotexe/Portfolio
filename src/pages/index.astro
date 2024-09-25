@@ -16,15 +16,49 @@ const project = await getFeaturedProjectUseCase();
       const target = event.target as HTMLElement;
       const buttonId = target.closest("button")?.id;
       const projectCount = target.closest("button")?.dataset.length || "0";
-      const currentRotationDeg = 360 / parseInt(projectCount, 10);
+      const currProjCount = parseInt(projectCount, 10);
+      const currentRotationDeg = 360 / currProjCount;
       const style = document.documentElement.style;
 
       if (buttonId === "next") {
-        initialRotation -= currentRotationDeg;
+        Math.floor((initialRotation -= currentRotationDeg));
       }
       if (buttonId === "prev") {
-        initialRotation += currentRotationDeg;
+        Math.floor((initialRotation += currentRotationDeg));
       }
+      //// Focus on this part
+      //const clickedIndex = target.closest(".projectCard")?.getAttribute("data-index");
+      //const clickedCurrProjCount = target.closest(".projectCard")?.getAttribute("data-length");
+      //
+      //if (clickedIndex && clickedCurrProjCount) {
+      //  const clickedIdxNum = parseInt(clickedIndex, 10);
+      //  const clickedProjCount = parseInt(clickedCurrProjCount, 10);
+      //  const currActiveProject = Math.abs(initialRotation / currentRotationDeg) % clickedProjCount;
+      //
+      //  console.log(currActiveProject, "currActiveProject");
+      //  console.log(clickedIdxNum, "clickedIdxNum");
+      //  console.log(clickedProjCount, "clickedProjCount");
+      //
+      //  if (
+      //    currActiveProject + 1 === clickedIdxNum ||
+      //    (currActiveProject === clickedProjCount && clickedIdxNum === 0) ||
+      //    (Number.isNaN(currActiveProject) && 1 === clickedIdxNum)
+      //  ) {
+      //    console.log("next");
+      //    // go next
+      //    Math.floor((initialRotation -= currentRotationDeg));
+      //  }
+      //
+      //  if (
+      //    currActiveProject > clickedIdxNum ||
+      //    (currActiveProject === 0 && clickedIdxNum === clickedProjCount - 1) ||
+      //    (Number.isNaN(currActiveProject) && clickedIdxNum === clickedProjCount - 1)
+      //  ) {
+      //    console.log("prev");
+      //    // go prev
+      //    Math.floor((initialRotation += currentRotationDeg));
+      //  }
+      //}
 
       style.setProperty("--current-rotation-value", `${initialRotation}deg`);
     });
@@ -32,7 +66,7 @@ const project = await getFeaturedProjectUseCase();
 </script>
 
 <Layout title="HomePage">
-  <section class="flex size-full flex-col items-center justify-between gap-8 text-clip md:gap-4">
+  <section class="flex size-full flex-col items-center gap-8 text-clip md:gap-4">
     <article class="w-fit gap-4 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8 xl:p-2">
       <h1 class="text-3xl sm:col-start-2 sm:self-end
             sm:justify-self-start md:text-4xl">
@@ -51,24 +85,25 @@ const project = await getFeaturedProjectUseCase();
         class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:z-0 md:w-5/6"
       />
     </article>
-    <aside class="relative flex size-fit max-w-xl grow flex-col items-center justify-center px-4">
-      <div class="absolute bottom-[calc(100%-1em)] md:top-0">
-        <h2
-          class:list={[
-            "relative text-5xl md:text-7xl font-bold text-primary",
-            "after:absolute after:font-bold after:inset-0 after:content-[attr(data-title)] after:z-10 after:[-webkit-text-stroke:2px_hsl(var(--foreground))] after:[text-stroke:2px_hsla(var(--foreground))] after:text-transparent ",
-          ]}
-          data-title="Featured"
-        >
-          Featured
-        </h2>
-      </div>
-      <div class="group overflow-hidden md:overflow-visible">
+
+    <aside class="relative flex grow flex-col items-center justify-center px-4 sm:justify-between">
+      <h2
+        class:list={[
+          " absolute sm:relative bottom-[95%] sm:bottom-[unset] text-5xl md:text-7xl font-bold text-primary",
+          "after:absolute after:font-bold after:inset-0 after:content-[attr(data-title)] after:z-10 after:[-webkit-text-stroke:2px_hsl(var(--foreground))] after:[text-stroke:2px_hsla(var(--foreground))] after:text-transparent ",
+        ]}
+        data-title="Featured"
+      >
+        Featured
+      </h2>
+
+      <div
+        class="group z-[2] size-full overflow-hidden sm:absolute sm:left-1/2 sm:top-[5%] sm:h-auto sm:w-[clamp(35em,50dvw,70dvw)] sm:-translate-x-1/2 md:overflow-visible"
+      >
         <button
           id="prev"
           class:list={[
             "absolute left-0 top-1/2 z-10 h-1/4 w-fit -translate-y-1/2 border p-1 backdrop-blur-md active:scale-95 md:p-2 lg:p-4",
-            "",
             "group-hover:block group-focus-visible:block hocus-visible:outline hocus-visible:outline-1 hoverable:hidden ",
           ]}
           data-length={project.length}
@@ -98,8 +133,10 @@ const project = await getFeaturedProjectUseCase();
                 description={value.description}
                 profileImg={value.imageUrl}
                 class:list={[
-                  "relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
+                  "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
                 ]}
+                data-index={index}
+                data-length={project.length}
                 style={`--position:${index + 1}`}
               />
             ))

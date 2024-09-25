@@ -6,6 +6,7 @@ import { ACCEPTED_FILE_TYPE, type TechStackNamesTypes } from "@/lib/constants";
 import { Crown, ImagePlus, Loader2 } from "lucide-react";
 import { Select } from "./Select";
 import { ZodError, z } from "zod";
+import type { LoginStatus } from "@/pages/dashboard/index.astro";
 
 export const prerender = false;
 
@@ -30,7 +31,14 @@ const PROJECT_INPUT_DATA = [
   },
 ] as const;
 
-export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function ProjectForm({
+  isLoggedIn,
+  loginStatus,
+}: {
+  isLoggedIn: boolean;
+  loginStatus: LoginStatus;
+}) {
+  //TODO: Refactor the useState to useReducer
   const [responseMessage, setResponseMessage] = useState("");
   const [objectUrls, setObjectUrls] = useState<string[]>([]);
   const [selectValues, setSelectValues] = useState<TechStackNamesTypes[]>([]);
@@ -44,6 +52,7 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
     addToFeatured: "",
   });
   const [isFormPending, setIsFormPending] = useState<boolean>(false);
+  const [isLoggingIn, setIsLogginIn] = useState<boolean>(() => loginStatus === "success" && false);
 
   const handleImageChange = (fileList: FileList | null) => {
     if (fileList === null) {
@@ -244,8 +253,23 @@ export default function ProjectForm({ isLoggedIn }: { isLoggedIn: boolean }) {
               { hidden: isLoggedIn }
             )}
             href="/api/redirect"
+            aria-disabled={isLoggingIn}
+            onClick={(e) => {
+              e.preventDefault();
+
+              setIsLogginIn(true);
+              location.assign("/api/redirect");
+            }}
           >
-            Connect to Github
+            {isLoggingIn ? (
+              <Loader2
+                className={cn(
+                  "animate-spin absolute text-muted-foreground [grid-area:1/1] place-self-center w-full block"
+                )}
+              />
+            ) : (
+              "Connect to Github"
+            )}
           </a>
         </div>
 

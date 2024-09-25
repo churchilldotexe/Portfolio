@@ -3,15 +3,39 @@ import Layout from "@/layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
 import { Image } from "astro:assets";
 import ProjectCard from "@/components/ProjectCard.astro";
-import { CircleChevronRight, CircleChevronLeft } from "lucide-react";
+import { CircleChevronRight, CircleChevronLeft, Globe } from "lucide-react";
 import { getFeaturedProjectUseCase } from "@/server/use-case/project";
+import { GithubIcon } from "@/components/svg/SocialIcons";
+import { TECH_STACKS } from "@/lib/constants";
 
 const project = await getFeaturedProjectUseCase();
 ---
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    const cardsParent = document.getElementById("cards-parent");
+    const projectCards = cardsParent?.querySelectorAll(".projectCard");
+
     let initialRotation = 0;
+    let currFacingCard = 0;
+
+    const autoRemoveDataset = (
+      projectCards: Element | undefined,
+      dataset: string,
+      value: string,
+      removeValue: string,
+      removeTime: number
+    ) => {
+      projectCards?.setAttribute(dataset, value);
+      setTimeout(() => {
+        projectCards?.setAttribute(dataset, removeValue);
+      }, removeTime);
+    };
+
+    if (projectCards?.[0] && projectCards[0] instanceof HTMLElement) {
+      //projectCards[0].classList.add("enter-animation");
+      autoRemoveDataset(projectCards[0], "data-enter", "true", "false", 500);
+    }
     document.addEventListener("click", (event) => {
       const target = event.target as HTMLElement;
       const buttonId = target.closest("button")?.id;
@@ -20,45 +44,24 @@ const project = await getFeaturedProjectUseCase();
       const currentRotationDeg = 360 / currProjCount;
       const style = document.documentElement.style;
 
+      console.log(projectCards);
+
       if (buttonId === "next") {
+        autoRemoveDataset(projectCards?.[currFacingCard], "data-exit", "true", "false", 500);
+        currFacingCard = ++currFacingCard % currProjCount;
         Math.floor((initialRotation -= currentRotationDeg));
+        autoRemoveDataset(projectCards?.[currFacingCard], "data-enter", "true", "false", 500);
       }
       if (buttonId === "prev") {
+        //starts at the last index
+        //
+        autoRemoveDataset(projectCards?.[currFacingCard], "data-prev-exit", "true", "false", 500);
+        currFacingCard =
+          currFacingCard === 0 ? 2 % currProjCount : --currFacingCard % currProjCount;
         Math.floor((initialRotation += currentRotationDeg));
+
+        autoRemoveDataset(projectCards?.[currFacingCard], "data-prev-enter", "true", "false", 500);
       }
-      //// Focus on this part
-      //const clickedIndex = target.closest(".projectCard")?.getAttribute("data-index");
-      //const clickedCurrProjCount = target.closest(".projectCard")?.getAttribute("data-length");
-      //
-      //if (clickedIndex && clickedCurrProjCount) {
-      //  const clickedIdxNum = parseInt(clickedIndex, 10);
-      //  const clickedProjCount = parseInt(clickedCurrProjCount, 10);
-      //  const currActiveProject = Math.abs(initialRotation / currentRotationDeg) % clickedProjCount;
-      //
-      //  console.log(currActiveProject, "currActiveProject");
-      //  console.log(clickedIdxNum, "clickedIdxNum");
-      //  console.log(clickedProjCount, "clickedProjCount");
-      //
-      //  if (
-      //    currActiveProject + 1 === clickedIdxNum ||
-      //    (currActiveProject === clickedProjCount && clickedIdxNum === 0) ||
-      //    (Number.isNaN(currActiveProject) && 1 === clickedIdxNum)
-      //  ) {
-      //    console.log("next");
-      //    // go next
-      //    Math.floor((initialRotation -= currentRotationDeg));
-      //  }
-      //
-      //  if (
-      //    currActiveProject > clickedIdxNum ||
-      //    (currActiveProject === 0 && clickedIdxNum === clickedProjCount - 1) ||
-      //    (Number.isNaN(currActiveProject) && clickedIdxNum === clickedProjCount - 1)
-      //  ) {
-      //    console.log("prev");
-      //    // go prev
-      //    Math.floor((initialRotation += currentRotationDeg));
-      //  }
-      //}
 
       style.setProperty("--current-rotation-value", `${initialRotation}deg`);
     });
@@ -86,11 +89,11 @@ const project = await getFeaturedProjectUseCase();
       />
     </article>
 
-    <aside class="relative flex grow flex-col items-center justify-center px-4 sm:justify-between">
+    <aside class="grid-custom-template relative grid w-full grow px-4">
       <h2
         class:list={[
-          " absolute sm:relative bottom-[95%] sm:bottom-[unset] text-5xl md:text-7xl font-bold text-primary",
-          "after:absolute after:font-bold after:inset-0 after:content-[attr(data-title)] after:z-10 after:[-webkit-text-stroke:2px_hsl(var(--foreground))] after:[text-stroke:2px_hsla(var(--foreground))] after:text-transparent ",
+          "absolute bottom-[calc(100%-1rem)] md:bottom-[calc(100%-4rem)] lg:bottom-[calc(100%-3rem)] text-5xl md:text-7xl font-bold text-primary",
+          "after:absolute  after:font-bold after:inset-0 after:content-[attr(data-title)] after:z-10 after:[-webkit-text-stroke:2px_hsl(var(--foreground))] after:[text-stroke:2px_hsla(var(--foreground))] after:text-transparent ",
         ]}
         data-title="Featured"
       >
@@ -98,7 +101,7 @@ const project = await getFeaturedProjectUseCase();
       </h2>
 
       <div
-        class="group z-[2] size-full overflow-hidden sm:absolute sm:left-1/2 sm:top-[5%] sm:h-auto sm:w-[clamp(35em,50dvw,70dvw)] sm:-translate-x-1/2 md:overflow-visible"
+        class="group relative z-[2] h-full w-[clamp(20rem,100%,64rem)] overflow-hidden md:overflow-visible"
       >
         <button
           id="prev"
@@ -119,27 +122,73 @@ const project = await getFeaturedProjectUseCase();
           ><CircleChevronRight className="hocus-visible:scale-110 md:size-8" /></button
         >
         <div
+          id="cards-parent"
           class:list={" size-full custom-div grid place-items-center"}
           style=`--quantity:${project.length}`
         >
           {
-            project.map((value, index) => (
-              <ProjectCard
-                techstackArr={value.techStacks}
-                repoUrl={value.repoUrl}
-                siteUrl={value.liveUrl}
-                cardId={value.imageKey}
-                projectName={value.name}
-                description={value.description}
-                profileImg={value.imageUrl}
-                class:list={[
-                  "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
-                ]}
-                data-index={index}
-                data-length={project.length}
-                style={`--position:${index + 1}`}
-              />
-            ))
+            project.map(
+              ({ description, name, imageUrl, liveUrl, repoUrl, imageKey, techStacks }, index) => {
+                const techStacksArrFiltered = TECH_STACKS.filter((stack) =>
+                  techStacks.includes(stack.stackName)
+                );
+                return (
+                  <div
+                    data-enter={false}
+                    data-exit={false}
+                    data-prev-enter={false}
+                    data-prev-exit={false}
+                    class:list={[
+                      "  size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground ",
+                      "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
+                      "exit-animation-next enter-animation-next enter-animation-prev exit-animation-prev",
+                    ]}
+                    style={`--position:${index + 1}`}
+                  >
+                    <Image
+                      class:list={["size-full rounded-lg object-cover aspect-video object-center"]}
+                      src={imageUrl}
+                      alt="sample page"
+                      inferSize={true}
+                    />
+
+                    <h3 class:list={["text-center text-xl font-bold capitalize"]}>{name}</h3>
+
+                    <div class:list={["absolute bottom-0 left-0 w-full backdrop-blur  "]}>
+                      <p class="mb-2 leading-6">{description}</p>
+                      <div class="flex w-full flex-wrap items-center justify-around gap-4">
+                        <a
+                          href={repoUrl}
+                          target="_blank"
+                          class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+                        >
+                          <GithubIcon className="size-6 fill-foreground " />
+                          repository
+                        </a>
+                        <a
+                          href={liveUrl}
+                          target="_blank"
+                          class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+                        >
+                          <Globe className="size-6 text-foreground " />
+                          live site
+                        </a>
+                        <div
+                          id="stack-div"
+                          class="hover-siblings-animation flex items-center gap-2 *:size-6"
+                        >
+                          {techStacksArrFiltered.map(({ href, Logo }) => (
+                            <a href={href} target="_blank" rel="noopener noreferrer">
+                              <Logo />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+            )
           }
         </div>
       </div>
@@ -161,6 +210,68 @@ const project = await getFeaturedProjectUseCase();
   .custom-item {
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
       translateZ(350px) scaleX(0.8) scaleY(0.8);
+  }
+
+  .enter-animation-prev[data-prev-enter="true"] *:not(img) {
+    transform: translateX(-1000px);
+    visibility: hidden;
+    animation: enter 500ms linear 1 forwards;
+  }
+
+  .enter-animation-next[data-enter="true"] *:not(img) {
+    transform: translateX(1000px);
+    visibility: hidden;
+    animation: enter 500ms linear 1 forwards;
+  }
+
+  @keyframes enter {
+    to {
+      transform: translateX(0);
+      visibility: visible;
+    }
+  }
+
+  .exit-animation-prev[data-prev-exit="true"] *:not(img) {
+    transform: translateX(0);
+    visibility: visible;
+    animation: exit-prev 500ms linear 1 forwards;
+  }
+
+  @keyframes exit-prev {
+    to {
+      transform: translateX(1000px);
+      visibility: hidden;
+    }
+  }
+
+  .exit-animation-next[data-exit="true"] *:not(img) {
+    transform: translateX(0);
+    visibility: visible;
+    animation: exit-next 500ms linear 1 forwards;
+  }
+
+  @keyframes exit-next {
+    to {
+      transform: translateX(-1000px);
+      visibility: hidden;
+    }
+  }
+
+  .grid-custom-template {
+    gap: 1rem;
+    grid-template-columns: [content-start]1fr [content-end];
+    grid-template-rows:
+      [ title-start content-start] auto
+      [ title-end] 1fr [ content-end];
+  }
+
+  .grid-custom-template > h2 {
+    place-self: center;
+    grid-area: title;
+  }
+  .grid-custom-template > div {
+    place-self: center;
+    grid-area: content;
   }
 
   @media (min-width: 768px) {

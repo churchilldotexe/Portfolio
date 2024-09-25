@@ -3,22 +3,27 @@ export const prerender = false;
 
 import ProjectForm from "@/components/react-components/ProjectForm";
 import Layout from "../../layouts/Layout.astro";
-import { COOKIES_PROPERTIES } from "@/lib/constants";
-import { refreshAccessToken } from "@/server/use-case/auth";
+
 const userId = Astro.locals.userId;
 
-if (!userId) {
-  const userToken = Astro.cookies.get(COOKIES_PROPERTIES.ACCESSTOKEN)?.value;
-  // if no token from cookies = not logged in
-  if (userToken) {
-    await refreshAccessToken(userToken);
-  }
+//TODO: show message in case failed/error refactor the api/callback
+//- [] create a type that will only show if the status is failed like an error message.
+//- [] probably remove the pending as it is not needed
+// - [] if can do a sonner effect component
+
+export type LoginStatus = "success" | "failed" | "pending";
+const loginParams = Astro.url.searchParams.get("login");
+let loginStatus: LoginStatus =
+  loginParams === "success" || loginParams === "pending" ? loginParams : "failed";
+
+if (!userId && loginStatus === "success") {
+  return Astro.redirect(`/api/redirect`); // helper to refresh cookie
 }
 const isLoggedIn = userId ? true : false;
 ---
 
 <Layout title="Welcome to Dashboard ">
   <section class="flex size-full flex-col items-center justify-center gap-4">
-    <ProjectForm client:load isLoggedIn={isLoggedIn} />
+    <ProjectForm client:load isLoggedIn={isLoggedIn} loginStatus={loginStatus} />
   </section>
 </Layout>

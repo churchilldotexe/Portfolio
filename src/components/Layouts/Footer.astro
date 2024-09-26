@@ -29,7 +29,7 @@ const SOCIAL_LINKS = [
 ] as const;
 ---
 
-<footer class="flex items-center justify-center gap-6  text-2xl">
+<footer class="z-50 flex items-center justify-center gap-6 p-2 text-2xl">
   {
     SOCIAL_LINKS.map((social) => (
       <a
@@ -45,12 +45,12 @@ const SOCIAL_LINKS = [
           "before:content-[attr(data-name)] text-neutral-50 before:absolute before:rounded before:top-0 before:text-lg before:left-1/2 before:-translate-x-1/2 before:p-1 before:bg-[var(--social-color)] before:shadow-elevate-light before:dark:shadow-elevate-dark ",
           //BEFORE content Transition Animation Related:
           "before:opacity-0 before:rotate-12 before:scale-50",
-          "before:hover:-top-10 before:hover:opacity-100 before:hover:rotate-0 before:transition-[opacity_top_transform] before:[transition-timing-function:cubic-bezier(.27,-0.43,.71,1.51)] before:hover:scale-100 before:duration-300",
+          "before:hover:-top-10 before:hover:opacity-100  before:hover:rotate-0 before:transition-[opacity_top_transform] before:[transition-timing-function:cubic-bezier(.27,-0.43,.71,1.51)] before:hover:scale-100 before:duration-300",
 
           "after:content-[''] after:border-l-8 after:border-r-8 after:border-t-[10px] after:border-l-transparent after:border-r-transparent after:border-t-[var(--social-color)] after:absolute after:left-1/2 after:-translate-x-1/2",
           // AFTER content Transition Animation Related:
-          "after:scale-50 after:rotate-12 after:top-6 after:opacity-0",
-          "after:hover:-top-1.5 after:hover:opacity-100 after:hover:rotate-0 after:transition-[opacity_top_transform] after:[transition-timing-function:cubic-bezier(.27,-0.43,.71,1.51)] after:hover:scale-100 after:duration-300",
+          "after:scale-50 after:rotate-12 after:top-6 after:opacity-0 ",
+          "after:hover:-top-1.5 after:hover:opacity-100 after:hover:rotate-0  after:transition-[opacity_top_transform] after:[transition-timing-function:cubic-bezier(.27,-0.43,.71,1.51)] after:hover:scale-100 after:duration-300",
         ]}
       >
         <social.logo className="fill-foreground hover:fill-[var(--social-color)] dark:hover:fill-foreground " />
@@ -58,4 +58,3 @@ const SOCIAL_LINKS = [
     ))
   }
 </footer>
-

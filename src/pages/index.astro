@@ -29,8 +29,6 @@ const project = await getFeaturedProjectUseCase();
       const currentRotationDeg = 360 / currProjCount;
       const style = document.documentElement.style;
 
-      console.log(projectCards);
-
       if (buttonId === "next") {
         //set to false before we go to next card
         projectCards?.[currFacingCard]?.setAttribute("data-enter", "false");
@@ -42,7 +40,9 @@ const project = await getFeaturedProjectUseCase();
       if (buttonId === "prev") {
         projectCards?.[currFacingCard]?.setAttribute("data-enter", "false");
         currFacingCard =
-          currFacingCard === 0 ? 2 % currProjCount : --currFacingCard % currProjCount;
+          currFacingCard === 0
+            ? (currProjCount - 1) % currProjCount
+            : --currFacingCard % currProjCount;
         Math.floor((initialRotation += currentRotationDeg));
         projectCards?.[currFacingCard]?.setAttribute("data-enter", "true");
       }
@@ -129,7 +129,9 @@ const project = await getFeaturedProjectUseCase();
                     inferSize={true}
                   />
 
-                  <div class:list={["absolute inset-0 w-full backdrop-blur grid-custom-area "]}>
+                  <div
+                    class:list={["sm:absolute sm:inset-0 w-full backdrop-blur grid-custom-area "]}
+                  >
                     <div class="absolute flex w-full flex-wrap items-center justify-around gap-4 ">
                       <h3
                         class:list={[
@@ -156,7 +158,7 @@ const project = await getFeaturedProjectUseCase();
                       </a>
                     </div>
 
-                    <div class="flex flex-wrap items-center justify-center">
+                    <div class="flex flex-wrap items-center justify-center gap-2">
                       <p class="w-full  px-4 py-2 leading-6">{description}</p>
                       <div class="hover-siblings-animation flex items-center gap-2  *:size-6">
                         {techStacksArrFiltered.map(({ href, Logo }) => (
@@ -277,6 +279,14 @@ const project = await getFeaturedProjectUseCase();
       transform: translateY(0);
       display: flex;
       opacity: 1;
+      filter: blur(0);
+    }
+  }
+  @media (prefers-reduced-motion) {
+    .enter-animation[data-enter="true"] > div > div:nth-of-type(1),
+    .enter-animation[data-enter="true"] > div > div:nth-of-type(2) {
+      opacity: 1;
+      transform: translateY(0);
       filter: blur(0);
     }
   }

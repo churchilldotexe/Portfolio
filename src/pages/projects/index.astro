@@ -58,12 +58,12 @@ const project = await getAllProjects();
         <div
           class:list={[
             "size-full rounded-md  relative bg-fixed",
-            "after:rounded-md after:hover:shadow-elevate-light after:hover:dark:shadow-elevate-dark bg-radial after:border after:border-border before:rounded-md after:transition-shadow after:duration-500",
+            "after:rounded-md after:not-hoverable:shadow-elevate-light after:not-hoverable:dark:shadow-elevate-dark after:hover:shadow-elevate-light after:hover:dark:shadow-elevate-dark bg-radial after:border after:border-border before:rounded-md after:transition-shadow after:duration-500",
           ]}
         >
           <dialog
             id={imageKey}
-            class="dialog-animate peer max-w-3xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
+            class="dialog-animate peer max-w-5xl gap-4 rounded-md bg-transparent p-4 backdrop:bg-background/15 backdrop:backdrop-blur-sm"
           >
             <ProjectCard
               techstackArr={techStacks}
@@ -135,6 +135,7 @@ const project = await getAllProjects();
     transition-timing-function: ease-in-out;
     transition-behavior: allow-discrete;
     scale: 0.5;
+    opacity: 0;
   }
 
   .dialog-animate[open] {

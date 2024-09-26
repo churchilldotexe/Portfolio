@@ -62,41 +62,27 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
 >
   <slot />
 
-  <div
+  <h3
     class:list={[
-      "absolute left-1/2 top-0 grid w-full -translate-x-1/2 grid-rows-[0fr] opacity-0 backdrop-blur transition-[opacity_grid-template-rows] duration-500 group-hover:grid-rows-[1fr] group-hover:opacity-100",
-      {
-        "grid-rows-1 opacity-100  static ": showDetails,
-      },
+      "overflow-hidden not-hoverable:overflow-visible text-center text-xl font-bold capitalize",
     ]}
   >
-    <h3 class:list={["overflow-hidden text-center text-xl font-bold capitalize"]}>
-      {projectName}
-    </h3>
-  </div>
-
-  <div class="size-fit">
-    <Image
-      class:list={["size-full rounded-lg object-cover aspect-video object-center"]}
-      src={profileImg}
-      alt="sample page"
-      inferSize={true}
-    />
-  </div>
-
+    {projectName}
+  </h3>
+  <Image
+    class:list={["size-full rounded-lg object-cover aspect-video object-center  "]}
+    src={profileImg}
+    alt="sample page"
+    inferSize={true}
+  />
   <div
     class:list={[
       "absolute bottom-0 left-0 grid w-full grid-rows-[0fr] opacity-0 backdrop-blur transition-[grid-template-rows_opacity] duration-500",
-      "hoverable:group-hover:grid-rows-[1fr] hoverable:group-hover:opacity-100 not-hoverable:grid-rows-1",
+      " hoverable:group-hover:grid-rows-[1fr] hoverable:group-hover:opacity-100 not-hoverable:grid-rows-1 not-hoverable:opacity-100",
       { "grid-rows-1 opacity-100": showDetails },
     ]}
   >
-    <div
-      class:list={[
-        "overflow-hidden group-hover:overflow-visible",
-        { "overflow-visible": showDetails },
-      ]}
-    >
+    <div class:list={["overflow-hidden", { "overflow-visible": showDetails }]}>
       <p class="mb-2 leading-6">{description}</p>
       <div class="flex w-full flex-wrap items-center justify-around gap-4">
         <a
@@ -128,24 +114,3 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
     </div>
   </div>
 </div>
-
-<style>
-  @media (hover: hover) {
-    .hover-siblings-animation > * {
-      transition: scale 200ms ease-in-out;
-      position: relative;
-      filter: grayscale(1);
-    }
-
-    .hover-siblings-animation > *:hover {
-      padding: 2px;
-      scale: 2;
-      filter: grayscale(0);
-    }
-
-    .hover-siblings-animation > *:has(~ :hover),
-    .hover-siblings-animation > *:hover ~ * {
-      filter: brightness(25%) grayscale(1);
-    }
-  }
-</style>

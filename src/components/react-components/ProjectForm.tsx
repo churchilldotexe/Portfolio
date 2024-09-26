@@ -96,25 +96,28 @@ export default function ProjectForm({
       return;
     }
 
-    const data = await fetcher(
+    const result = await fetcher(
       "/api/create-project",
       { method: "POST", body: formData },
       fetcherSchema
     );
 
-    if (data instanceof Error || data instanceof ZodError) {
-      throw new Error(`${data.name}. ${data.cause}. ${data.message}`);
+    if (!result.success) {
+      if (result.error instanceof ZodError) {
+        throw new Error(`Validation error: ${result.error.message}`);
+      } else {
+        throw new Error(`Error: ${result.error.message}`);
+      }
     }
-    if (data.message) {
-      (event.target as HTMLFormElement).reset();
-      setObjectUrls((prevUrl) => {
-        return prevUrl.filter((url) => URL.revokeObjectURL(url));
-      });
 
-      setSelectValues([]);
-      setIsFormPending(false);
-      setResponseMessage(data.message);
-    }
+    (event.target as HTMLFormElement).reset();
+    setObjectUrls((prevUrl) => {
+      return prevUrl.filter((url) => URL.revokeObjectURL(url));
+    });
+
+    setSelectValues([]);
+    setIsFormPending(false);
+    setResponseMessage(result.data.message);
   }
 
   return (

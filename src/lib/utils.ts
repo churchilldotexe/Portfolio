@@ -1,3 +1,4 @@
+import type { ZodTypeAny } from "astro:schema";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ZodError, type z } from "zod";
@@ -6,11 +7,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+type FetcherReturnTypes<T extends ZodTypeAny> =
+  | {
+      success: true;
+      data: z.TypeOf<T>;
+    }
+  | { success: false; error: Error | ZodError<any> };
+
 export async function fetcher<T extends z.ZodTypeAny>(
   url: string | Request | URL,
   init: RequestInit,
   responseValidator: T
-) {
+): Promise<FetcherReturnTypes<T>> {
   const response = await fetch(url, init)
     .then((res) => {
       if (!res.ok) {
@@ -23,9 +31,9 @@ export async function fetcher<T extends z.ZodTypeAny>(
       return e instanceof Error ? e : new Error(e);
     });
 
-  if (response instanceof Error) return response;
+  if (response instanceof Error) return { success: false, error: response };
 
-  return await response
+  const data = await response
     .json()
     .then((resData) => {
       const parsedData = responseValidator.parse(resData) as z.infer<T>;
@@ -34,6 +42,13 @@ export async function fetcher<T extends z.ZodTypeAny>(
     .catch((e) => {
       return e instanceof Error ? e : e instanceof ZodError ? e : new Error(e);
     });
+
+  if (data instanceof ZodError) {
+    return { success: false, error: data };
+  } else if (data instanceof Error) {
+    return { success: false, error: data };
+  }
+  return { success: true, data };
 }
 
 export function removeArrayItem<T>(value: T, arr: T[]): T[] {

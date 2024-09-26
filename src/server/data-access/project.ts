@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import db from "../database";
 import projects, {
   insertProjectsSchema,
@@ -88,7 +88,7 @@ export async function getFeaturedProjectFromDB(userId: string): Promise<GetProje
       projects.createdAt,
       projects.updatedAt
     )
-    .orderBy(projects.createdAt);
+    .orderBy(desc(projects.updatedAt));
 
   return featuredProjectData;
 }

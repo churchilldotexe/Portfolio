@@ -2,7 +2,6 @@
 import Layout from "@/layouts/Layout.astro";
 import profileImg from "@/assets/profile.png";
 import { Image } from "astro:assets";
-import ProjectCard from "@/components/ProjectCard.astro";
 import { CircleChevronRight, CircleChevronLeft, Globe } from "lucide-react";
 import { getFeaturedProjectUseCase } from "@/server/use-case/project";
 import { GithubIcon } from "@/components/svg/SocialIcons";
@@ -19,22 +18,8 @@ const project = await getFeaturedProjectUseCase();
     let initialRotation = 0;
     let currFacingCard = 0;
 
-    const autoRemoveDataset = (
-      projectCards: Element | undefined,
-      dataset: string,
-      value: string,
-      removeValue: string,
-      removeTime: number
-    ) => {
-      projectCards?.setAttribute(dataset, value);
-      setTimeout(() => {
-        projectCards?.setAttribute(dataset, removeValue);
-      }, removeTime);
-    };
-
     if (projectCards?.[0] && projectCards[0] instanceof HTMLElement) {
-      //projectCards[0].classList.add("enter-animation");
-      autoRemoveDataset(projectCards[0], "data-enter", "true", "false", 500);
+      projectCards?.[currFacingCard]?.setAttribute("data-enter", "true");
     }
     document.addEventListener("click", (event) => {
       const target = event.target as HTMLElement;
@@ -47,20 +32,19 @@ const project = await getFeaturedProjectUseCase();
       console.log(projectCards);
 
       if (buttonId === "next") {
-        autoRemoveDataset(projectCards?.[currFacingCard], "data-exit", "true", "false", 500);
+        //set to false before we go to next card
+        projectCards?.[currFacingCard]?.setAttribute("data-enter", "false");
+
         currFacingCard = ++currFacingCard % currProjCount;
         Math.floor((initialRotation -= currentRotationDeg));
-        autoRemoveDataset(projectCards?.[currFacingCard], "data-enter", "true", "false", 500);
+        projectCards?.[currFacingCard]?.setAttribute("data-enter", "true");
       }
       if (buttonId === "prev") {
-        //starts at the last index
-        //
-        autoRemoveDataset(projectCards?.[currFacingCard], "data-prev-exit", "true", "false", 500);
+        projectCards?.[currFacingCard]?.setAttribute("data-enter", "false");
         currFacingCard =
           currFacingCard === 0 ? 2 % currProjCount : --currFacingCard % currProjCount;
         Math.floor((initialRotation += currentRotationDeg));
-
-        autoRemoveDataset(projectCards?.[currFacingCard], "data-prev-enter", "true", "false", 500);
+        projectCards?.[currFacingCard]?.setAttribute("data-enter", "true");
       }
 
       style.setProperty("--current-rotation-value", `${initialRotation}deg`);
@@ -71,14 +55,11 @@ const project = await getFeaturedProjectUseCase();
 <Layout title="HomePage">
   <section class="flex size-full flex-col items-center gap-8 text-clip md:gap-4">
     <article class="w-fit gap-4 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8 xl:p-2">
-      <h1 class="text-3xl sm:col-start-2 sm:self-end
-            sm:justify-self-start md:text-4xl">
+      <h1 class="text-3xl sm:col-start-2 sm:self-end sm:justify-self-start md:text-4xl">
         Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
       </h1>
       <p
-        class="my-4 inline-block bg-rose-500 p-2 text-lg font-semibold text-gray-50
-            sm:col-start-1 sm:col-end-3 sm:row-start-2
-            sm:self-start sm:text-end md:py-2 md:text-2xl"
+        class="my-4 inline-block bg-rose-500 p-2 text-lg font-semibold text-gray-50 sm:col-start-1 sm:col-end-3 sm:row-start-2 sm:self-start sm:text-end md:py-2 md:text-2xl"
       >
         A Font-End Developer
       </p>
@@ -89,7 +70,7 @@ const project = await getFeaturedProjectUseCase();
       />
     </article>
 
-    <aside class="grid-custom-template relative grid w-full grow px-4">
+    <aside class="grid-custom-template relative grid grow px-4">
       <h2
         class:list={[
           "absolute bottom-[calc(100%-1rem)] md:bottom-[calc(100%-4rem)] lg:bottom-[calc(100%-3rem)] text-5xl md:text-7xl font-bold text-primary",
@@ -127,68 +108,68 @@ const project = await getFeaturedProjectUseCase();
           style=`--quantity:${project.length}`
         >
           {
-            project.map(
-              ({ description, name, imageUrl, liveUrl, repoUrl, imageKey, techStacks }, index) => {
-                const techStacksArrFiltered = TECH_STACKS.filter((stack) =>
-                  techStacks.includes(stack.stackName)
-                );
-                return (
-                  <div
-                    data-enter={false}
-                    data-exit={false}
-                    data-prev-enter={false}
-                    data-prev-exit={false}
-                    class:list={[
-                      "  size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground ",
-                      "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
-                      "exit-animation-next enter-animation-next enter-animation-prev exit-animation-prev",
-                    ]}
-                    style={`--position:${index + 1}`}
-                  >
-                    <Image
-                      class:list={["size-full rounded-lg object-cover aspect-video object-center"]}
-                      src={imageUrl}
-                      alt="sample page"
-                      inferSize={true}
-                    />
+            project.map(({ description, name, imageUrl, liveUrl, repoUrl, techStacks }, index) => {
+              const techStacksArrFiltered = TECH_STACKS.filter((stack) =>
+                techStacks.includes(stack.stackName)
+              );
+              return (
+                <div
+                  data-enter={false}
+                  class:list={[
+                    "  size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground ",
+                    "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
+                    "exit-animation  enter-animation ",
+                  ]}
+                  style={`--position:${index + 1}`}
+                >
+                  <Image
+                    class:list={[" w-full rounded-lg object-cover aspect-video object-center"]}
+                    src={imageUrl}
+                    alt="sample page"
+                    inferSize={true}
+                  />
 
-                    <h3 class:list={["text-center text-xl font-bold capitalize"]}>{name}</h3>
+                  <div class:list={["absolute inset-0 w-full backdrop-blur grid-custom-area "]}>
+                    <div class="absolute flex w-full flex-wrap items-center justify-around gap-4 ">
+                      <h3
+                        class:list={[
+                          "grow w-full text-center text-[clamp(.5rem,5vw,3.5rem)] font-bold capitalize",
+                        ]}
+                      >
+                        {name}
+                      </h3>
+                      <a
+                        href={repoUrl}
+                        target="_blank"
+                        class=" flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+                      >
+                        <GithubIcon className="size-6 fill-foreground " />
+                        repository
+                      </a>
+                      <a
+                        href={liveUrl}
+                        target="_blank"
+                        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+                      >
+                        <Globe className="size-6 text-foreground " />
+                        live site
+                      </a>
+                    </div>
 
-                    <div class:list={["absolute bottom-0 left-0 w-full backdrop-blur  "]}>
-                      <p class="mb-2 leading-6">{description}</p>
-                      <div class="flex w-full flex-wrap items-center justify-around gap-4">
-                        <a
-                          href={repoUrl}
-                          target="_blank"
-                          class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
-                        >
-                          <GithubIcon className="size-6 fill-foreground " />
-                          repository
-                        </a>
-                        <a
-                          href={liveUrl}
-                          target="_blank"
-                          class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
-                        >
-                          <Globe className="size-6 text-foreground " />
-                          live site
-                        </a>
-                        <div
-                          id="stack-div"
-                          class="hover-siblings-animation flex items-center gap-2 *:size-6"
-                        >
-                          {techStacksArrFiltered.map(({ href, Logo }) => (
-                            <a href={href} target="_blank" rel="noopener noreferrer">
-                              <Logo />
-                            </a>
-                          ))}
-                        </div>
+                    <div class="flex flex-wrap items-center justify-center">
+                      <p class="w-full  px-4 py-2 leading-6">{description}</p>
+                      <div class="hover-siblings-animation flex items-center gap-2  *:size-6">
+                        {techStacksArrFiltered.map(({ href, Logo }) => (
+                          <a href={href} target="_blank" rel="noopener noreferrer">
+                            <Logo />
+                          </a>
+                        ))}
                       </div>
                     </div>
                   </div>
-                );
-              }
-            )
+                </div>
+              );
+            })
           }
         </div>
       </div>
@@ -197,66 +178,7 @@ const project = await getFeaturedProjectUseCase();
 </Layout>
 
 <style>
-  @property --current-rotation-value {
-    syntax: "<angle>";
-    inherits: true;
-    initial-value: 0deg;
-  }
-  .custom-div {
-    transform-style: preserve-3d;
-    transition: transform 0.55s ease-in-out;
-    transform: perspective(1800px) rotateY(var(--current-rotation-value));
-  }
-  .custom-item {
-    transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-      translateZ(350px) scaleX(0.8) scaleY(0.8);
-  }
-
-  .enter-animation-prev[data-prev-enter="true"] *:not(img) {
-    transform: translateX(-1000px);
-    visibility: hidden;
-    animation: enter 500ms linear 1 forwards;
-  }
-
-  .enter-animation-next[data-enter="true"] *:not(img) {
-    transform: translateX(1000px);
-    visibility: hidden;
-    animation: enter 500ms linear 1 forwards;
-  }
-
-  @keyframes enter {
-    to {
-      transform: translateX(0);
-      visibility: visible;
-    }
-  }
-
-  .exit-animation-prev[data-prev-exit="true"] *:not(img) {
-    transform: translateX(0);
-    visibility: visible;
-    animation: exit-prev 500ms linear 1 forwards;
-  }
-
-  @keyframes exit-prev {
-    to {
-      transform: translateX(1000px);
-      visibility: hidden;
-    }
-  }
-
-  .exit-animation-next[data-exit="true"] *:not(img) {
-    transform: translateX(0);
-    visibility: visible;
-    animation: exit-next 500ms linear 1 forwards;
-  }
-
-  @keyframes exit-next {
-    to {
-      transform: translateX(-1000px);
-      visibility: hidden;
-    }
-  }
-
+  /*aside element starts here*/
   .grid-custom-template {
     gap: 1rem;
     grid-template-columns: [content-start]1fr [content-end];
@@ -272,6 +194,24 @@ const project = await getFeaturedProjectUseCase();
   .grid-custom-template > div {
     place-self: center;
     grid-area: content;
+  }
+
+  /*aside element ends here*/
+
+  /*Cards sphere style starts here*/
+  @property --current-rotation-value {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+  }
+  .custom-div {
+    transform-style: preserve-3d;
+    transition: transform 0.55s ease-in-out;
+    transform: perspective(1800px) rotateY(var(--current-rotation-value));
+  }
+  .custom-item {
+    transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+      translateZ(350px) scaleX(0.8) scaleY(0.8);
   }
 
   @media (min-width: 768px) {
@@ -291,6 +231,53 @@ const project = await getFeaturedProjectUseCase();
     .custom-item {
       transform: rotateY(calc((var(--position) - 1) * (360 / var(--quantity)) * 1deg))
         translateZ(450px) scaleX(0.7) scaleY(0.7);
+    }
+  }
+  /*Cards sphere style ends here*/
+
+  /*mapped Cards styling and layout starts here*/
+  .grid-custom-area {
+    display: grid;
+    grid-template-rows:
+      [ links-start]1fr[ links-end description-start stacks-start]
+      1fr[description-end starts-end];
+    grid-template-columns: [ links-start description-start stacks-start]1fr[ links-end] 1fr[description-end stacks-end];
+  }
+
+  .grid-custom-area > div:nth-of-type(1) {
+    grid-area: links;
+    place-self: end stretch;
+  }
+
+  .grid-custom-area > div:nth-of-type(2) {
+    place-self: center stretch;
+    grid-area: description;
+  }
+
+  /*to hide the cards that is not in front*/
+  .enter-animation:not([data-enter="true"]) > div > div:nth-of-type(1),
+  .enter-animation:not([data-enter="true"]) > div > div:nth-of-type(2) {
+    display: none;
+  }
+
+  .enter-animation[data-enter="true"] > div > div:nth-of-type(1),
+  .enter-animation[data-enter="true"] > div > div:nth-of-type(2) {
+    opacity: 0;
+    transform: translateY(20%);
+    filter: blur(2px);
+    animation: enter 500ms linear 600ms 1 forwards;
+  }
+
+  .enter-animation[data-enter="true"] > div > div:nth-of-type(1) {
+    animation: enter 500ms linear 700ms 1 forwards;
+  }
+
+  @keyframes enter {
+    to {
+      transform: translateY(0);
+      display: flex;
+      opacity: 1;
+      filter: blur(0);
     }
   }
 </style>

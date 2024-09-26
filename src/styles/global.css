@@ -68,3 +68,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (hover: hover) {
+  .hover-siblings-animation > * {
+    transition: scale 200ms ease-in-out;
+    position: relative;
+    filter: grayscale(1);
+  }
+
+  .hover-siblings-animation > *:hover {
+    padding: 2px;
+    scale: 2;
+    filter: grayscale(0);
+  }
+
+  .hover-siblings-animation > *:has(~ :hover),
+  .hover-siblings-animation > *:hover ~ * {
+    filter: brightness(25%) grayscale(1);
+  }
+}

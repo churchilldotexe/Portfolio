@@ -7,14 +7,13 @@ import Layout from "../../layouts/Layout.astro";
 const userId = Astro.locals.userId;
 
 //TODO: show message in case failed/error refactor the api/callback
-//- [] create a type that will only show if the status is failed like an error message.
-//- [] probably remove the pending as it is not needed
+//- [x] create a type that will only show if the status is failed like an error message.
+//- [x] probably remove the pending as it is not needed
 // - [] if can do a sonner effect component
 
-export type LoginStatus = "success" | "failed" | "pending";
+export type LoginStatus = "success" | "failed";
 const loginParams = Astro.url.searchParams.get("login");
-let loginStatus: LoginStatus =
-  loginParams === "success" || loginParams === "pending" ? loginParams : "failed";
+let loginStatus: LoginStatus = loginParams === "success" ? loginParams : "failed";
 
 if (!userId && loginStatus === "success") {
   return Astro.redirect(`/api/redirect`); // helper to refresh cookie

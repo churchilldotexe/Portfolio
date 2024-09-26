@@ -116,8 +116,8 @@ const project = await getFeaturedProjectUseCase();
                 <div
                   data-enter={false}
                   class:list={[
-                    "  size-full flex flex-col justify-around  p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground ",
-                    "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] md:[backface-visibility:visible] ",
+                    "size-full flex flex-col justify-around p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground ",
+                    "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] lg:[backface-visibility:visible] ",
                     "exit-animation  enter-animation ",
                   ]}
                   style={`--position:${index + 1}`}
@@ -130,12 +130,12 @@ const project = await getFeaturedProjectUseCase();
                   />
 
                   <div
-                    class:list={["sm:absolute sm:inset-0 w-full backdrop-blur grid-custom-area "]}
+                    class:list={["sm:absolute sm:inset-0 w-full backdrop-blur grid-custom-area  "]}
                   >
-                    <div class="absolute flex w-full flex-wrap items-center justify-around gap-4 ">
+                    <div class=" flex w-full flex-wrap items-center justify-around gap-4 sm:absolute ">
                       <h3
                         class:list={[
-                          "grow w-full text-center text-[clamp(.5rem,5vw,3.5rem)] font-bold capitalize",
+                          "grow w-full text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize",
                         ]}
                       >
                         {name}
@@ -158,13 +158,15 @@ const project = await getFeaturedProjectUseCase();
                       </a>
                     </div>
 
-                    <div class="flex flex-wrap items-center justify-center gap-2">
+                    <div class="flex flex-wrap items-center justify-center gap-2 p-4">
                       <p class="w-full  px-4 py-2 leading-6">{description}</p>
-                      <div class="hover-siblings-animation flex items-center gap-2  *:size-6">
-                        {techStacksArrFiltered.map(({ href, Logo }) => (
-                          <a href={href} target="_blank" rel="noopener noreferrer">
-                            <Logo />
-                          </a>
+                      <div class="hover-siblings-animation flex items-center gap-2 *:size-6">
+                        {techStacksArrFiltered.map(({ href, Logo, stackName }) => (
+                          <abbr title={stackName}>
+                            <a href={href} target="_blank" rel="noopener noreferrer">
+                              <Logo />
+                            </a>
+                          </abbr>
                         ))}
                       </div>
                     </div>
@@ -242,10 +244,14 @@ const project = await getFeaturedProjectUseCase();
     display: grid;
     grid-template-rows:
       [ links-start]1fr[ links-end description-start stacks-start]
-      1fr[description-end starts-end];
-    grid-template-columns: [ links-start description-start stacks-start]1fr[ links-end] 1fr[description-end stacks-end];
+      auto[description-end starts-end];
+    grid-template-columns: [ links-start description-start]1fr[ links-end] auto[description-end];
   }
-
+  @media (min-width: 640px) {
+    .grid-custom-area {
+      grid-template-columns: [ links-start description-start]1fr[ links-end] 1fr[description-end];
+    }
+  }
   .grid-custom-area > div:nth-of-type(1) {
     grid-area: links;
     place-self: end stretch;

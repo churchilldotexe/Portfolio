@@ -125,13 +125,11 @@ const project = await getFeaturedProjectUseCase();
                   <Image
                     class:list={[" w-full rounded-lg object-cover aspect-video object-center"]}
                     src={imageUrl}
-                    alt="sample page"
+                    alt={name}
                     inferSize={true}
                   />
 
-                  <div
-                    class:list={["sm:absolute sm:inset-0 w-full backdrop-blur grid-custom-area  "]}
-                  >
+                  <div class:list={["sm:absolute sm:inset-0 w-full grid-custom-area "]}>
                     <div class=" flex w-full flex-wrap items-center justify-around gap-4 sm:absolute ">
                       <h3
                         class:list={[
@@ -158,7 +156,7 @@ const project = await getFeaturedProjectUseCase();
                       </a>
                     </div>
 
-                    <div class="flex flex-wrap items-center justify-center gap-2 p-4">
+                    <div class="flex flex-wrap items-center justify-center gap-2 p-4 ">
                       <p class="w-full  px-4 py-2 leading-6">{description}</p>
                       <div class="hover-siblings-animation flex items-center gap-2 *:size-6">
                         {techStacksArrFiltered.map(({ href, Logo, stackName }) => (
@@ -270,14 +268,27 @@ const project = await getFeaturedProjectUseCase();
 
   .enter-animation[data-enter="true"] > div > div:nth-of-type(1),
   .enter-animation[data-enter="true"] > div > div:nth-of-type(2) {
-    opacity: 0;
-    transform: translateY(20%);
-    filter: blur(2px);
-    animation: enter 500ms linear 600ms 1 forwards;
+    /*animation: enter 500ms linear 600ms 1 forwards;*/
+
+    transition-property: opacity transform filter;
+    transition-duration: 500ms;
+    transition-timing-function: linear;
+    transition-delay: 600ms;
+    transform: translateY(0);
+    display: flex;
+    opacity: 1;
+    filter: blur(0);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(20%);
+      filter: blur(2px);
+    }
   }
 
   .enter-animation[data-enter="true"] > div > div:nth-of-type(1) {
-    animation: enter 500ms linear 700ms 1 forwards;
+    /*animation: enter 500ms linear 700ms 1 forwards;*/
+    transition-delay: 700ms;
   }
 
   @keyframes enter {

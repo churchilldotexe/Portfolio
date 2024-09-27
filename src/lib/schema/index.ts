@@ -23,23 +23,3 @@ export type ProjectFormTypes = z.infer<typeof projectFormSchema>;
 export type CreateProjectPostType = Record<keyof ProjectFormTypes, string | undefined> & {
   message?: "Success";
 };
-
-export const projectPostSchema = z.custom<CreateProjectPostType>((val) => {
-  if (typeof val !== "object" || val === null) {
-    return false;
-  }
-
-  // Check if all properties from the original schema exist and are optional strings
-  for (const key in projectFormSchema.shape) {
-    if (key in val && val[key] !== undefined && typeof val[key] !== "string") {
-      return false;
-    }
-  }
-
-  // Check new properties
-  if ("message" in val && !["Success"].includes(val.status as string)) {
-    return false;
-  }
-
-  return true;
-});

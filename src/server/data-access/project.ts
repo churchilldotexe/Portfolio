@@ -88,7 +88,8 @@ export async function getFeaturedProjectFromDB(userId: string): Promise<GetProje
       projects.createdAt,
       projects.updatedAt
     )
-    .orderBy(desc(projects.updatedAt));
+    .orderBy(desc(projects.updatedAt))
+    .limit(4);
 
   return featuredProjectData;
 }

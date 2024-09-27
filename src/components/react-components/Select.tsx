@@ -10,10 +10,11 @@ import {
   useCallback,
   useEffect,
 } from "react";
+import styles from "./selectStyles.module.css";
 
 type SelectProps = {
   selectValues: TechStackNamesTypes[];
-  setSelectValues: React.Dispatch<React.SetStateAction<TechStackNamesTypes[]>>;
+  setSelectValues: (newValues: TechStackNamesTypes[]) => void;
 };
 
 export function Select({ selectValues, setSelectValues }: SelectProps) {
@@ -91,7 +92,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
     value: TechStackNamesTypes
   ) => {
     event.stopPropagation();
-    setSelectValues((prevArr) => removeArrayItem(value, prevArr));
+    setSelectValues(removeArrayItem(value, selectValues));
   };
 
   return (
@@ -112,7 +113,10 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
       <summary className="grid grid-cols-[1fr,auto,auto] gap-2 items-center border pr-2 cursor-pointer relative">
         <div
           ref={scrollContainerRef}
-          className="w-full flex overscroll-x-contain gap-2 overflow-x-auto items-center justify-center snap-x snap-mandatory py-2 px-4 scroll-py-4  cursor-default scroll-smooth "
+          className={cn(
+            " w-full flex overscroll-x-contain gap-2 overflow-x-auto items-center justify-center snap-x snap-mandatory py-2 px-4 scroll-py-4  cursor-default scroll-smooth ",
+            styles["remove-scrollbar-x"]
+          )}
         >
           {selectValues.length > 0 ? (
             selectValues.map((val) => (
@@ -175,7 +179,6 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
           )}
         ></span>
       </summary>
-
       <div
         ref={divRef}
         className={cn(
@@ -198,7 +201,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
                   }
                 )}
                 onClick={(e) => {
-                  setSelectValues((val) => [...val, value.stackName]);
+                  setSelectValues([...selectValues, value.stackName]);
                   e.stopPropagation();
                   const target = e.target as HTMLButtonElement;
                   // so that the button focus stays on the list of buttons

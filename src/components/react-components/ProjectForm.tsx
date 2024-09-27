@@ -1,12 +1,13 @@
 import { projectFormSchema, type CreateProjectPostType } from "@/lib/schema";
 import { GenerateFormComponents } from "./GenerateFormComponents";
 import { cn, fetcher } from "@/lib/utils";
-import { useState, type FormEvent } from "react";
+import { useReducer, useState, type FormEvent } from "react";
 import { ACCEPTED_FILE_TYPE, type TechStackNamesTypes } from "@/lib/constants";
 import { Crown, ImagePlus, Loader2 } from "lucide-react";
 import { Select } from "./Select";
 import { ZodError, z } from "zod";
-import type { LoginStatus } from "@/pages/dashboard/index.astro";
+import { Toast } from "./Toast";
+import type { LoginParamsTypes } from "@/pages/api/callback";
 
 export const prerender = false;
 
@@ -31,18 +32,17 @@ const PROJECT_INPUT_DATA = [
   },
 ] as const;
 
-export default function ProjectForm({
-  isLoggedIn,
-  loginStatus,
-}: {
-  isLoggedIn: boolean;
-  loginStatus: LoginStatus;
-}) {
-  //TODO: Refactor the useState to useReducer
-  const [responseMessage, setResponseMessage] = useState("");
-  const [objectUrls, setObjectUrls] = useState<string[]>([]);
-  const [selectValues, setSelectValues] = useState<TechStackNamesTypes[]>([]);
-  const [formErrorMessage, setFormErrorMessage] = useState<CreateProjectPostType>({
+type State = {
+  responseMessage: string;
+  errorMessage: CreateProjectPostType;
+  isFormPending: boolean;
+  objectUrls: string[];
+  selectValues: TechStackNamesTypes[];
+};
+
+const initialState: State = {
+  responseMessage: "",
+  errorMessage: {
     name: "",
     repository: "",
     description: "",
@@ -50,9 +50,54 @@ export default function ProjectForm({
     image: "",
     stacks: "",
     addToFeatured: "",
-  });
-  const [isFormPending, setIsFormPending] = useState<boolean>(false);
-  const [isLoggingIn, setIsLogginIn] = useState<boolean>(() => loginStatus === "success" && false);
+  },
+  isFormPending: false,
+  objectUrls: [],
+  selectValues: [],
+};
+
+type Action =
+  | { type: "SET_RESPONSE_MESSAGE"; payload: string }
+  | { type: "SET_ERROR_MESSAGE"; payload: CreateProjectPostType }
+  | { type: "SET_IS_FORM_PENDING"; payload: boolean }
+  | { type: "SET_OBJECT_URLS"; payload: string[] }
+  | { type: "SET_SELECT_VALUES"; payload: TechStackNamesTypes[] };
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "SET_RESPONSE_MESSAGE":
+      return { ...state, responseMessage: action.payload };
+    case "SET_SELECT_VALUES":
+      return { ...state, selectValues: action.payload };
+    case "SET_IS_FORM_PENDING":
+      return { ...state, isFormPending: action.payload };
+    case "SET_OBJECT_URLS":
+      for (let url of state.objectUrls) {
+        URL.revokeObjectURL(url);
+      }
+      return { ...state, objectUrls: action.payload };
+    case "SET_ERROR_MESSAGE":
+      return { ...state, errorMessage: action.payload };
+    default:
+      return state;
+  }
+};
+
+export default function ProjectForm({
+  isLoggedIn,
+  loginParams,
+}: {
+  isLoggedIn: boolean;
+  loginParams: LoginParamsTypes;
+}) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const [isLoggingIn, setIsLogginIn] = useState<boolean>(
+    () => loginParams.status === "success" && false
+  );
+  const handleSelectValuesChange = (newValues: TechStackNamesTypes[]) => {
+    dispatch({ type: "SET_SELECT_VALUES", payload: newValues });
+  };
 
   const handleImageChange = (fileList: FileList | null) => {
     if (fileList === null) {
@@ -61,17 +106,12 @@ export default function ProjectForm({
 
     const files = Array.from(fileList);
     const newUrls = files.map((file) => URL.createObjectURL(file));
-    setObjectUrls((prevUrls) => {
-      for (const url of prevUrls) {
-        URL.revokeObjectURL(url);
-      }
-      return newUrls;
-    });
+    dispatch({ type: "SET_OBJECT_URLS", payload: newUrls });
   };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsFormPending(true);
+    dispatch({ type: "SET_IS_FORM_PENDING", payload: true });
     const formData = new FormData(event.target as HTMLFormElement);
     const stacks = formData.get("stacks")?.toString().split(",");
     const parsedData = projectFormSchema.safeParse({
@@ -83,15 +123,18 @@ export default function ProjectForm({
       const { image, liveSite, name, repository, description, stacks, addToFeatured } =
         parsedData.error.formErrors.fieldErrors;
 
-      setIsFormPending(false);
-      setFormErrorMessage({
-        image: image?.[0],
-        liveSite: liveSite?.[0],
-        name: name?.[0],
-        repository: repository?.[0],
-        description: description?.[0],
-        stacks: stacks?.[0],
-        addToFeatured: addToFeatured?.[0],
+      dispatch({ type: "SET_IS_FORM_PENDING", payload: false });
+      dispatch({
+        type: "SET_ERROR_MESSAGE",
+        payload: {
+          image: image?.[0],
+          liveSite: liveSite?.[0],
+          name: name?.[0],
+          repository: repository?.[0],
+          description: description?.[0],
+          stacks: stacks?.[0],
+          addToFeatured: addToFeatured?.[0],
+        },
       });
       return;
     }
@@ -111,19 +154,17 @@ export default function ProjectForm({
     }
 
     (event.target as HTMLFormElement).reset();
-    setObjectUrls((prevUrl) => {
-      return prevUrl.filter((url) => URL.revokeObjectURL(url));
-    });
+    dispatch({ type: "SET_OBJECT_URLS", payload: [] });
 
-    setSelectValues([]);
-    setIsFormPending(false);
-    setResponseMessage(result.data.message);
+    dispatch({ type: "SET_SELECT_VALUES", payload: [] });
+    dispatch({ type: "SET_IS_FORM_PENDING", payload: false });
+    dispatch({ type: "SET_RESPONSE_MESSAGE", payload: result.data.message });
   }
 
   return (
     <div
       className={cn("size-full p-6 grid place-items-center gap-6 grid-cols-1", {
-        "xl:grid-cols-2": objectUrls.length > 0,
+        "xl:grid-cols-2": state.objectUrls.length > 0,
       })}
     >
       <Form
@@ -153,7 +194,7 @@ export default function ProjectForm({
               {label}
             </label>
             <ErrorMessage useDefaultStyling={false} position="bottomMiddle" name={name}>
-              {formErrorMessage[name]}
+              {state.errorMessage[name]}
             </ErrorMessage>
           </fieldset>
         ))}
@@ -177,7 +218,7 @@ export default function ProjectForm({
             Project Description
           </label>
           <ErrorMessage useDefaultStyling={false} position="bottomMiddle" name="description">
-            {formErrorMessage["description"]}
+            {state.errorMessage["description"]}
           </ErrorMessage>
         </fieldset>
 
@@ -203,7 +244,7 @@ export default function ProjectForm({
                   required
                 />
                 <ErrorMessage useDefaultStyling={false} name="image">
-                  {formErrorMessage["image"]}
+                  {state.errorMessage["image"]}
                 </ErrorMessage>
               </label>
             </fieldset>
@@ -223,32 +264,36 @@ export default function ProjectForm({
 
           <fieldset className="relative w-full ">
             <legend className="sr-only">Technology Stacks</legend>
-            <Input type="hidden" name="stacks" value={selectValues} required />
+            <Input type="hidden" name="stacks" value={state.selectValues} required />
 
-            <Select selectValues={selectValues} setSelectValues={setSelectValues} />
+            <Select selectValues={state.selectValues} setSelectValues={handleSelectValuesChange} />
             <ErrorMessage useDefaultStyling={false} name="stacks" position="topMiddle">
-              {formErrorMessage["stacks"]}
+              {state.errorMessage["stacks"]}
             </ErrorMessage>
           </fieldset>
         </div>
 
         <div className="relative ">
           <button
-            disabled={isFormPending || !isLoggedIn}
+            disabled={state.isFormPending || !isLoggedIn}
             className={cn("relative grid size-full bg-primary p-1 ", {
-              "bg-muted": isFormPending,
+              "bg-muted": state.isFormPending,
             })}
             type="submit"
           >
-            <Loader2
-              className={cn(
-                "animate-spin absolute text-muted-foreground [grid-area:1/1] place-self-center w-full hidden",
-                {
-                  block: isFormPending,
-                }
-              )}
-            />
-            <span className={cn("", { "opacity-0 select-none": isFormPending })}>Submit</span>
+            {state.isFormPending && (
+              <>
+                <Loader2
+                  className={cn(
+                    "animate-spin absolute text-muted-foreground [grid-area:1/1] place-self-center w-full block"
+                  )}
+                />
+                <Toast variant="info" position="bottom-right">
+                  Uploading project to Database
+                </Toast>
+              </>
+            )}
+            <span className={cn("", { "opacity-0 select-none": state.isFormPending })}>Submit</span>
           </button>
           <a
             className={cn(
@@ -274,12 +319,28 @@ export default function ProjectForm({
               "Connect to Github"
             )}
           </a>
-        </div>
 
-        {responseMessage && <p>{responseMessage}</p>}
+          {isLoggingIn && (
+            <Toast variant="info" position="bottom-right">
+              Logging in
+            </Toast>
+          )}
+        </div>
       </Form>
 
-      {objectUrls.length > 0 ? <img src={objectUrls[0]} alt="project preview" /> : null}
+      {state.objectUrls.length > 0 ? <img src={state.objectUrls[0]} alt="project preview" /> : null}
+
+      {Boolean(state.responseMessage) && (
+        <Toast variant="success" position="bottom-right">
+          {state.responseMessage}
+        </Toast>
+      )}
+
+      {loginParams.status === "success" && (
+        <Toast variant="success" position="bottom-right">
+          You can now Post a Project
+        </Toast>
+      )}
     </div>
   );
 }

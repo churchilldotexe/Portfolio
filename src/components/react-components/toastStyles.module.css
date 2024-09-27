@@ -4,47 +4,116 @@
   initial-value: 2s;
 }
 
-.hide-toast {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+@property --exit-top-value {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: inherit;
 }
 
-/*.close-toast {*/
-/*  animation-name: close-toast;*/
-/*  animation-duration: 300ms;*/
-/*  animation-delay: 0;*/
-/*  animation-timing-function: linear;*/
-/*  animation-iteration-count: 1;*/
-/*  animation-fill-mode: forwards;*/
-/*  animation-delay: var(--toast-delay);*/
-/*  top: unset;*/
-/*  bottom: unset;*/
-/*}*/
+@property --exit-bottom-value {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: inherit;
+}
 
-.close-toast {
-  animation: close-toast 300ms linear var(--toast-delay) 1 forwards;
+@property --top-value {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: inherit;
+}
+
+@property --bottom-value {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: inherit;
+}
+
+.toast-styles {
+  position: fixed;
+  border-width: 2px;
+  border-radius: 0.25em;
+  width: fit-content;
+  padding: 0.5em 1em;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+}
+
+/*variants*/
+.top-middle,
+.bottom-middle {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.top-left,
+.bottom-left {
+  left: 1.25rem;
+}
+.top-right,
+.bottom-right {
+  right: 1.25rem;
+}
+
+.default {
+  border-color: hsl(240, 3.7%, 15.9%);
+}
+.success {
+  border-color: hsl(142.4, 71.8%, 29.2%);
+  color: hsl(142.4, 71.8%, 29.2%);
+}
+.error {
+  border-color: hsl(0, 73.7%, 41.8%);
+  color: hsl(0, 73.7%, 41.8%);
+}
+.warning {
+  border-color: hsl(52.8, 98.3%, 76.9%);
+  color: hsl(40.6, 96.1%, 40.4%);
+}
+.info {
+  border-color: hsl(213.1, 93.9%, 67.8%);
+  color: hsl(224.3, 76.3%, 48%);
+}
+
+/*animation*/
+.toast-animation {
+  animation:
+    enter 300ms linear 0s 1 forwards,
+    close-toast 300ms linear var(--toast-delay) 1 forwards;
+  top: var(--exit-top-value);
+  bottom: var(--exit-bottom-value);
+}
+
+.force-close-animation[data-hide="true"] {
+  animation: force-close 300ms linear 0s 1 forwards;
+  top: var(--top-value);
+  bottom: var(--bottom-value);
+}
+@keyframes force-close {
+  to {
+    top: var(--exit-top-value);
+    bottom: var(--exit-bottom-value);
+  }
 }
 
 @keyframes close-toast {
   to {
-    transform: translateY(200%);
+    top: var(--exit-top-value);
+    bottom: var(--exit-bottom-value);
   }
 }
-
-@keyframes hide {
+@keyframes enter {
   to {
-    display: none;
+    top: var(--top-value);
+    bottom: var(--bottom-value);
   }
 }
 
-.closing-animation {
+.closing-timer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background-color: hsl(142.1, 70.6%, 45.3%);
   transition-property: transform;
   transition-duration: var(--toast-delay);
   transition-timing-function: linear;
@@ -54,4 +123,26 @@
   @starting-style {
     transform: scale(1, 1);
   }
+}
+
+.close-btn {
+  display: none;
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  padding: 0.25em;
+
+  &:hover {
+    background-color: hsl(0, 93.5%, 81.8%);
+  }
+  svg {
+    fill: hsl(0, 73.7%, 41.8%);
+  }
+}
+
+.close-btn[data-show="true"] {
+  display: block;
 }

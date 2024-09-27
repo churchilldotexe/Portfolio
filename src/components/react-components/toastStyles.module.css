@@ -1,0 +1,57 @@
+@property --toast-delay {
+  syntax: "<time>";
+  inherits: true;
+  initial-value: 2s;
+}
+
+.hide-toast {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/*.close-toast {*/
+/*  animation-name: close-toast;*/
+/*  animation-duration: 300ms;*/
+/*  animation-delay: 0;*/
+/*  animation-timing-function: linear;*/
+/*  animation-iteration-count: 1;*/
+/*  animation-fill-mode: forwards;*/
+/*  animation-delay: var(--toast-delay);*/
+/*  top: unset;*/
+/*  bottom: unset;*/
+/*}*/
+
+.close-toast {
+  animation: close-toast 300ms linear var(--toast-delay) 1 forwards;
+}
+
+@keyframes close-toast {
+  to {
+    transform: translateY(200%);
+  }
+}
+
+@keyframes hide {
+  to {
+    display: none;
+  }
+}
+
+.closing-animation {
+  transition-property: transform;
+  transition-duration: var(--toast-delay);
+  transition-timing-function: linear;
+  transform: scale(0, 1);
+  transform-origin: left;
+
+  @starting-style {
+    transform: scale(1, 1);
+  }
+}

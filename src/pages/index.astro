@@ -8,6 +8,8 @@ import { GithubIcon } from "@/components/svg/SocialIcons";
 import { TECH_STACKS } from "@/lib/constants";
 
 const project = await getFeaturedProjectUseCase();
+//TODO: - [] tech stacks auto scroll with pause and contained use the grid template to contain and maybe refactor the info bar
+// -- refactor article tag
 ---
 
 <script>
@@ -54,20 +56,17 @@ const project = await getFeaturedProjectUseCase();
 
 <Layout title="HomePage">
   <section class="flex size-full flex-col items-center gap-8 text-clip md:gap-4">
-    <article class="w-fit gap-4 sm:grid sm:justify-center sm:gap-x-4 xl:gap-x-8 xl:p-2">
-      <h1 class="text-3xl sm:col-start-2 sm:self-end sm:justify-self-start md:text-4xl">
+    <article class="article-grid-template w-fit gap-4 py-4 sm:gap-y-0">
+      <h1 class="text-3xl md:text-4xl">
         Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
       </h1>
       <p
-        class="my-4 inline-block bg-rose-500 p-2 text-lg font-semibold text-gray-50 sm:col-start-1 sm:col-end-3 sm:row-start-2 sm:self-start sm:text-end md:py-2 md:text-2xl"
+        class="inline-block w-fit bg-rose-500 p-2 text-lg font-semibold text-gray-50 sm:w-full sm:text-end md:text-2xl"
       >
         A Font-End Developer
       </p>
-      <Image
-        src={profileImg}
-        alt="profile picture for portfolio"
-        class="sm:relative sm:z-10 sm:col-start-1 sm:row-start-1 sm:row-end-3 sm:w-11/12 sm:justify-self-end md:z-0 md:w-5/6"
-      />
+      <div>next react js ts</div>
+      <Image src={profileImg} alt="profile picture for portfolio" class="w-5/6" />
     </article>
 
     <aside class="grid-custom-template relative grid grow px-4">
@@ -180,6 +179,60 @@ const project = await getFeaturedProjectUseCase();
 </Layout>
 
 <style>
+  .article-grid-template {
+    display: grid;
+    grid-template-areas:
+      "fullName"
+      "role"
+      "profile-img"
+      "technologies";
+  }
+
+  .article-grid-template > h1 {
+    grid-area: fullName;
+  }
+
+  .article-grid-template > p {
+    grid-area: role;
+  }
+
+  .article-grid-template > div {
+    grid-area: technologies;
+  }
+
+  .article-grid-template > img {
+    grid-area: profile-img;
+  }
+
+  @media (min-width: 640px) {
+    .article-grid-template {
+      grid-template-areas: revert;
+      grid-template-rows:
+        [profile-img-start fullName-start]1fr [fullName-end role-start technologies-start]
+        1fr [profile-img-end role-end technologies-end];
+
+      grid-template-columns: [profile-img-start role-start]auto[profile-img-end fullName-start technologies-start] 1fr[fullName-end role-end technologies-end];
+    }
+
+    .article-grid-template > h1 {
+      place-self: end;
+      z-index: 1;
+    }
+
+    .article-grid-template > p {
+      place-self: start;
+    }
+
+    .article-grid-template > div {
+      place-self: center stretch;
+      grid-area: technologies;
+    }
+    .article-grid-template > img {
+      place-self: center end;
+      z-index: 1;
+    }
+  }
+
   /*aside element starts here*/
   .grid-custom-template {
     gap: 1rem;
@@ -245,11 +298,13 @@ const project = await getFeaturedProjectUseCase();
       auto[description-end starts-end];
     grid-template-columns: [ links-start description-start]1fr[ links-end] auto[description-end];
   }
+
   @media (min-width: 640px) {
     .grid-custom-area {
       grid-template-columns: [ links-start description-start]1fr[ links-end] 1fr[description-end];
     }
   }
+
   .grid-custom-area > div:nth-of-type(1) {
     grid-area: links;
     place-self: end stretch;

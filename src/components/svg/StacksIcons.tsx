@@ -18,7 +18,7 @@ export const ReactIcon = (props: SVGProps<SVGSVGElement>) => (
 );
 
 export const NextjsIcon = (props: SVGProps<SVGSVGElement>) => (
-  <div className="grid m-auto place-items-center rounded-full relative size-full before:content-[''] before:absolute before:rounded-full before:-z-10 before:size-[90%] before:inset-0 before:m-auto before:bg-white">
+  <div className="relative m-auto grid size-full place-items-center rounded-full before:absolute before:inset-0 before:-z-10 before:m-auto before:size-[90%] before:rounded-full before:bg-white before:content-['']">
     <svg
       height="100%"
       viewBox=".5 -.2 1023 1024.1"

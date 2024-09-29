@@ -98,7 +98,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
   return (
     <details
       ref={detailsRef}
-      className="list-none relative hoverable:hocus-visible:outline-1 hoverable:hocus-visible:outline hoverable:hocus-visible:outline-primary"
+      className="relative list-none hoverable:hocus-visible:outline hoverable:hocus-visible:outline-1 hoverable:hocus-visible:outline-primary"
       open={isOpen}
       onToggle={(e) => {
         if (e.currentTarget.open) {
@@ -110,7 +110,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
         e.target.open = false;
       }}
     >
-      <summary className="grid grid-cols-[1fr,auto,auto] gap-2 items-center border pr-2 cursor-pointer relative">
+      <summary className="relative grid cursor-pointer grid-cols-[1fr,auto,auto] items-center gap-2 border pr-2">
         <div
           ref={scrollContainerRef}
           className={cn(
@@ -134,7 +134,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
                 }}
               >
                 {val}
-                <span className="pl-2 hoverable:group-hover:text-destructive not-hoverable:text-destructive hoverable:group-focus-visible:text-destructive ">
+                <span className="pl-2 hoverable:group-hover:text-destructive hoverable:group-focus-visible:text-destructive not-hoverable:text-destructive ">
                   &times;
                 </span>
               </button>
@@ -168,7 +168,7 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
             {<ChevronRight />} <span className="sr-only">scroll Right</span>
           </button>
         </div>
-        <span className=" p-[1px] my-1 self-stretch bg-muted " />
+        <span className=" my-1 self-stretch bg-muted p-px " />
         <span
           className={cn(
             " relative translate-y-1/4 border-4 border-transparent border-t-foreground hoverable:hocus-visible:border-t-primary ",
@@ -190,39 +190,37 @@ export function Select({ selectValues, setSelectValues }: SelectProps) {
           const isIncluded = selectValues.includes(value.stackName);
 
           return (
-            <>
-              <button
-                key={value.stackName}
-                type="button"
-                className={cn(
-                  "border focus:text-primary w-fit grow px-2 py-1 hoverable:hover:text-rose-300 ",
-                  {
-                    " hidden pointer-events-none": isIncluded,
-                  }
-                )}
-                onClick={(e) => {
-                  setSelectValues([...selectValues, value.stackName]);
-                  e.stopPropagation();
-                  const target = e.target as HTMLButtonElement;
-                  // so that the button focus stays on the list of buttons
-                  if (target.nextElementSibling instanceof HTMLElement) {
-                    target.nextElementSibling.focus();
-                  } else {
-                    dropDownNavigation(0);
-                  }
-                }}
-                onBlur={() => {
-                  if (TECH_STACKS.length === selectValues.length) {
-                    setIsOpen(false);
-                  }
-                }}
-                onKeyDown={(e) => handleDropDownKeyDown(e)}
-                aria-hidden={isIncluded}
-                tabIndex={isIncluded ? -1 : 0}
-              >
-                {value.stackName}
-              </button>
-            </>
+            <button
+              key={value.stackName}
+              type="button"
+              className={cn(
+                "border focus:text-primary w-fit grow px-2 py-1 hoverable:hover:text-rose-300 ",
+                {
+                  " hidden pointer-events-none": isIncluded,
+                }
+              )}
+              onClick={(e) => {
+                setSelectValues([...selectValues, value.stackName]);
+                e.stopPropagation();
+                const target = e.target as HTMLButtonElement;
+                // so that the button focus stays on the list of buttons
+                if (target.nextElementSibling instanceof HTMLElement) {
+                  target.nextElementSibling.focus();
+                } else {
+                  dropDownNavigation(0);
+                }
+              }}
+              onBlur={() => {
+                if (TECH_STACKS.length === selectValues.length) {
+                  setIsOpen(false);
+                }
+              }}
+              onKeyDown={(e) => handleDropDownKeyDown(e)}
+              aria-hidden={isIncluded}
+              tabIndex={isIncluded ? -1 : 0}
+            >
+              {value.stackName}
+            </button>
           );
         })}
       </div>

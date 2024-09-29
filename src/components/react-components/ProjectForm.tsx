@@ -168,7 +168,7 @@ export default function ProjectForm({
       })}
     >
       <Form
-        className="space-y-5 max-w-4xl w-full"
+        className="w-full max-w-4xl space-y-5"
         method="POST"
         encType="multipart/form-data"
         onSubmit={submit}
@@ -176,7 +176,7 @@ export default function ProjectForm({
         {PROJECT_INPUT_DATA.map(({ label, name }) => (
           <fieldset className="relative w-full" key={name}>
             <Input
-              className="peer w-full rounded border p-2 placeholder-transparent outline-none text-gray-950"
+              className="peer w-full rounded border p-2 text-gray-950 outline-none placeholder:text-transparent"
               name={name}
               id={name}
               type="text"
@@ -201,7 +201,7 @@ export default function ProjectForm({
 
         <fieldset className="relative">
           <Textarea
-            className="peer w-full rounded border p-2 placeholder-transparent outline-none text-gray-950"
+            className="peer w-full rounded border p-2 text-gray-950 outline-none placeholder:text-transparent"
             name="description"
             id="description"
             placeholder="Project Description"
@@ -222,8 +222,8 @@ export default function ProjectForm({
           </ErrorMessage>
         </fieldset>
 
-        <div className="flex w-full justify-between items-center">
-          <div className="flex gap-4 items-center px-2">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-4 px-2">
             <fieldset className="w-full">
               <legend className="sr-only">Image Upload</legend>
               <label className="relative cursor-pointer" htmlFor="imageFile">

@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import db from "../database";
 import projects, {
   insertProjectsSchema,

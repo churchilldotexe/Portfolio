@@ -17,8 +17,6 @@ export const prerender = false;
  * Note: This endpoint has side effects (sets cookies) regardless of the HTTP method used.
  * The GET method is maintained for compatibility with redirects and simple navigation.
  *
- * @param {cookies,locals,redirect} - redirect for redirect, locals for env variable for cloudflare and cookies for signing HTTP-only cookie
- * @returns {Promise<Response>} - Redirects to login on failure, or to the callback URL on success
  */
 
 export const GET: APIRoute = async ({ redirect, cookies, request }): Promise<Response> => {

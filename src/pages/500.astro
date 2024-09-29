@@ -1,4 +1,5 @@
 ---
+import { ServerDownSvg } from "@/components/svg/ErrorSvg";
 import Layout from "../layouts/Layout.astro";
 
 interface Props {
@@ -6,9 +7,38 @@ interface Props {
 }
 
 const { error } = Astro.props;
+const errMsg =
+  error instanceof Error ? error.message : "Unknown Error Occured. Please Contact Admin";
+const errName = error instanceof Error ? error.name : "Unknown error";
 ---
 
 <!-- TODO: create a better one  -->
 <Layout title="Page not Found">
-  <div>{error instanceof Error ? error.message : "Unknown error"}</div>
+  <section class="size-full outline outline-sky-500">
+    <div
+      class:list={[
+        "relative mx-auto max-w-screen-xl size-full outline outline-yellow-500",
+        " grid-cols-[[title-start_svg-start_desc_end]1fr[title-start_svg-start_desc_end]] grid-rows-[[title-start_svg-start]auto[title-end_svg-end_desc-start]1fr[desc-end]] grid",
+      ]}
+    >
+      <h1
+        class:list={[
+          "w-full absolute bottom-4 [grid-area:title] place-self-end text-center text-4xl font-bold text-primary outline  outline-blue-400 sm:text-6xl",
+          "after:content-[attr(data-name)] after:[-webkit-text-stroke:2px_hsl(var(--primary))] after:absolute after:inset-0 after:text-transparent after:z-10 after:[text-stroke:2px_hsl(var(--primary))]",
+        ]}
+        data-name={errName}
+      >
+        {errName}
+      </h1>
+      <ServerDownSvg
+        className="z-[1]  self-stretch justify-self-stretch outline outline-lime-500 [grid-area:svg] "
+      />
+
+      <p
+        class="z-[1] inline-block self-start justify-self-stretch text-center text-xl outline outline-rose-500 [grid-area:desc]"
+      >
+        {errMsg}
+      </p>
+    </div>
+  </section>
 </Layout>

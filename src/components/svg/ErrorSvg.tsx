@@ -164,7 +164,7 @@ export function ServerDownSvg({ ...props }: IconProp) {
       xmlns="http://www.w3.org/2000/svg"
       data-name="Layer 1"
       height="100%"
-      width="100%"
+      width=""
       //width="1119.60911"
       //height="699"
       viewBox="0 0 1119.60911 699"
@@ -330,8 +330,8 @@ export function ServerClusterSvg({ ...props }: IconProp) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       data-name="Layer 1"
-      width="888"
-      height="710.80704"
+      width="100%"
+      height="100%"
       viewBox="0 0 888 710.80704"
       {...props}
     >

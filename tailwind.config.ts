@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
+import typography from "@tailwindcss/typography";
 
 import { fontFamily } from "tailwindcss/defaultTheme";
 
@@ -73,7 +74,7 @@ const config = {
     },
   },
   plugins: [
-    require("@tailwindcss/typography"),
+    typography,
     plugin(({ addVariant }) => {
       addVariant("hocus-visible", ["&:hover", "&:focus:visible"]);
       addVariant("hoverable", "@media (hover: hover)");

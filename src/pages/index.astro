@@ -6,7 +6,6 @@ import { CircleChevronRight, CircleChevronLeft, Globe } from "lucide-react";
 import { getFeaturedProjectUseCase } from "@/server/use-case/project";
 import { GithubIcon } from "@/components/svg/SocialIcons";
 import { TECH_STACKS } from "@/lib/constants";
-
 const project = await getFeaturedProjectUseCase();
 ---
 
@@ -52,22 +51,23 @@ const project = await getFeaturedProjectUseCase();
   });
 </script>
 
-<!-- TODO: Fix the text in the image:
-  Must have a proper backdrop blur.,. try to find out smoothing the edge-->
 <Layout title="HomePage">
   <section class="flex size-full flex-col items-center gap-8 text-clip md:gap-4">
-    <article class:list="article-grid-template w-fit gap-4 py-4 sm:gap-y-0">
+    <article class:list={["article-grid-template w-fit gap-4 py-4 sm:gap-y-0"]}>
       <h1 class="text-3xl md:text-4xl">
-        Hi, I am <strong class="block">Churchill Jay Sungcados</strong>
+        Hi, I am <strong
+          class:list={["typing-animation block overflow-hidden whitespace-nowrap font-mono  "]}
+          >Churchill Jay Sungcados</strong
+        >
       </h1>
       <p
         class="inline-block w-fit bg-rose-500 p-2 text-lg font-semibold text-gray-50 sm:w-full sm:text-end md:text-2xl"
       >
         A Font-End Developer
       </p>
-      <div class="flex w-full items-center justify-center gap-2 overflow-x-hidden">
+      <div class="mt-4 flex w-full items-center justify-center gap-2">
         {
-          TECH_STACKS.map(({ Logo }) => (
+          TECH_STACKS.filter((stack) => stack.stackName !== "PostgreSQL").map(({ Logo }) => (
             <div>
               <Logo className="size-6" />
             </div>
@@ -77,7 +77,7 @@ const project = await getFeaturedProjectUseCase();
       <Image src={profileImg} alt="profile picture for portfolio" class="w-5/6" />
     </article>
 
-    <aside class:list="grid-custom-template relative grid grow px-4">
+    <aside class:list={["grid-custom-template relative grid grow px-4"]}>
       <h2
         class:list={[
           "absolute bottom-[calc(100%-1rem)] md:bottom-[calc(100%-4rem)] lg:bottom-[calc(100%-3rem)] text-5xl md:text-7xl font-bold text-primary",
@@ -137,10 +137,14 @@ const project = await getFeaturedProjectUseCase();
                   />
 
                   <div class:list={["sm:absolute sm:inset-0 w-full grid-custom-area "]}>
-                    <div class=" flex w-full flex-wrap items-center justify-around gap-4 sm:absolute ">
+                    <div
+                      class:list={[
+                        "  w-full flex-wrap items-center justify-around relative gap-4 sm:absolute ",
+                      ]}
+                    >
                       <h3
                         class:list={[
-                          "grow w-full text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize",
+                          "grow w-full  dark:drop-shadow-custom-dark  drop-shadow-custom text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize ",
                         ]}
                       >
                         {name}
@@ -148,7 +152,7 @@ const project = await getFeaturedProjectUseCase();
                       <a
                         href={repoUrl}
                         target="_blank"
-                        class=" flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+                        class="flex items-center gap-2 text-lg drop-shadow-custom transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping dark:drop-shadow-custom-dark"
                       >
                         <GithubIcon className="size-6 fill-foreground " />
                         repository
@@ -156,7 +160,7 @@ const project = await getFeaturedProjectUseCase();
                       <a
                         href={liveUrl}
                         target="_blank"
-                        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping"
+                        class="flex items-center gap-2 text-lg drop-shadow-custom transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping dark:drop-shadow-custom-dark"
                       >
                         <Globe className="size-6 text-foreground " />
                         live site
@@ -164,7 +168,14 @@ const project = await getFeaturedProjectUseCase();
                     </div>
 
                     <div class="flex flex-wrap items-center justify-center gap-2 p-4 ">
-                      <p class="w-full  px-4 py-2 leading-6">{description}</p>
+                      <p
+                        class:list={[
+                          "w-full  px-4 py-2 leading-6 relative backdrop-blur-sm tracking-wide  ",
+                          "before:content-[''] before:bg-gradient-to-b  before:from-transparent before:dark:via-background before:via-background/50 before:to-transparent  before:absolute before:blur-lg before:filter before:inset-0 before:-z-10",
+                        ]}
+                      >
+                        {description}
+                      </p>
                       <div class="hover-siblings-animation flex items-center gap-2 *:size-6">
                         {techStacksArrFiltered.map(({ href, Logo, stackName }) => (
                           <abbr title={stackName}>
@@ -234,11 +245,18 @@ const project = await getFeaturedProjectUseCase();
 
     .article-grid-template > div {
       place-self: center stretch;
-      grid-area: technologies;
     }
     .article-grid-template > img {
       place-self: center end;
       z-index: 1;
+    }
+  }
+
+  .typing-animation {
+    width: 100%;
+    transition: width 3s steps(23);
+    @starting-style {
+      width: 0;
     }
   }
 
@@ -341,7 +359,8 @@ const project = await getFeaturedProjectUseCase();
     transform: translateY(0);
     display: flex;
     opacity: 1;
-    filter: blur(0);
+    /*filter: blur(0);*/
+    filter: blur(unset);
 
     @starting-style {
       opacity: 0;
@@ -360,7 +379,8 @@ const project = await getFeaturedProjectUseCase();
       transform: translateY(0);
       display: flex;
       opacity: 1;
-      filter: blur(0);
+      /*filter: blur(0);*/
+      filter: blur(unset);
     }
   }
   @media (prefers-reduced-motion) {

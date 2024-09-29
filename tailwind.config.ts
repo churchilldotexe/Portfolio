@@ -49,7 +49,8 @@ const config = {
         },
       },
       dropShadow: {
-        custom: ["0 1px 1px hsl(var(--foreground))", "0 -1px 1px hsl(var(--background)) "],
+        "custom-dark": ["0 1px 1px hsl(var(--foreground))", "0 -1px 1px hsl(var(--background)) "],
+        custom: ["0 1px 1px hsl(var(--background))", "0 -1px 1px hsl(var(--foreground)) "],
       },
       boxShadow: {
         "elevate-light": "0 8px 6px 0 rgba(0,0,0,.37), -6px -4px 10px white",

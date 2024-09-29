@@ -109,13 +109,13 @@ const isRouteActive = (linkHref: string, currentPath: string): boolean => {
   id="nav"
 >
   <div
-    class="flex items-center gap-6 text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))] hover:underline"
+    class="flex items-center gap-6 text-xl leading-none [text-shadow:1px_1px_2px_hsl(var(--background)),_0_0_1em_hsl(var(--background)),_0_0_0.2em_hsl(var(--background))]"
   >
     <a
       class="hidden md:block"
       href="/dashboard"
       class:list={[
-        "",
+        "hover:underline",
         {
           "text-primary backdrop-blur-[3px] [text-shadow:1px_1px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black]":
             pathname === "/dashboard",

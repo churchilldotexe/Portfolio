@@ -7,7 +7,7 @@ import { TECH_STACKS } from "@/lib/constants";
 
 type Props = {
   cardId: string;
-  profileImg: ImageMetadata["src"];
+  profileImg: string;
   projectName: string;
   description: string;
   showDetails?: boolean;
@@ -21,7 +21,6 @@ const {
   description,
   projectName,
   profileImg,
-  id,
   repoUrl,
   siteUrl,
   techstackArr,
@@ -85,6 +84,20 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
     <div class:list={["overflow-hidden", { "overflow-visible": showDetails }]}>
       <p class="mb-2 leading-6">{description}</p>
       <div class="flex w-full flex-wrap items-center justify-around gap-4">
+        <div
+          id="stack-div"
+          class="hover-siblings-animation flex w-full grow items-center justify-center gap-2 *:size-6"
+        >
+          {
+            techStacksArrFiltered.map(({ href, Logo, stackName }) => (
+              <abbr title={stackName}>
+                <a href={href} target="_blank" rel="noopener noreferrer">
+                  <Logo />
+                </a>
+              </abbr>
+            ))
+          }
+        </div>
         <a
           href={repoUrl}
           target="_blank"
@@ -101,15 +114,6 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
           <Globe className="size-6 text-foreground " />
           live site
         </a>
-        <div id="stack-div" class="hover-siblings-animation flex items-center gap-2 *:size-6">
-          {
-            techStacksArrFiltered.map(({ href, Logo }) => (
-              <a href={href} target="_blank" rel="noopener noreferrer">
-                <Logo />
-              </a>
-            ))
-          }
-        </div>
       </div>
     </div>
   </div>

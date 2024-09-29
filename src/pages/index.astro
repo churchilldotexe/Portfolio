@@ -8,8 +8,6 @@ import { GithubIcon } from "@/components/svg/SocialIcons";
 import { TECH_STACKS } from "@/lib/constants";
 
 const project = await getFeaturedProjectUseCase();
-//TODO: - [] tech stacks auto scroll with pause and contained use the grid template to contain and maybe refactor the info bar
-// -- refactor article tag
 ---
 
 <script>
@@ -65,7 +63,15 @@ const project = await getFeaturedProjectUseCase();
       >
         A Font-End Developer
       </p>
-      <div>next react js ts</div>
+      <div class="flex w-full items-center justify-center gap-2 overflow-x-hidden">
+        {
+          TECH_STACKS.map(({ Logo, stackName, href }) => (
+            <div>
+              <Logo className="size-6" />
+            </div>
+          ))
+        }
+      </div>
       <Image src={profileImg} alt="profile picture for portfolio" class="w-5/6" />
     </article>
 
@@ -201,6 +207,7 @@ const project = await getFeaturedProjectUseCase();
   }
 
   .article-grid-template > img {
+    place-self: center;
     grid-area: profile-img;
   }
 

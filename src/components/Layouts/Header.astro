@@ -1,5 +1,5 @@
 ---
-import { Moon, Sun } from "lucide-react";
+import { ArrowUpRight, LucideLink2, Moon, MoveUpRight, Sun } from "lucide-react";
 
 //TODO: dashboard burger menu
 
@@ -22,10 +22,6 @@ const pageLinks = [
   {
     href: "/about/",
     name: "About",
-  },
-  {
-    href: "/contact/",
-    name: "Contact",
   },
 ];
 
@@ -132,9 +128,9 @@ const isRouteActive = (linkHref: string, currentPath: string): boolean => {
       pageLinks.map((link) => (
         <li
           class:list={[
-            "flex-1 max-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform tracking-wide",
+            "flex-1 max-w-fit w-full px-2 mt-1 pt-1 pb-2 md:text-xl  transition-transform tracking-wide hover:text-primary",
             {
-              "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset text-primary backdrop-blur-[3px]  dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black] [text-shadow:.5px_.5px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))] ":
+              "relative rounded-lg bg-background dark:shadow-elevate-dark-inset scale-95 shadow-elevate-light-inset text-primary backdrop-blur-[3px]  dark:[text-shadow:.5px_.5px_2px_black,_0_0_.1em_black] [text-shadow:.5px_.5px_2px_black,_0_0_.1em_hsl(var(--primary-foreground))]  ":
                 isRouteActive(link.href, pathname),
             },
           ]}
@@ -145,6 +141,19 @@ const isRouteActive = (linkHref: string, currentPath: string): boolean => {
         </li>
       ))
     }
+
+    <li
+      class="mt-1 w-full max-w-fit flex-1 px-2 pb-2 pt-1 tracking-wide transition-transform md:text-xl"
+    >
+      <a
+        rel="noopener noreferrer"
+        href="#"
+        class="flex w-full items-center gap-1 hover:text-primary hover:underline"
+        data-astro-prefetch
+      >
+        {(<LucideLink2 className=" size-5  " />)} Resume</a
+      >
+    </li>
   </ul>
 </nav>
 

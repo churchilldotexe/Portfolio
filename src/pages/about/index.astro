@@ -2,69 +2,102 @@
 import Layout from "../../layouts/Layout.astro";
 ---
 
-<Layout title="About Me">
-  <div>
-    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Numquam, delectus fugiat. Accusantium,
-    animi incidunt tempore voluptatum ipsa eaque officiis quae soluta odio assumenda laborum quos
-    placeat accusamus ratione est possimus.
-  </div>
-</Layout>
+<Layout title="About Me"
+  ><section class="mx-auto flex size-full max-w-prose flex-col items-center justify-center gap-4">
+    <h1 class="text-2xl text-primary md:text-3xl">Churchill Jay Sungcados</h1>
+    <div class="flex items-center justify-center gap-2 underline">
+      <a href="mailto:churchillexe@gmail.com">churchillexe@gmail.com</a>
+      <div class="my-1 self-stretch bg-muted p-px"></div>
+      <a href="https://github.com/churchilldotexe">github.com/churchilldotexe</a>
+    </div>
+    <p class="p-2">
+      I'm a self taught Frontend Developer, who likes to code in Typescript. I like the type safety
+      Typescript brings, it makes me and help me become a better developer by being strict to the
+      code base. I enjoy developing a lot and would like to learn more, as of now i am learning
+      fullstack development.
+    </p>
+    <br />
+    <article class="space-y-3">
+      <h2 class="text-xl">My Coding Education</h2>
 
-<style>
-  main {
-    margin: auto;
-    padding: 1rem;
-    width: 800px;
-    max-width: calc(100% - 2rem);
-    color: white;
-    font-size: 20px;
-    line-height: 1.6;
-  }
-  .astro-a {
-    position: absolute;
-    top: -32px;
-    left: 50%;
-    transform: translatex(-50%);
-    width: 220px;
-    height: auto;
-    z-index: -1;
-  }
-  h1 {
-    font-size: 4rem;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    margin-bottom: 1em;
-  }
-  .text-gradient {
-    background-image: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 400%;
-    background-position: 0%;
-  }
-  .instructions {
-    margin-bottom: 2rem;
-    border: 1px solid rgba(var(--accent-light), 25%);
-    background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
-    padding: 1.5rem;
-    border-radius: 8px;
-  }
-  .instructions code {
-    font-size: 0.8em;
-    font-weight: bold;
-    background: rgba(var(--accent-light), 12%);
-    color: rgb(var(--accent-light));
-    border-radius: 4px;
-    padding: 0.3em 0.4em;
-  }
-  .instructions strong {
-    color: rgb(var(--accent-light));
-  }
-  .link-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-    gap: 2rem;
-    padding: 0;
-  }
-</style>
+      <article class="space-y-1">
+        <h3 class="text-lg">
+          <a
+            href="https://v2.scrimba.com/home"
+            class="inline text-indigo-500 underline"
+            rel="noopener noreferrer">Scrimba</a
+          >
+        </h3>
+        <div class="px-2">
+          <p>
+            I started my journey from scrimba and took their frontend Career path that helps me
+            understand the importance of html semantics and css designs and learn JavaScript and
+            React
+          </p>
+          <p class="pt-2">Certificates:</p>
+          <ul class="flex flex-wrap items-center justify-center gap-2">
+            <li class="">
+              <a
+                href="https://scrimba.com/certificate/udx5yxHW/gfrontend"
+                rel="noopener noreferrer"
+                class="text-indigo-500 underline"
+                >Frontend Career Path
+              </a>
+            </li>
+
+            <div class="my-1 self-stretch bg-muted p-px"></div>
+            <li>
+              <a
+                rel="noopener noreferrer"
+                href="https://scrimba.com/certificate/udx5yxHW/greact"
+                class="text-indigo-500 underline"
+                >Advance React
+              </a>
+            </li>
+
+            <div class="my-1 self-stretch bg-muted p-px"></div>
+            <li>
+              <a
+                class="text-indigo-500 underline"
+                rel="noopener noreferrer"
+                href="https://scrimba.com/certificate/udx5yxHW/gaiengineer"
+                >Ai Engineer
+              </a>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="space-y-1">
+        <h3 class="text-lg text-indigo-500 underline">
+          <a rel="noopener noreferrer" href="https://frontendmasters.com/">Frontend Masters</a>
+        </h3>
+        <div class="space-y-2 px-2">
+          <p class="">
+            I also learned the idea and basics of Data Structures and algorithms. It helped me
+            understand the concept and the structure of a language and how JavaScript Data Structure
+            works under the hood.
+          </p>
+          <ul class="flex w-full flex-wrap justify-center gap-2">
+            <li>
+              <a
+                class="text-indigo-500 underline"
+                href="https://frontendmasters.com/courses/algorithms/introduction/"
+                >Algorithm and Data structure Course</a
+              >
+            </li>
+            <div class="my-1 self-stretch bg-muted p-px"></div>
+            <li>
+              <a
+                rel="noopener noreferrer"
+                class="text-indigo-500 underline"
+                href=" https://drive.google.com/file/d/1oCMJksVHLZbmcVzF4SjEI5qjJI_9N-En/view?usp=sharing "
+                >Certificate</a
+              >
+            </li>
+          </ul>
+        </div>
+      </article>
+    </article>
+  </section>
+</Layout>

@@ -76,7 +76,8 @@ const techStacksArrFiltered = TECH_STACKS.filter((stack) => techstackArr.include
   />
   <div
     class:list={[
-      "absolute bottom-0 left-0 grid w-full grid-rows-[0fr] opacity-0 backdrop-blur transition-[grid-template-rows_opacity] duration-500",
+      "absolute bottom-0 left-0 grid w-full grid-rows-[0fr] opacity-0 backdrop-blur shadow-glass rounded-t-lg  transition-[grid-template-rows_opacity] duration-500",
+      "bg-gradient-to-t from-white dark:from-black to-transparent",
       " hoverable:group-hover:grid-rows-[1fr] hoverable:group-hover:opacity-100 not-hoverable:grid-rows-1 not-hoverable:opacity-100",
       { "grid-rows-1 opacity-100": showDetails },
     ]}

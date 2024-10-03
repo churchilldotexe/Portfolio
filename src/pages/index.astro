@@ -6,7 +6,9 @@ import { CircleChevronRight, CircleChevronLeft, Globe } from "lucide-react";
 import { getFeaturedProjectUseCase } from "@/server/use-case/project";
 import { GithubIcon } from "@/components/svg/SocialIcons";
 import { TECH_STACKS } from "@/lib/constants";
+
 const project = await getFeaturedProjectUseCase();
+const excludeStacks = ["PostgreSQL", "Drizzle"];
 ---
 
 <script>
@@ -67,11 +69,13 @@ const project = await getFeaturedProjectUseCase();
       </p>
       <div class="mt-4 flex w-full items-center justify-center gap-2">
         {
-          TECH_STACKS.filter((stack) => stack.stackName !== "PostgreSQL").map(({ Logo }) => (
-            <div>
-              <Logo className="size-6" />
-            </div>
-          ))
+          TECH_STACKS.filter((stack) => !excludeStacks.includes(stack.stackName)).map(
+            ({ Logo }) => (
+              <div>
+                <Logo className="size-6" />
+              </div>
+            )
+          )
         }
       </div>
       <Image src={profileImg} alt="profile picture for portfolio" class="w-5/6" />
@@ -123,7 +127,7 @@ const project = await getFeaturedProjectUseCase();
                 <div
                   data-enter={false}
                   class:list={[
-                    "size-full flex flex-col justify-around p-4 shadow-elevate-light backdrop-blur dark:shadow-elevate-dark text-foreground ",
+                    "  size-full flex flex-col justify-around p-4 shadow-elevate-light  dark:shadow-elevate-dark text-foreground ",
                     "projectCard relative custom-item bg-background [grid-area:1/1] [backface-visibility:hidden] lg:[backface-visibility:visible] ",
                     "exit-animation  enter-animation ",
                   ]}
@@ -136,7 +140,14 @@ const project = await getFeaturedProjectUseCase();
                     inferSize={true}
                   />
 
-                  <div class:list={["sm:absolute sm:inset-0 w-full grid-custom-area "]}>
+                  <div
+                    class:list={[
+                      "sm:absolute z-[1] sm:inset-0 w-full grid-custom-area",
+                      "after:absolute after:inset-0  after:mb-0 after:mt-auto after:h-[40%] after:-z-[1]",
+                      " after:rounded-t-xl after:backdrop-blur after:shadow-glass after:border-t-muted  ",
+                      "after:bg-gradient-to-t after:from-white/50 dark:after:from-black after:to-transparent ",
+                    ]}
+                  >
                     <div
                       class:list={[
                         "  w-full flex-wrap items-center justify-around relative gap-4 sm:absolute ",
@@ -144,7 +155,7 @@ const project = await getFeaturedProjectUseCase();
                     >
                       <h3
                         class:list={[
-                          "grow w-full  dark:drop-shadow-custom-dark  drop-shadow-custom text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize ",
+                          "grow w-full text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize ",
                         ]}
                       >
                         {name}
@@ -152,7 +163,7 @@ const project = await getFeaturedProjectUseCase();
                       <a
                         href={repoUrl}
                         target="_blank"
-                        class="flex items-center gap-2 text-lg drop-shadow-custom transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping dark:drop-shadow-custom-dark"
+                        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none"
                       >
                         <GithubIcon className="size-6 fill-foreground " />
                         repository
@@ -160,7 +171,7 @@ const project = await getFeaturedProjectUseCase();
                       <a
                         href={liveUrl}
                         target="_blank"
-                        class="flex items-center gap-2 text-lg drop-shadow-custom transition-all hover:scale-110 focus:border-b focus:outline-none active:animate-ping dark:drop-shadow-custom-dark"
+                        class="flex items-center gap-2 text-lg  transition-all hover:scale-110 focus:border-b focus:outline-none"
                       >
                         <Globe className="size-6 text-foreground " />
                         live site
@@ -168,12 +179,7 @@ const project = await getFeaturedProjectUseCase();
                     </div>
 
                     <div class="flex flex-wrap items-center justify-center gap-2 p-4 ">
-                      <p
-                        class:list={[
-                          "w-full  px-4 py-2 leading-6 relative backdrop-blur-sm tracking-wide  ",
-                          "before:content-[''] before:bg-gradient-to-b  before:from-transparent before:dark:via-background before:via-background/50 before:to-transparent  before:absolute before:blur-lg before:filter before:inset-0 before:-z-10",
-                        ]}
-                      >
+                      <p class:list={["w-full px-4 p-2 leading-6 relative tracking-wide "]}>
                         {description}
                       </p>
                       <div class="hover-siblings-animation flex items-center gap-2 *:size-6">
@@ -343,15 +349,22 @@ const project = await getFeaturedProjectUseCase();
   }
 
   /*to hide the cards that is not in front*/
+  .enter-animation:not([data-enter="true"]) > div::after,
   .enter-animation:not([data-enter="true"]) > div > div:nth-of-type(1),
   .enter-animation:not([data-enter="true"]) > div > div:nth-of-type(2) {
     display: none;
   }
 
+  .enter-animation[data-enter="true"] > div::after {
+    transition-property: opacity;
+    transition-delay: 500ms;
+    transition-duration: 400ms;
+    transition-timing-function: linear;
+    opacity: 1;
+  }
+
   .enter-animation[data-enter="true"] > div > div:nth-of-type(1),
   .enter-animation[data-enter="true"] > div > div:nth-of-type(2) {
-    /*animation: enter 500ms linear 600ms 1 forwards;*/
-
     transition-property: opacity transform filter;
     transition-duration: 500ms;
     transition-timing-function: linear;
@@ -359,10 +372,16 @@ const project = await getFeaturedProjectUseCase();
     transform: translateY(0);
     display: flex;
     opacity: 1;
-    /*filter: blur(0);*/
-    filter: blur(unset);
+    filter: blur(0);
+  }
 
-    @starting-style {
+  @starting-style {
+    .enter-animation[data-enter="true"] > div::after {
+      opacity: 0;
+    }
+
+    .enter-animation[data-enter="true"] > div > div:nth-of-type(1),
+    .enter-animation[data-enter="true"] > div > div:nth-of-type(2) {
       opacity: 0;
       transform: translateY(20%);
       filter: blur(2px);
@@ -370,19 +389,9 @@ const project = await getFeaturedProjectUseCase();
   }
 
   .enter-animation[data-enter="true"] > div > div:nth-of-type(1) {
-    /*animation: enter 500ms linear 700ms 1 forwards;*/
     transition-delay: 700ms;
   }
 
-  @keyframes enter {
-    to {
-      transform: translateY(0);
-      display: flex;
-      opacity: 1;
-      /*filter: blur(0);*/
-      filter: blur(unset);
-    }
-  }
   @media (prefers-reduced-motion) {
     .enter-animation[data-enter="true"] > div > div:nth-of-type(1),
     .enter-animation[data-enter="true"] > div > div:nth-of-type(2) {

@@ -55,6 +55,7 @@ const config = {
       boxShadow: {
         "elevate-light": "0 8px 6px 0 rgba(0,0,0,.37), -6px -4px 10px white",
         "elevate-dark": "0 8px 6px 0 rgba(0,0,0,0.15), -6px -4px 10px black",
+        glass: "0px -7px 12px -7px rgba(0,0,0,0.65)",
         "elevate-light-inset": "0 8px 6px 0 rgba(0,0,0,.37) inset, -6px -4px 10px white inset",
         "elevate-dark-inset": "0 8px 6px 0 rgba(0,0,0,0.15) inset, -6px -4px 10px black inset",
       },

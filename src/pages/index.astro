@@ -134,20 +134,13 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
                   style={`--position:${index + 1}`}
                 >
                   <Image
-                    class:list={[" w-full rounded-lg object-cover aspect-video object-center"]}
+                    class:list={[" size-full rounded-lg object-contain aspect-video object-center"]}
                     src={imageUrl}
                     alt={name}
                     inferSize={true}
                   />
 
-                  <div
-                    class:list={[
-                      "sm:absolute z-[1] sm:inset-0 w-full grid-custom-area",
-                      "after:absolute after:inset-0  after:mb-0 after:mt-auto after:h-[40%] after:-z-[1]",
-                      " after:rounded-t-xl after:backdrop-blur after:shadow-glass after:border-t-muted  ",
-                      "after:bg-gradient-to-t after:from-white/50 dark:after:from-black after:to-transparent ",
-                    ]}
-                  >
+                  <div class:list={["gap-2 sm:absolute z-[1] sm:inset-0 w-full grid-custom-area"]}>
                     <div
                       class:list={[
                         "w-full flex-wrap items-center justify-around relative gap-4 sm:absolute ",
@@ -155,7 +148,7 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
                     >
                       <h3
                         class:list={[
-                          "grow w-full text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize ",
+                          "grow relative w-full text-center text-[clamp(.5em,5vw,3.5rem)] font-bold capitalize drop-shadow-custom-dark text-primary ",
                         ]}
                       >
                         {name}
@@ -163,22 +156,27 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
                       <a
                         href={repoUrl}
                         target="_blank"
-                        class="flex items-center gap-2 text-lg transition-all hover:scale-110 focus:border-b focus:outline-none"
+                        class=" flex items-center gap-2 text-lg text-foreground transition-all hover:scale-110 focus:border-b focus:outline-none sm:text-black sm:drop-shadow-custom"
                       >
-                        <GithubIcon className="size-6 fill-foreground " />
+                        <GithubIcon className="size-6 fill-foreground sm:fill-black " />
                         repository
                       </a>
                       <a
                         href={liveUrl}
                         target="_blank"
-                        class="flex items-center gap-2 text-lg  transition-all hover:scale-110 focus:border-b focus:outline-none"
+                        class="flex items-center gap-2 text-lg text-foreground transition-all hover:scale-110 focus:border-b focus:outline-none sm:text-black sm:drop-shadow-custom"
                       >
-                        <Globe className="size-6 text-foreground " />
+                        <Globe className="size-6 text-foreground sm:text-black " />
                         live site
                       </a>
                     </div>
 
-                    <div class="flex flex-wrap items-center justify-center gap-2 p-4 ">
+                    <div
+                      class:list={[
+                        "flex flex-wrap items-center justify-center gap-2 p-3 ",
+                        "backdrop-blur-2xl shadow-glass rounded-t-xl bg-gradient-to-r from-background/20 via-background to-background/20 ",
+                      ]}
+                    >
                       <p class:list={["w-full px-4 p-2 leading-6 relative tracking-wide "]}>
                         {description}
                       </p>
@@ -372,7 +370,7 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
     transform: translateY(0);
     display: flex;
     opacity: 1;
-    filter: blur(0);
+    filter: unset;
   }
 
   @starting-style {

@@ -28,7 +28,7 @@ if (!userId && loginParams.status === "success") {
 const isLoggedIn = userId ? true : false;
 ---
 
-<Layout title="Welcome to Dashboard ">
+<Layout title="Dashboard ">
   <section class="flex size-full flex-col items-center justify-center gap-4">
     <ProjectForm client:load isLoggedIn={isLoggedIn} loginParams={loginParams} />
   </section>

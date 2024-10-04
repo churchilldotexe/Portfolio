@@ -81,7 +81,7 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
       <Image src={profileImg} alt="profile picture for portfolio" class="w-5/6" />
     </article>
 
-    <aside class:list={["grid-custom-template relative grid grow px-4"]}>
+    <aside class:list={["grid-custom-template relative h-fit  grid grow px-4"]}>
       <h2
         class:list={[
           "absolute bottom-[calc(100%-1rem)] md:bottom-[calc(100%-4rem)] lg:bottom-[calc(100%-3rem)] text-5xl md:text-7xl font-bold text-primary",
@@ -91,9 +91,8 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
       >
         Featured
       </h2>
-
       <div
-        class="group relative z-[2] h-full w-[clamp(20rem,100%,64rem)] overflow-hidden md:overflow-visible"
+        class="group relative z-[2] w-[clamp(20rem,100%,64rem)] overflow-hidden md:overflow-visible"
       >
         <button
           id="prev"
@@ -115,7 +114,7 @@ const excludeStacks = ["PostgreSQL", "Drizzle"];
         >
         <div
           id="cards-parent"
-          class:list={" size-full custom-div grid place-items-center"}
+          class:list={" w-full custom-div grid place-items-center"}
           style=`--quantity:${project.length}`
         >
           {

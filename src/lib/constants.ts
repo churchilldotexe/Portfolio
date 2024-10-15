@@ -10,6 +10,7 @@ import {
   NextjsIcon,
   ReactIcon,
   TypeScript,
+  Vitest,
 } from "@/components/svg/StacksIcons";
 import type { AstroCookieSetOptions } from "astro";
 
@@ -95,6 +96,11 @@ export const TECH_STACKS = [
     stackName: "TypeScript",
     href: "https://www.typescriptlang.org/docs/",
     Logo: TypeScript,
+  },
+  {
+    stackName: "Vitest",
+    href: "https://vitest.dev/",
+    Logo: Vitest,
   },
 ] as const;
 

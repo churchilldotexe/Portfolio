@@ -1,5 +1,5 @@
 ---
-import { ArrowUpRight, LucideLink2, Moon, MoveUpRight, Sun } from "lucide-react";
+import { ExternalLinkIcon, Moon, Sun } from "lucide-react";
 
 export const prerender = false;
 const pathname = Astro.url.pathname;
@@ -149,7 +149,7 @@ const isRouteActive = (linkHref: string, currentPath: string): boolean => {
         class="flex w-full items-center gap-1 hover:text-primary hover:underline"
         data-astro-prefetch
       >
-        {(<LucideLink2 className=" size-5  " />)} Resume</a
+        Resume <ExternalLinkIcon className=" size-5  " /></a
       >
     </li>
   </ul>

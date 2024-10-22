@@ -153,60 +153,234 @@ what these command do is to `nvm list` to list the available node version and in
 
 ## Basic setup and Scaffolding
 
-### Php
+- **Php**
 
-To setup a dynamic php to the browser the simple way to do it is to just setup a normal html and just change it to php.
+  To setup a dynamic php to the browser the simple way to do it is to just setup a normal html and just change it to php.
 
-```php
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title></title>
-    <link href="css/style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h1>
-       <?php echo "Hello world"; ?>
-    </h1>
-  </body>
-</html>
+  ```php
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title></title>
+      <link href="css/style.css" rel="stylesheet" />
+    </head>
+    <body>
+      <h1>
+         <?php echo "Hello world"; ?>
+      </h1>
+    </body>
+  </html>
 
-```
+  ```
 
-the php tag inside the h1 tag is now considered as a php code meaning you can do your logic directly in there.
+  the php tag inside the h1 tag is now considered as a php code meaning you can do your logic directly in there.
 
-### Javascript
+- **Javascript**
 
-On javascript you can set it up like this
+  On javascript you can set it up like this
 
-```javascript
+  ```javascript
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title></title>
-    <link href="css/style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h1 id="title">Hi</h1>
-   <script>
-        document.getElementById('title').textContent = "Hello world";
-    </script>
-  </body>
-</html>
-```
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title></title>
+      <link href="css/style.css" rel="stylesheet" />
+    </head>
+    <body>
+      <h1 id="title">Hi</h1>
+     <script>
+          document.getElementById('title').textContent = "Hello world";
+      </script>
+    </body>
+  </html>
+  ```
 
-You can take control of it using `script` tag and with DOM manipulation you can take control the html tag (h1 id in this example) and render text.
+  You can take control of it using `script` tag and with DOM manipulation you can take control the html tag (h1 id in this example) and render text.
 
-### differences between the two
+- **differences between the two**
 
-The main difference between the two is Javascript execute the code on the browser after the page loads while php will execute it in the server before sending it to the browser
+  The main difference between the two is Javascript execute the code on the browser after the page loads while php will execute it in the server before sending it to the browser
 
 ## Scoping and hoisting
+
+- **PHP**
+
+  - **Hoisting**
+    Hoisting in php is simple everything aside from function is non-hoisted.
+    Meaning you have to define them in order
+
+    ```php
+       <?php
+          $foo = 1;
+          $bar = 2;
+          echo $baz; // Reference error
+          $baz = 3;
+
+          returnFoo($foo) // works
+          function returnFoo($foo){
+          return $foo
+       }
+
+       ?>
+    ```
+
+  - **Scoping** :
+
+    Scoping on other hand have a complexity into it.
+    You can think of it like : **Php is functional scoping**.
+    Meaning you can access the variable even if it is outside an if-else block
+    but you cant access them outside the function block.
+
+    - example:
+
+      ```php
+      <?php
+         $isRead = true;
+
+         if(isRead){
+            $msg = "hello";
+         }
+          echo $msg; //works
+
+          function AccessMe($foo){
+            $bar = "you cant";
+            return $foo;
+         }
+
+          echo $bar; // Error
+      ?>
+      ```
+
+  - **Referencing**:
+    In you can copy the value of another variable by doing:
+
+    ```php
+    <?php
+       $foo = 1;
+       $bar = $foo;
+       $bar = $bar * 3;
+       echo $foo // output: 1
+    ?>
+    ```
+
+    here `$bar` creates a copy of `$foo`. Meaning it is a new point of memory
+    and they are reference to a different memory so even tho we change `$bar`
+    `$foo` is unaffected.
+
+    On the other hand, if you use a `&` reference operator. It will become different :
+
+    ```php
+    <?php
+       $foo = 1;
+       $bar = &$foo;
+       $bar = $bar * 3;
+       echo $foo // output: 3
+    ?>
+    ```
+
+    Now by adding `&` reference operator. `$foo` and `$bar` are pointing the same memory so if you change one of them the other will change as well.
+
+- **Javascript**
+
+  - **Hoisting**:
+    JavaScript has more complex hoisting behavior than PHP:
+
+    - `var` declarations are hoisted but not their values
+    - `function` declarations are fully hoisted (declaration and implementation)
+    - `let` and `const` are hoisted but remain in the Temporal Dead Zone (TDZ) until declaration
+
+    ```javascript
+    console.log(foo); // undefined (var is hoisted)
+    console.log(bar); // ReferenceError (let/const in TDZ)
+    console.log(baz); // ReferenceError (not declared)
+    returnFoo(1); // works (functions are fully hoisted)
+
+    var foo = 1;
+    let bar = 2;
+    const baz = 3;
+
+    function returnFoo(foo) {
+      return foo;
+    }
+    ```
+
+  - **Scoping**:
+    JavaScript has lexical (block) scoping, different from PHP's functional scoping:
+
+    - `var` is function-scoped (similar to PHP)
+    - `let` and `const` are block-scoped (different from PHP)
+
+    ```javascript
+    let isRead = true;
+    if (isRead) {
+      let msg = "hello";
+      var varMsg = "hi";
+    }
+    console.log(msg); // ReferenceError (block-scoped)
+    console.log(varMsg); // works (function-scoped)
+
+    function accessMe(foo) {
+      let bar = "you cant";
+      var varBar = "you cant";
+      return foo;
+    }
+    console.log(bar); // Error
+    console.log(varBar); // Error (function-scoped)
+    ```
+
+    Special `var` behavior in Blocks:
+
+    ```javascript
+    var x = 1;
+    {
+      console.log(x); // undefined (hoisting within block)
+      var x = 2;
+    }
+    console.log(x); // 2
+    ```
+
+  - Referencing:
+    JavaScript handles primitives and objects differently:
+
+    - Primitives (similar to PHP without using reference (**&**)):
+
+    ```javascript
+    let foo = 1;
+    let bar = foo;
+    bar = bar * 3;
+    console.log(foo); // output: 1
+    ```
+
+    - Objects is similar to php with Reference **&**:
+
+    ```javascript
+    let foo = { value: 1 };
+    let bar = foo; // Objects are passed by reference
+    bar.value = bar.value * 3;
+    console.log(foo.value); // output: 3
+    ```
+
+    - You can also do a shallow copy which is the same to php without using the reference **&**
+
+    ```javascript
+    let foo = { value: 1 };
+    let bar = { ...foo }; // Shallow copy
+    bar.value = bar.value * 3;
+    console.log(foo.value); // output: 1
+    ```
+
+  - Differences
+
+    - Hoisting behavior is more complex in JavaScript with var/let/const
+    - JavaScript has block-scoping with let/const while PHP is function-scoped
+    - JavaScript objects are always referenced, while PHP needs & operator
+    - JavaScript requires explicit object copying (spread, Object.assign, etc.) while PHP copies by default
+    - JavaScript has the Temporal Dead Zone concept which doesn't exist in PHP
 
 ---
 

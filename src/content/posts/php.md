@@ -177,6 +177,12 @@ what these command do is to `nvm list` to list the available node version and in
 
   the php tag inside the h1 tag is now considered as a php code meaning you can do your logic directly in there.
 
+  Then you can run the development server with : 
+  ```bash
+  php -S localhost:8888
+  ```
+  You can specify another port
+
 - **Javascript**
 
   On javascript you can set it up like this
@@ -438,36 +444,46 @@ what these command do is to `nvm list` to list the available node version and in
 ### Boolean and Conditionals
 
 - **php**
-  There are two ways to define if else statement in php
 
+  #### if-else statement
+
+    There are two ways to define if else statement in php
+
+    ```php
+    <?php
+         $greeting = "Nihao";
+        $english = false;
+        if ($english) {
+            $msg = "Hello";
+        } else {
+            $msg = "Nihao";
+        }
+    ?>
+    <ul>
+       <li>
+          <?=$msg?>
+       </li>
+    </ul>
+    ```
+
+    Alternative for conditonals:
+
+    ```php
+    <?php
+       <ul>
+          <?php if($english): ?>
+             <li><?=$msg?></li>
+          <?php endif; ?>
+       </ul>
+    ?>
+
+    ```
+
+  #### ternary operator 
   ```php
-  <?php
-       $greeting = "Nihao";
-      $english = false;
-      if ($english) {
-          $msg = "Hello";
-      } else {
-          $msg = "Nihao";
-      }
+  <?php 
+  echo $_SERVER['REQUEST_URI'] ? "bg-gray-900 text-white" : "text-gray-300";
   ?>
-  <ul>
-     <li>
-        <?=$msg?>
-     </li>
-  </ul>
-  ```
-
-  Alternative for conditonals:
-
-  ```php
-  <?php
-     <ul>
-        <?php if($english): ?>
-           <li><?=$msg?></li>
-        <?php endif; ?>
-     </ul>
-  ?>
-
   ```
 
 - **Javascript**
@@ -819,6 +835,12 @@ what these command do is to `nvm list` to list the available node version and in
 
    ?>
 ```
+
+## Syntaxes
+
+### var_dump
+### die();
+### Superglobals
 
 ---
 

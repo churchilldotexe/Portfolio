@@ -1,10 +1,9 @@
 ---
-name: "Php and Javascript Side by Side"
-date: 2024-10-22
-description: "A side by side comparison of php and Javascript"
-slug: "php-js"
+name: Php and Javascript Side by Side
+date: 2024-10-22T00:00:00.000Z
+description: A side by side comparison of php and Javascript
+slug: php-js
 ---
-
 # Php and Javascript Side by side
 
 ## Setting up the Environment
@@ -177,10 +176,12 @@ what these command do is to `nvm list` to list the available node version and in
 
   the php tag inside the h1 tag is now considered as a php code meaning you can do your logic directly in there.
 
-  Then you can run the development server with : 
+  Then you can run the development server with :
+
   ```bash
   php -S localhost:8888
   ```
+
   You can specify another port
 
 - **Javascript**
@@ -211,6 +212,104 @@ what these command do is to `nvm list` to list the available node version and in
 - **differences between the two**
 
   The main difference between the two is Javascript execute the code on the browser after the page loads while php will execute it in the server before sending it to the browser
+
+## Separate logic from template
+
+- php
+
+  In Php Although you can write php logic alongside html as well as its business logic. It is not readable and when the code base grows it will become hard to reason about so it.
+  So it is better to split the logic and the view.
+  In php, you can split them with this
+
+  ```
+  ├── index.php
+
+  └── index.view.php
+  ```
+
+  - index.php is where your logic code lives and
+  - index.view.php is for your php html
+
+  then you can use `require` or `include`
+
+  ```php
+  // index.php (Logic/Controller)
+  <?php
+  // Here you put your PHP logic, database queries, etc.
+  $title = "My Website";
+  $books = [
+    [
+        'title' => 'Book1',
+        'author' => 'author1',
+        'url' => 'https://example.com'
+    ],
+    [
+        'title' => 'Book2',
+        'author' => 'author2',
+        'url' => 'https://example1.com'
+    ]
+  ];
+
+  // After all logic is done, include the view
+  require 'index.view.php';
+  ```
+
+  then in index.view.php
+
+  ```php
+
+  <!-- index.view.php (Template/View) -->
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title><?= $title ?></title>
+  </head>
+  <body>
+    <h1><?= $title ?></h1>
+
+    <ul>
+        <?php foreach ($books as $book): ?>
+            <li>
+                <a href="<?= $book['url'] ?>">
+                    <?= $book['title'] ?>
+                </a>
+                <p>By <?= $book['author'] ?></p>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+  </body>
+  </html>
+  ```
+
+- Javascript
+  It is also the same with javascript you can Separate the html and the Javascript
+  to have a redeable and more scalable setup
+
+  ```
+
+  ├── index.html
+
+  └── index.js
+
+  ```
+
+  in `index.html` you can access the js with a script tag
+
+  ```javascript
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>My Page</title>
+      <!-- JavaScript can be included in head or before closing body tag -->
+      <script src="index.js"></script>
+  </head>
+  <body>
+      <!-- Or here at the end of body (common practice) -->
+      <script src="index.js"></script>
+  </body>
+  </html>
+  ```
 
 ## Scoping and hoisting
 
@@ -479,7 +578,8 @@ what these command do is to `nvm list` to list the available node version and in
 
     ```
 
-  #### ternary operator 
+  #### ternary operator
+
   ```php
   <?php 
   echo $_SERVER['REQUEST_URI'] ? "bg-gray-900 text-white" : "text-gray-300";
@@ -488,6 +588,7 @@ what these command do is to `nvm list` to list the available node version and in
 
 - **Javascript**
   It is the same with php where you can define it like this
+
   ```javascript
   if (truthy) {
     //execute
@@ -495,6 +596,7 @@ what these command do is to `nvm list` to list the available node version and in
     //execute me instead
   }
   ```
+
 - difference
   They may be define the same but they have different code scoping
   - php:
@@ -583,7 +685,7 @@ what these command do is to `nvm list` to list the available node version and in
   ```
 
   the caveat here is we are creating a reference of the $books value by using `&`.
-   This reference operator will create a new point reference in the array. 
+   This reference operator will create a new point reference in the array.
    Meaning we are directly changing the value of $books after the loop the `$book`value still holds that reference so when used in another foreach which is in the code: ` foreach ($anotherBooks as $book `
    $books here still point to `$books[1]`
 
@@ -684,7 +786,8 @@ what these command do is to `nvm list` to list the available node version and in
 
 - **php**
 
-  It is an array inside of an array that has an Associative key as a pointer of the values inside the array
+  It is an array inside of an array that has an Associative key as a pointer of the values inside the array.
+  If array is like an Array List. Associative Array is like a **hashmap** where it has a key and a value associated to it.
 
   ```php
   <?php
@@ -716,6 +819,24 @@ what these command do is to `nvm list` to list the available node version and in
      <?php endforeach; ?>
   ```
 
+  #### array_key_exists()
+
+  is a helper function to check if the passed `key` exists in an associated array.
+  It takes in two arguments:
+  1. **key** - the property or key that you want to check.
+  2. **associated array** - the associated array that you want to check to.
+
+  ```php
+  <?php
+  $foo = [
+    'bar' => 1,
+    'baz' => 2
+  ];
+
+    array_key_exists('bar',$foo); // true
+    array_key_exists('boo',$foo); // false, doesnt exist
+  ```
+
 - **Javascript**
   Javascript object is the closest comparison to _php's Associative array_.
   It have the same behavior where it has a key associated with value(key/value pair)
@@ -724,8 +845,8 @@ what these command do is to `nvm list` to list the available node version and in
   ```javascript
   const book = [
      {
-        'title' => 'Book1',
-        'author' => 'author1',
+        title : 'Book1',
+        author => 'author1',
         'url' => 'https://example.com',
      },
      {
@@ -745,6 +866,46 @@ what these command do is to `nvm list` to list the available node version and in
     </li>
   ));
   ```
+
+  ##### hasOwnProperty()  
+
+  _hasOwnProperty()_  is a method that is a close comparison of php's associated array, it checks if the key exist in an object. It has a different syntax since it is a method it must be chain on the object that you want to check.
+
+  ```javascript
+  const foo = {
+    bar: 1,
+    baz: 2
+  }
+
+  console.log(foo.hasOwnProperty('bar')) // true
+  console.log(foo.hasOwnProperty('boo')) // false
+  ```
+
+### Class (Objects)
+
+  A blueprint
+
+```php
+<?php 
+class Person {
+  public $name ;
+  public $age; 
+
+  public function greet()
+  {
+    echo $this->name . "greets you.";
+  }
+}
+
+
+$person = new Person();
+
+$person->name="foo";
+$person->age=25;
+
+$person->greet();
+
+```
 
 ### Functions
 
@@ -839,105 +1000,185 @@ what these command do is to `nvm list` to list the available node version and in
 ## Syntaxes
 
 ### var_dump
-### die();
-### Superglobals
 
----
+a function that displays the value or information of a variable, Arrays and objects.
+when Array or object it will display recursively no matter the depth in a proper structure.
+It is best paired with [`die()`](<php#die()>) and a html's `<pre>` to have a readable structure.
 
-## Separate logic from template
+```php
+<?php
 
-- php
-
-  In Php Although you can write php logic alongside html as well as its business logic. It is not readable and when the code base grows it will become hard to reason about so it.
-  So it is better to split the logic and the view.
-  In php, you can split them with this
-
-  ```
-  ├── index.php
-
-  └── index.view.php
-  ```
-
-  - index.php is where your logic code lives and
-  - index.view.php is for your php html
-
-  then you can use `require` or `include`
-
-  ```php
-  // index.php (Logic/Controller)
-  <?php
-  // Here you put your PHP logic, database queries, etc.
-  $title = "My Website";
-  $books = [
-    [
+   $book = [
+     {
         'title' => 'Book1',
         'author' => 'author1',
-        'url' => 'https://example.com'
-    ],
-    [
+        'url' => 'https://example.com',
+     },
+     {
         'title' => 'Book2',
         'author' => 'author2',
-        'url' => 'https://example1.com'
-    ]
+        'url' => 'https://example1.com',
+     }
   ];
 
-  // After all logic is done, include the view
-  require 'index.view.php';
+  echo "<pre>";
+  var_dump($book);
+  echo "</pre>";
+
+  die();
+```
+
+### die()
+
+Die is a function that will prevent the code after it to not execute. It is like a ,in a way, a `return`.
+
+### Superglobals
+
+A pre-defined Contants(variables) that are Accessible on any scopes. Meaning you can access it on any php files and even inside a function.
+It is useful to access certain information from server and http. Some notable Superglobals are:
+
+- `$_SERVER` : contains information like headers, url path and query, request methods and more.
+
+  ```php
+    <?php 
+
   ```
 
-  then in index.view.php
+  ```php
+  <?php 
+  $_SERVER['REQUEST_URI'] 
+  ```
+
+  will output the following and more:
 
   ```php
 
-  <!-- index.view.php (Template/View) -->
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title><?= $title ?></title>
-  </head>
-  <body>
-    <h1><?= $title ?></h1>
-
-    <ul>
-        <?php foreach ($books as $book): ?>
-            <li>
-                <a href="<?= $book['url'] ?>">
-                    <?= $book['title'] ?>
-                </a>
-                <p>By <?= $book['author'] ?></p>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-
-  </body>
-  </html>
-  ```
-
-- Javascript
-  It is also the same with javascript you can Separate the html and the Javascript
-  to have a redeable and more scalable setup
+  array(28) {
+    ["REMOTE_ADDR"]=>
+    string(9) "127.0.0.1"
+    ["REMOTE_PORT"]=>
+    string(5) "48066"
+    ["SERVER_NAME"]=>
+    string(9) "localhost"
+    ["SERVER_PORT"]=>
+    string(4) "8888"
+    ["REQUEST_URI"]=>
+    string(1) "/"
+    ["REQUEST_METHOD"]=>
+    string(3) "GET"
+    ["SCRIPT_NAME"]=>
+    string(10) "/index.php"
+    ["HTTP_HOST"]=>
+    string(14) "localhost:8888"
+    ["HTTP_SEC_FETCH_MODE"]=>
+    string(8) "navigate"
+    ...
+  }
 
   ```
 
-  ├── index.html
+### parse_url()
 
-  └── index.js
+It will receive a url as an argument and parse it as a **associative array**
+some of those properties are:
 
+- path = the path of the url `/path`
+- query = the key/value pairs query parameter. `?query=foo`
+- more example:
+
+  ```php
+  <?php
+  $url = 'http://username:password@hostname:9090/path?arg=value#anchor';
+
+  var_dump(parse_url($url));
+  // will output: 
+  array(8) {
+    ["scheme"]=> string(4) "http"
+    ["host"]=> string(8) "hostname"
+    ["port"]=> int(9090)
+    ["user"]=> string(8) "username"
+    ["pass"]=> string(8) "password"
+    ["path"]=> string(5) "/path"
+    ["query"]=> string(9) "arg=value"
+    ["fragment"]=> string(6) "anchor"
+  }
   ```
 
-  in `index.html` you can access the js with a script tag
+### http_response_code(404)
 
-  ```javascript
-  <!DOCTYPE html>
-  <html>
-  <head>
-      <title>My Page</title>
-      <!-- JavaScript can be included in head or before closing body tag -->
-      <script src="index.js"></script>
-  </head>
-  <body>
-      <!-- Or here at the end of body (common practice) -->
-      <script src="index.js"></script>
-  </body>
-  </html>
-  ```
+a function that receives a [valid http status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) and it will be sent in the network a valid response code as a response.
+it is useful in a case of error like `404` where when the page is not found, you can create a custom page and at the same time you can sent a valid status code to the client.
+
+Example :
+
+```php
+<?php
+
+function abort($code = 404)
+{
+
+    http_response_code($code);
+
+    require "controller/{$code}.php";
+    die();
+
+}
+```
+
+this code will send a response code and set the proper controller that corresponds to the status code.
+
+<!--TODO: javascript equivalent-->
+
+## Connecting to database
+
+```php
+<?php 
+new PDO($dsn);
+```
+
+```php
+
+<?php
+$dsn = "mysql:host=localhost;port=3306;dbname=myapp;user=root;password=mypass;charset=utf8mb4";
+# or 
+$dsn = "mysql:host=127.0.0.1;port=3306;dbname=myapp;user=root;password=mypass;charset=utf8mb4";
+
+$pdo = new PDO($dsn);
+
+
+$statement = $pdo->prepare("SELECT * FROM posts");
+
+$statement->execute();
+
+$posts = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($posts as $post) {
+    echo "<li>{$post['title']}</li>";
+}
+```
+
+```php
+<?php
+
+class Database
+{
+    private $connection;
+    public function __construct($config, $userName = "root", $password = "")
+    {
+        $dsm = "mysql:" . http_build_query($config, "", ";");
+        $this->connection = new PDO($dsm, $userName, $password, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    }
+
+    public function query($query)
+    {
+
+        $statement = $this->connection->prepare($query);
+
+        $statement->execute();
+
+        return $statement;
+    }
+
+}
+```
+

@@ -883,29 +883,98 @@ what these command do is to `nvm list` to list the available node version and in
 
 ### Class (Objects)
 
-  A blueprint
+- A blueprint is a way to define a structure of variable,constant and functions that can be use multiple times and also can be use differently from one another.
 
-```php
-<?php 
-class Person {
-  public $name ;
-  public $age; 
+  ```php
+  <?php 
+  class Person {
+    public $name ;
+    public $age; 
 
-  public function greet()
-  {
-    echo $this->name . "greets you.";
+    public function greet()
+    {
+      echo $this->name . "greets you.";
+    }
   }
-}
 
 
-$person = new Person();
+  $person = new Person();
 
-$person->name="foo";
-$person->age=25;
+  $person->name="foo";
+  $person->age=25;
 
-$person->greet();
+  $person->greet();
 
-```
+  ```
+
+#### Defining constant in class
+
+- There are some cases where you want to define a _read only_ variable or constant.
+You can leverage constant inside the class which also give you a benefit of a type inferred constant.
+
+  ```php
+  <?php 
+  class Response {
+    public const NOTFOUND = 404;
+    public const FORBIDDEN = 403;
+  }
+
+    //usage 
+  var_dump(Response::NOTFOUND) // will output 404
+  ```
+
+#### Owning and wrapping a predefined methods
+
+- If you need to have a more customized method that that came from php or a method that you dont own, you can wrap it to another method and add your desired logic to it.
+- This is useful for:
+  - the methods that you need to do a **guard checks** and you keep on defining those checks.
+  - if you can see a pattern that you're adding the same logic over and over again everytime you use the said method.
+
+  Example:
+
+  ```php
+  <?
+
+  class Database
+  {
+      private $connection;
+      private $statement;
+
+      public function __construct($config, $userName = "root", $password = "")
+      {
+          $dsm = "mysql:" . http_build_query($config, "", ";");
+          $this->connection = new PDO($dsm, $userName, $password, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+      }
+
+      public function query($query, $params = [])
+      {
+
+          $this->statement = $this->connection->prepare($query);
+
+          $this->statement->execute($params);
+
+          return $this;
+      }
+
+      public function getOne()
+      {
+          return $this->statement->fetch();
+      }
+
+      public function getOrAbort()
+      {
+          $result = $this->getOne();
+          if (!$result) {
+              abort();
+          }
+
+          return $result;
+      }
+
+  }
+  ```
+
+  This class uses `PDO` which is an object from php. The best example here is `getOrAbort()`, this method need to check if `getOne()` method is truthy if not then abort().
 
 ### Functions
 
@@ -997,6 +1066,8 @@ $person->greet();
    ?>
 ```
 
+---
+
 ## Syntaxes
 
 ### var_dump
@@ -1037,7 +1108,7 @@ Die is a function that will prevent the code after it to not execute. It is like
 A pre-defined Contants(variables) that are Accessible on any scopes. Meaning you can access it on any php files and even inside a function.
 It is useful to access certain information from server and http. Some notable Superglobals are:
 
-- `$_SERVER` : contains information like headers, url path and query, request methods and more.
+- #### `$_SERVER` : contains information like headers, url path and query, request methods and more
 
   ```php
     <?php 
@@ -1075,6 +1146,48 @@ It is useful to access certain information from server and http. Some notable Su
     ...
   }
 
+  ```
+
+- #### `$_GET`
+
+  Since `GET` request transfers data to the backend mainly by **URL**. This Superglobals helper is a way:
+  - to access the information about a **GET** request
+  - to get access to the URL parameter, or query string.
+  - It will be parsed in an Associative array as long as it is a query parameter.
+
+  ```php
+  <?php
+  $url = "https://foo.com/?bar=baz";
+
+  var_dump($_GET);
+  /*
+  will output:
+    array(1) {
+      ["bar"]=>
+      string(3) "baz"
+    } 
+  */
+
+
+  var_dump($_GET['bar'])
+  // will output : 
+  # string(3) "baz"
+  ```
+
+- #### `$_POST`
+  
+  While `GET` method mainly send data through url. `POST` by default dont do that, so `$_POST` Superglobals is a helper from php to access the entire named data from your `form`.
+
+  ```php
+  <?php
+  
+  var_dump($_POST);
+  /*
+  array(1) {
+    ["body"]=>
+    string(3) "foo"
+  }
+  */
   ```
 
 ### parse_url()
@@ -1128,6 +1241,8 @@ function abort($code = 404)
 this code will send a response code and set the proper controller that corresponds to the status code.
 
 <!--TODO: javascript equivalent-->
+
+---
 
 ## Connecting to database
 

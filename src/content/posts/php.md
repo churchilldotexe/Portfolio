@@ -4,6 +4,7 @@ date: 2024-10-22T00:00:00.000Z
 description: A side by side comparison of php and Javascript
 slug: php-js
 ---
+
 # Php and Javascript Side by side
 
 ## Setting up the Environment
@@ -504,6 +505,23 @@ what these command do is to `nvm list` to list the available node version and in
   ?>
   ```
 
+  - #### helper methods and functions
+
+    [string functions documentation](https://www.php.net/ref.strings)
+
+    - `strlen()` : checks the length of a string.
+
+      ```php
+      <?php
+        $foo = "bar";
+        strlen($foo); // 3
+      ```
+
+    - `string_replace`:
+    - `stringtoupper`;
+
+    # TODO:
+
   the first one will render `hello world` while the second one (single qoute) will render `$greet world`
 
 - **Javascript**
@@ -546,42 +564,42 @@ what these command do is to `nvm list` to list the available node version and in
 
   #### if-else statement
 
-    There are two ways to define if else statement in php
+  There are two ways to define if else statement in php
 
-    ```php
-    <?php
-         $greeting = "Nihao";
-        $english = false;
-        if ($english) {
-            $msg = "Hello";
-        } else {
-            $msg = "Nihao";
-        }
-    ?>
-    <ul>
-       <li>
-          <?=$msg?>
-       </li>
-    </ul>
-    ```
+  ```php
+  <?php
+       $greeting = "Nihao";
+      $english = false;
+      if ($english) {
+          $msg = "Hello";
+      } else {
+          $msg = "Nihao";
+      }
+  ?>
+  <ul>
+     <li>
+        <?=$msg?>
+     </li>
+  </ul>
+  ```
 
-    Alternative for conditonals:
+  Alternative for conditonals:
 
-    ```php
-    <?php
-       <ul>
-          <?php if($english): ?>
-             <li><?=$msg?></li>
-          <?php endif; ?>
-       </ul>
-    ?>
+  ```php
+  <?php
+     <ul>
+        <?php if($english): ?>
+           <li><?=$msg?></li>
+        <?php endif; ?>
+     </ul>
+  ?>
 
-    ```
+  ```
 
   #### ternary operator
 
   ```php
-  <?php 
+  <?php
   echo $_SERVER['REQUEST_URI'] ? "bg-gray-900 text-white" : "text-gray-300";
   ?>
   ```
@@ -637,150 +655,154 @@ what these command do is to `nvm list` to list the available node version and in
 
 - php
 
-  Array in php is like an ArrayList in data structure where you can grow the array beyond its index
+  Array in php is like an ArrayList in data structure where you can grow the array beyond its index.
   In a sense it is the same with Javascript.
 
-  #### Iteration
+  - #### Iteration
 
-  ```php
-  <?php
-  foreach ($books as $book){
-     echo "<li>{$book}s</li>"
-  }
-  foreach ($anotherBooks as $book){ // safe assignment book doesnt have another reference
-     echo "<li>{$book}s</li>"
-  }
-  ?>
+    ```php
+    <?php
+    foreach ($books as $book){
+       echo "<li>{$book}s</li>"
+    }
+    foreach ($anotherBooks as $book){ // safe assignment book doesnt have another reference
+       echo "<li>{$book}s</li>"
+    }
+    ?>
 
-  ```
+    ```
 
-  ```php
-     <?php foreach ($books of $book): ?>
-       <li><?= $book ?></li>
-     <?php endforeach;?>
-  ```
+    ```php
+       <?php foreach ($books of $book): ?>
+         <li><?= $book ?></li>
+       <?php endforeach;?>
+    ```
 
-  ```php
-  <?php
-     $books[0]
-  ?>
-  ```
+    ```php
+    <?php
+       $books[0]
+    ?>
+    ```
 
-  ##### Caveat of looping
+  - ##### Caveat of looping
 
-  There is another form of looping that directly modifies the array
+    There is another form of looping that directly modifies the array
 
-  ```php
-  <?php
-  $books = ["foo", "bar"];
-  foreach ($books as &$book){
-   $book = $book."1";
-  }
-  // $books now ["foo1","bar1"]
+    ```php
+    <?php
+    $books = ["foo", "bar"];
+    foreach ($books as &$book){
+     $book = $book."1";
+    }
+    // $books now ["foo1","bar1"]
 
-  foreach ($anotherBooks as $book){ // dangerous! $book is still reference to $books[1]
-     echo "<li>{$book}s</li>";
-  }
-  ?>
-  ```
+    foreach ($anotherBooks as $book){ // dangerous! $book is still reference to $books[1]
+       echo "<li>{$book}s</li>";
+    }
+    ?>
+    ```
 
-  the caveat here is we are creating a reference of the $books value by using `&`.
-   This reference operator will create a new point reference in the array.
-   Meaning we are directly changing the value of $books after the loop the `$book`value still holds that reference so when used in another foreach which is in the code: ` foreach ($anotherBooks as $book `
-   $books here still point to `$books[1]`
+    the caveat here is we are creating a reference of the $books value by using `&`.
+     This reference operator will create a new point reference in the array.
+     Meaning we are directly changing the value of $books after the loop the `$book`value still holds that reference so when used in another foreach which is in the code: ` foreach ($anotherBooks as $book `
+     $books here still point to `$books[1]`
 
-  So You must remember every time you use `&` reference operator in forEach you must use `unset($variable)`
+    So You must remember every time you use `&` reference operator in forEach you must use `unset($variable)`
 
-  ```php
-  <?php
-  $books = ["foo", "bar"];
-  foreach ($books as &$book){
-   $book = $book."1";
-  }
-  // $books now ["foo1","bar1"]
-  unset($book)
+    ```php
+    <?php
+    $books = ["foo", "bar"];
+    foreach ($books as &$book){
+     $book = $book."1";
+    }
+    // $books now ["foo1","bar1"]
+    unset($book)
 
-  foreach ($anotherBooks as $book){ // now safe. $book can be use as it doesnt have a reference
-     echo "<li>{$book}s</li>";
-  }
-  ?>
-  ```
+    foreach ($anotherBooks as $book){ // now safe. $book can be use as it doesnt have a reference
+       echo "<li>{$book}s</li>";
+    }
+    ?>
+    ```
 
-  #### built in filter
+  - #### built ins
 
-  `array_filter`
+    [php array functions documentation](https://www.php.net/manual/en/book.array.php)
 
-  ```php
-     <?php
-         $filterBooks = array_filter($books, function ($book) {
-             return $book['author'] === 'author1';
-         });
-     ?>
-  ```
+    - filter
 
-  is exactly the same signature with [filter function with lambda fn](<php#lambda Functions>)
+      `array_filter`
+
+      ```php
+         <?php
+             $filterBooks = array_filter($books, function ($book) {
+                 return $book['author'] === 'author1';
+             });
+         ?>
+      ```
+
+      this is exactly the same signature with [filter function with lambda fn](#lambda-functions)
 
 - Javascript
   Javascript array also behaves like an Array List where you can grow the length of the array and do a shift and unshift operations
 
-  #### Iteration
+  - #### Iteration
 
-  There are several ways to loop through an array and these are:
+    There are several ways to loop through an array and these are:
 
-  - **map**
-    This is the most common iteration in JS because it can be use to easily render
-    DOM elements and is commonly use in React library.
-    It returns a new array
+    - **map**
+      This is the most common iteration in JS because it can be use to easily render
+      DOM elements and is commonly use in React library.
+      It returns a new array
+
+      ```javascript
+      const foo = ["bar", "baz"];
+      const newFoo = foo.map((val) => {
+        return val + "s";
+      });
+      console.log(newFoo);
+      ```
+
+    - **forEach**
+      This will iterate over the array and returns **void**
 
     ```javascript
     const foo = ["bar", "baz"];
-    const newFoo = foo.map((val) => {
-      return val + "s";
+
+    foo.forEach((val) => {
+      console.log(val);
     });
-    console.log(newFoo);
     ```
 
-  - **forEach**
-    This will iterate over the array and returns **void**
-
-  ```javascript
-  const foo = ["bar", "baz"];
-
-  foo.forEach((val) => {
-    console.log(val);
-  });
-  ```
-
-  - **for of**
-    This will iterate over the array and the iterated variable represents the value
-
-  ```javascript
-  const foo = ["bar", "baz"];
-
-  for (const fo of foo) {
-    console.log(fo);
-  }
-  ```
-
-  - **for loop**
-    This is the same with for of but you have a better control over the itteration
-    because normally the `i` represents the index of the iteration.
+    - **for of**
+      This will iterate over the array and the iterated variable represents the value
 
     ```javascript
     const foo = ["bar", "baz"];
-    for (let i = 0; i < foo.length; i++) {
-      console.log(foo[i]);
+
+    for (const fo of foo) {
+      console.log(fo);
     }
     ```
 
-  #### Built-in filter
+    - **for loop**
+      This is the same with for of but you have a better control over the itteration
+      because normally the `i` represents the index of the iteration.
 
-  Javascript also have a built-in filter
+      ```javascript
+      const foo = ["bar", "baz"];
+      for (let i = 0; i < foo.length; i++) {
+        console.log(foo[i]);
+      }
+      ```
 
-  ```javascript
-  const foo = ["bar", "baz"];
-  const filterfoo = foo.filter((val) => val === "bar");
-  ```
+  - #### Built-in filter
+
+    Javascript also have a built-in filter
+
+    ```javascript
+    const foo = ["bar", "baz"];
+    const filterfoo = foo.filter((val) => val === "bar");
+    ```
 
 ### Associative array
 
@@ -819,162 +841,203 @@ what these command do is to `nvm list` to list the available node version and in
      <?php endforeach; ?>
   ```
 
-  #### array_key_exists()
-
-  is a helper function to check if the passed `key` exists in an associated array.
-  It takes in two arguments:
-  1. **key** - the property or key that you want to check.
-  2. **associated array** - the associated array that you want to check to.
+  You can think of this like adding customized index names so instead of numbers you can add a string that you want.  
+  If you think of it this way there is no stopping you of doing it like this:
 
   ```php
   <?php
-  $foo = [
-    'bar' => 1,
-    'baz' => 2
-  ];
-
-    array_key_exists('bar',$foo); // true
-    array_key_exists('boo',$foo); // false, doesnt exist
+  $array2 = array("a" => "green", "b" => "yellow", "blue", "red");
   ```
 
-- **Javascript**
-  Javascript object is the closest comparison to _php's Associative array_.
-  It have the same behavior where it has a key associated with value(key/value pair)
-  it can also be access using `object['key']` syntax.
+  This array now have the following indexes/value pairs:
 
-  ```javascript
-  const book = [
-     {
-        title : 'Book1',
-        author => 'author1',
-        'url' => 'https://example.com',
-     },
-     {
-        'title' => 'Book2',
-        'author' => 'author2',
-        'url' => 'https://example1.com',
-     }
-  ]
-  ```
+  - a => green
+  - b => yellow
+  - 0 => blue
+  - 1 => red
 
-  then you can render and loop them like this
+  notice that since we added a values that dont have an **associated array** with them, it automatically assigned to the default assignments which is a number that starts with 0.
 
-  ```javascript
-  books.map((book) => (
-    <li>
-      <a href={book.url}>{book.title}</a>
-    </li>
-  ));
-  ```
+  - #### array_key_exists()
 
-  ##### hasOwnProperty()  
+    is a helper function to check if the passed `key` exists in an associated array.
+    It takes in two arguments:
 
-  _hasOwnProperty()_  is a method that is a close comparison of php's associated array, it checks if the key exist in an object. It has a different syntax since it is a method it must be chain on the object that you want to check.
+    1. **key** - the property or key that you want to check.
+    2. **associated array** - the associated array that you want to check to.
+
+    ```php
+    <?php
+    $foo = [
+      'bar' => 1,
+      'baz' => 2
+    ];
+
+      array_key_exists('bar',$foo); // true
+      array_key_exists('boo',$foo); // false, doesnt exist
+    ```
+
+  - **Javascript**
+    Javascript object is the closest comparison to _php's Associative array_.
+    It have the same behavior where it has a key associated with value(key/value pair)
+    it can also be access using `object['key']` syntax.
+
+    ```javascript
+    const book = [
+       {
+          title : 'Book1',
+          author => 'author1',
+          'url' => 'https://example.com',
+       },
+       {
+          'title' => 'Book2',
+          'author' => 'author2',
+          'url' => 'https://example1.com',
+       }
+    ]
+    ```
+
+    then you can render and loop them like this
+
+    ```javascript
+    books.map((book) => (
+      <li>
+        <a href={book.url}>{book.title}</a>
+      </li>
+    ));
+    ```
+
+  - ##### hasOwnProperty()
+
+  _hasOwnProperty()_ is a method that is a close comparison of php's associated array, it checks if the key exist in an object. It has a different syntax since it is a method it must be chain on the object that you want to check.
 
   ```javascript
   const foo = {
     bar: 1,
-    baz: 2
-  }
+    baz: 2,
+  };
 
-  console.log(foo.hasOwnProperty('bar')) // true
-  console.log(foo.hasOwnProperty('boo')) // false
+  console.log(foo.hasOwnProperty("bar")); // true
+  console.log(foo.hasOwnProperty("boo")); // false
   ```
 
-### Class (Objects)
+### Class
 
-- A blueprint is a way to define a structure of variable,constant and functions that can be use multiple times and also can be use differently from one another.
+A blueprint is a way to define a structure of variable,constant and functions that can be use multiple times and also can be use differently from one another.
 
-  ```php
-  <?php 
-  class Person {
-    public $name ;
-    public $age; 
+```php
+<?php
+class Person {
+  public $name ;
+  public $age;
 
-    public function greet()
-    {
-      echo $this->name . "greets you.";
-    }
-  }
-
-
-  $person = new Person();
-
-  $person->name="foo";
-  $person->age=25;
-
-  $person->greet();
-
-  ```
-
-#### Defining constant in class
-
-- There are some cases where you want to define a _read only_ variable or constant.
-You can leverage constant inside the class which also give you a benefit of a type inferred constant.
-
-  ```php
-  <?php 
-  class Response {
-    public const NOTFOUND = 404;
-    public const FORBIDDEN = 403;
-  }
-
-    //usage 
-  var_dump(Response::NOTFOUND) // will output 404
-  ```
-
-#### Owning and wrapping a predefined methods
-
-- If you need to have a more customized method that that came from php or a method that you dont own, you can wrap it to another method and add your desired logic to it.
-- This is useful for:
-  - the methods that you need to do a **guard checks** and you keep on defining those checks.
-  - if you can see a pattern that you're adding the same logic over and over again everytime you use the said method.
-
-  Example:
-
-  ```php
-  <?
-
-  class Database
+  public function greet()
   {
-      private $connection;
-      private $statement;
-
-      public function __construct($config, $userName = "root", $password = "")
-      {
-          $dsm = "mysql:" . http_build_query($config, "", ";");
-          $this->connection = new PDO($dsm, $userName, $password, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
-      }
-
-      public function query($query, $params = [])
-      {
-
-          $this->statement = $this->connection->prepare($query);
-
-          $this->statement->execute($params);
-
-          return $this;
-      }
-
-      public function getOne()
-      {
-          return $this->statement->fetch();
-      }
-
-      public function getOrAbort()
-      {
-          $result = $this->getOne();
-          if (!$result) {
-              abort();
-          }
-
-          return $result;
-      }
-
+    echo $this->name . "greets you.";
   }
+}
+
+
+$person = new Person();
+
+$person->name="foo";
+$person->age=25;
+
+$person->greet();
+
+```
+
+- #### Defining constant in class
+
+  - There are some cases where you want to define a _read only_ variable or constant.
+  - As it is a read only it cant be change once it is defined.
+  - can be access using `::` scope resolution operator without defining a new instance.
+  - You can leverage constant inside the class which also give you a benefit of a type inferred constant.
+
+    ```php
+    <?php
+    class Response {
+      public const NOTFOUND = 404;
+      public const FORBIDDEN = 403;
+    }
+
+      //usage
+    var_dump(Response::NOTFOUND) // will output 404
+    ```
+
+- #### Defining static in class
+
+  - useful for **pure function** as it can be access without creating a new class instance.
+  - can be access using `::` scope resolution operator without defining a new instance.
+
+  ```php
+    <?php
+
+    class Validator
+    {
+        public static function string(string $value, int $min = 1, int $max = INF): bool
+        {
+            $trimmedValue = trim($value);
+            var_dump(strlen($trimmedValue) >= $min);
+
+            return strlen($trimmedValue) >= $min && strlen($trimmedValue) <= $max;
+        }
+    }
   ```
 
-  This class uses `PDO` which is an object from php. The best example here is `getOrAbort()`, this method need to check if `getOne()` method is truthy if not then abort().
+- #### Owning and wrapping a predefined methods
+
+  - If you need to have a more customized method that that came from php or a method that you dont own, you can wrap it to another method and add your desired logic to it.
+  - This is useful for:
+
+    - the methods that you need to do a **guard checks** and you keep on defining those checks.
+    - if you can see a pattern that you're adding the same logic over and over again everytime you use the said method.
+
+    Example:
+
+    ```php
+    <?
+
+    class Database
+    {
+        private $connection;
+        private $statement;
+
+        public function __construct($config, $userName = "root", $password = "")
+        {
+            $dsm = "mysql:" . http_build_query($config, "", ";");
+            $this->connection = new PDO($dsm, $userName, $password, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+        }
+
+        public function query($query, $params = [])
+        {
+
+            $this->statement = $this->connection->prepare($query);
+
+            $this->statement->execute($params);
+
+            return $this;
+        }
+
+        public function getOne()
+        {
+            return $this->statement->fetch();
+        }
+
+        public function getOrAbort()
+        {
+            $result = $this->getOne();
+            if (!$result) {
+                abort();
+            }
+
+            return $result;
+        }
+
+    }
+    ```
+
+    This class uses `PDO` which is an object from php. The best example here is `getOrAbort()`, this method need to check if `getOne()` method is truthy if not then abort().
 
 ### Functions
 
@@ -1099,9 +1162,65 @@ It is best paired with [`die()`](<php#die()>) and a html's `<pre>` to have a rea
   die();
 ```
 
-### die()
+### die
 
-Die is a function that will prevent the code after it to not execute. It is like a ,in a way, a `return`.
+Die is a function that will prevent the code after it to not execute. It is like ,in a way, a `return`.
+
+### filter_var
+
+- syntax: `filter_var(mixed $value, int $filter = FILTER_DEFAULT, array|int $options = 0): mixed`
+
+  - $value - `mixed` types or simply any types.
+  - $filter - `int` It corresponds to the `filter types identifiers`. It is a list of constants that corresponds to an ID so it is an int.
+  - $options - `array|int` - It can be an associated array or [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php) like the second argument.
+    The **associated array** can have:
+    - `flags` key for additional filter that corresponds to `filter`, second argument or another [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php) .
+    - `options` a more precise or customized filter for the second argument.
+  - **return** - `mixed` :
+    - returns `bool false` : if the validation fails and in some cases returns `undefined` | `""` for sanitization.
+    - returns `filtered value` : if the validation or sanitization is a success.
+
+A php utility function that can validate and sanitize the value you passed in.
+It will check the `value`(**first argument**) given and base on the `filter types`(**second argument**) it will perform the following:
+
+- validate
+  if the [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php), second argument,starts with `FILTER_VALIDATE_*`.
+- sanitize
+  if the [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php), second argument,starts with `FILTER_SANITIZE_*`.
+- sanitize then validate
+  if the [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php), second argument,starts with `FILTER_SANITIZE_*` and then the third argument is also a [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php) but with a `FILTER_VALIDATE_*`.
+
+  example:
+  sanitize email and then verify:
+
+  ```php
+  <?php
+  $value = "         ema:il@email.com";
+    filter_var($value, FILTER_SANITIZE_EMAIL ,FILTER_VALIDATE_EMAIL);
+  // output: email@email.com
+    filter_var($value, FILTER_VALIDATE_EMAIL ,FILTER_SANITIZE_EMAIL);
+  // output: false
+  ```
+
+  the second filter will return false due to the following:
+
+  - It will validate the value first so if it is a valid email no need to sanitze then will return the filtered value. In our example it has a **white space** and also it has **invalid character** which is `:` so it will invalidate it.
+
+- customized/concise validation and/or sanitization
+  if the second argument , [FILTER TYPES](https://www.php.net/manual/en/filter.filters.php), is a validate type(`FILTER_VALIDATE_*`) and the third argument is an associated array with `flags` and/or `options` property.
+
+  examples:
+  string with `regExp` filter that accepts lower or capital letters and integers
+
+  ```php
+  <?php
+    $string = "abc123";
+    $filteredString = filter_var($string, FILTER_VALIDATE_REGEXP, [
+        "options" => [
+            "regexp" => "/^[a-z0-9]+$/i"
+        ]
+    ]);
+  ```
 
 ### Superglobals
 
@@ -1111,13 +1230,13 @@ It is useful to access certain information from server and http. Some notable Su
 - #### `$_SERVER` : contains information like headers, url path and query, request methods and more
 
   ```php
-    <?php 
+    <?php
 
   ```
 
   ```php
-  <?php 
-  $_SERVER['REQUEST_URI'] 
+  <?php
+  $_SERVER['REQUEST_URI']
   ```
 
   will output the following and more:
@@ -1151,6 +1270,7 @@ It is useful to access certain information from server and http. Some notable Su
 - #### `$_GET`
 
   Since `GET` request transfers data to the backend mainly by **URL**. This Superglobals helper is a way:
+
   - to access the information about a **GET** request
   - to get access to the URL parameter, or query string.
   - It will be parsed in an Associative array as long as it is a query parameter.
@@ -1165,22 +1285,22 @@ It is useful to access certain information from server and http. Some notable Su
     array(1) {
       ["bar"]=>
       string(3) "baz"
-    } 
+    }
   */
 
 
   var_dump($_GET['bar'])
-  // will output : 
+  // will output :
   # string(3) "baz"
   ```
 
 - #### `$_POST`
-  
+
   While `GET` method mainly send data through url. `POST` by default dont do that, so `$_POST` Superglobals is a helper from php to access the entire named data from your `form`.
 
   ```php
   <?php
-  
+
   var_dump($_POST);
   /*
   array(1) {
@@ -1204,7 +1324,7 @@ some of those properties are:
   $url = 'http://username:password@hostname:9090/path?arg=value#anchor';
 
   var_dump(parse_url($url));
-  // will output: 
+  // will output:
   array(8) {
     ["scheme"]=> string(4) "http"
     ["host"]=> string(8) "hostname"
@@ -1240,14 +1360,110 @@ function abort($code = 404)
 
 this code will send a response code and set the proper controller that corresponds to the status code.
 
-<!--TODO: javascript equivalent-->
+### **DIR**
+
+Syntax: `__DIR__`
+a constant from php that will reveal the current directory on where it is invoke. the same as `pwd` for unix terminal.
+
+### DIRECTORY_SEPARATOR
+
+a php constant that will return your OS specific directory Separator. linux/mac: `/`, windows: `\`
+
+### Extract
+
+[docs for extract](https://www.php.net/manual/en/function.extract.php)
+
+syntax: `extract(assoc_arr,extract_rules,prefix)`
+args:
+`assoc_arr` : it receives an associated array as an argument
+`extract_rules` : is a way to check for invalid variable or keys collision. In the case of collision, you can have a rules to either **overwrite**, **skip** or **add prefix** .
+`prefix`: depends on the second parameter. if the second parameter rules have a `PREFIX` set to it. you _need_ to defined the prefix through here.
+
+Will extract or imports the variable defined in the assoc_array so that you can access the variable defined to it to the local symbol. It is best paired with `require` in the case of creating a custom logic for it.
+
+spl_autoload_register
+
+[docs for autoload_register](https://www.php.net/manual/en/function.spl-autoload-register.php)
+syntax: `spl_autoload_register(?callbale $callback = null, bool $append)`
+`callback` a function that will registers the autoload.
+
+Is a function that will detect the classes in your code base and autoload them. The logic behind this is it will return the class that it detects so thats why in the first parameter,callback, must have a `$class parameter` as an identifier for the class detected and with it you can require the directory on where the class is located.
+
+```php
+<?php
+spl_autoload_register(function ($class) {
+    require base_path("core/{$class}.php");
+});
+
+```
+
+### Compact
+
+<!--TODO:-->
+
+### Namespace and use
+
+```php
+<?php
+
+namespace Core;
+use PDO; //do a use declaration like this especially if it is from php/you dont own them
+
+class foo{
+  /*code here*/
+  PDO($dsn);
+}
+```
+
+- #### Namespace :
+
+  It is a way to organize your file, especially for those file that have the same functionality.
+  You can think of it as a way to register all of the class below it to a symlink
+
+  - tips and some use cases:
+
+    - once it is define especially in the top of the file everything that is applicable to be symlink/namespace will be registered under the namespace and cannot be acquired using require but `use`.
+    - It is mostly use to declare classes so that it is ready and can be use in the files it needs to be.
+    - It is best paired with lazy loading logic like `spl_autoload_register` for a reason of the project wide declarition of file and also only run them when used/acquired.
+
+  - syntax: `namespace Core;`
+
+  - list of applicable and not applicable for namespaces:
+
+  | Can Use Namespace | Cannot Use Namespace                              |
+  | ----------------- | ------------------------------------------------- |
+  | Classes           | Variables                                         |
+  | Interfaces        | Class Properties                                  |
+  | Functions         | Class Methods                                     |
+  | Constants         | Language Constructs (echo, include, require, etc) |
+  | Traits            | Superglobals ($\_GET, $\_POST, etc)               |
+  | Enums             | Static Variables                                  |
+
+- #### use :
+
+  Is a way to **use** the registered namespace/symlink under its `name` specified in the namespace
+  creating and using symlink. in our example : `Core`.
+
+  syntax:`use Core\foo`
+
+  - `Core\foo` is the name of the object on where the namespace is declared.
+  - `PDO` if the class/logic affected came from php or you dont own the naming must start with `\`. You dont need to specify the name of the namespace since it came from php, directly.
+    - `/PDO` other way, if you dont use the `use` syntax to require it you can add `\` before it to be ignore in a namespace.
+
+### header
+
+[docs](https://www.php.net/manual/en/function.header.php)
+A way to redirect to another page.
+Syntax: `header(Location: url)`
+`Location:` - a header string
+`url` - the url
 
 ---
 
 ## Connecting to database
 
 ```php
-<?php 
+<?php
 new PDO($dsn);
 ```
 
@@ -1255,7 +1471,7 @@ new PDO($dsn);
 
 <?php
 $dsn = "mysql:host=localhost;port=3306;dbname=myapp;user=root;password=mypass;charset=utf8mb4";
-# or 
+# or
 $dsn = "mysql:host=127.0.0.1;port=3306;dbname=myapp;user=root;password=mypass;charset=utf8mb4";
 
 $pdo = new PDO($dsn);
@@ -1297,3 +1513,78 @@ class Database
 }
 ```
 
+## Validation and Authorization
+
+Most of the time, validation is needed in our form to set some rules on how and what the shape of data is that is being sent to the server.
+While creating a validation in the frontend or in your html. It is important to also have a validation in the server because frontends validation can possibly be bypass.
+For example:
+
+- Simple html template for form:
+
+  ```php
+  <form method="POST">
+    <textarea
+      id="body"
+      name="body"
+      minlength="20"
+      maxlenght="1000"
+      required
+    ></textarea>
+    <button>Submit</button>
+  </form>
+  ```
+
+  With this simple validation we made sure that we have need to pass something in the textarea by adding `required` and also limiting the input by adding `minlenght` and `maxlength`.
+  however, this can be bypass, as long as you know the endpoint there is no stoping you for doing something like this .
+
+  ```bash
+  # assuming the url below is the end point
+  curl -X POST https://localhost:8888/notes/create -d 'body=I just bypass your validation.'
+  ```
+
+  with this terminal code you can now bypass the frontend and send a post request to the server using `curl` without interacting to the frontend.
+
+---
+
+## Routing Folder Structure and Conventions
+
+- show for details page (/note/create)
+- create for creating (/note)
+- index for main Path (/notes)
+- destroy for delete requuest response controller (/destroy)
+
+controller naming Following REST Conventions:
+
+- DELETE - will have a name something like `destroy`.
+- POST - add the resources to the parent and controller name will be like `strong`. have the same resource with GET.. <!--TODO: elaborate this-->
+
+## Thinking about folder security
+
+when setting up a simple routing system and folder structure to connect the php file with `url`. The files are being required from a source point which is the root's `index.php` but doing this comes with a **security risk** since the source file ,`index.php`, is being rendered together with the code so for example
+
+```bash
+.
+├── configs.php
+├── controller
+├── core
+├── functions.php
+├── phpcs.xml
+├── index.php
+├── routers.php
+├── routes.php
+└── views
+```
+
+in this example the `index.php` file is collocated with other folder and files so if your index.php is the root which is the path `/` you will be able to access it through `localhost:8888/index.php`. This may look normal but since you can do this it means you can also do this `localhost:8888/functions.php`and you dont intend and dont want to do this .
+
+To secure the root it is recommended to create a `public` folder that will isolate the root file this way you cant access them through url.
+
+```bash
+├── public
+│   └── index.php
+├── functions.php
+├── phpcs.xml
+├── routers.php
+├── routes.php
+└── views
+```

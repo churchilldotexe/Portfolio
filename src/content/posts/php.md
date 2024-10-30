@@ -4,7 +4,6 @@ date: 2024-10-22T00:00:00.000Z
 description: A side by side comparison of php and Javascript
 slug: php-js
 ---
-
 # Php and Javascript Side by side
 
 ## Setting up the Environment
@@ -148,6 +147,14 @@ nvm use <version>
 ```
 
 what these command do is to `nvm list` to list the available node version and install it using `nvm install` and you can also switch versions that you installed using `nvm use`
+
+#### Extras and helpers
+
+You can install through composer a [laravel-ide-helper](https://github.com/barryvdh/laravel-ide-helper?tab=readme-ov-file#installation) that will provide autocompletion with a rich documentation.
+
+```bash
+composer require --dev barryvdh/laravel-ide-helper
+```
 
 ---
 
@@ -520,7 +527,7 @@ what these command do is to `nvm list` to list the available node version and in
     - `string_replace`:
     - `stringtoupper`;
 
-    # TODO:
+    # TODO
 
   the first one will render `hello world` while the second one (single qoute) will render `$greet world`
 
@@ -985,6 +992,11 @@ $person->greet();
     }
   ```
 
+  > [!TIP] Good to know.
+  > if you in some case have to setup a variable like : `protected $foo;`
+  > you cannot use `$this` to call the variable instead do this:
+  > `protected static $foo` then `static::$foo` to use it
+
 - #### Owning and wrapping a predefined methods
 
   - If you need to have a more customized method that that came from php or a method that you dont own, you can wrap it to another method and add your desired logic to it.
@@ -1038,6 +1050,142 @@ $person->greet();
     ```
 
     This class uses `PDO` which is an object from php. The best example here is `getOrAbort()`, this method need to check if `getOne()` method is truthy if not then abort().
+
+- #### Container
+
+  Container is a way to encapsulate/wrap a repeated logics/class to lessen complexity. Like a container it will just stores your logic with identifier and then call it
+
+  ```php
+  <?php 
+  namespace Core; // to be easily accessible
+
+  class Container{
+    protected $container = []; // assoc_arr that will store your logic
+
+    // will add the logic to the store
+    public function bind(string $key, callable $callback):void
+    {
+      $this->container[$key] = $callback;
+    }
+
+    public function resolve($key)
+    {
+      # guard statement, to avoid non existence $key
+      if(array_key_exists($key, $this->container)){
+        throw new \Exception();
+      }
+
+      return call_user_func($this->container[$key]); // return the matched function
+    }
+  }
+  ```
+
+  - Usage:
+
+    database example code is from [owning class section](#owning-and-wrapping-a-predefined-methods)
+
+    ```php
+    <?php 
+    use Core\Container;
+    use Core\Database;
+
+     // example of repeated logic
+
+    $container = new Container();
+    $container->bind('Core\Database',function(){
+      $config = require'configs.php'; //sample config
+
+      return new Database($config['db'],'root','password');
+    })
+    ```
+
+    What it does is. the initialization of database is now stored in an Associative array
+    using `'Core\Database'` as a key, which is better for readability, and store the `database class` which lessens the complexity.
+    and you can then use the stored database like this:
+
+    ```php
+    <?php
+    $db = $container->resolve()
+    $query='SELECT * FROM users where id = :foo;'
+    $foo = 'foo';
+    $db->query($query,['foo'=>$foo])->getOne();
+    ```
+
+    This lessen the complexity but you still need to initialized a `new Container` class everytime you use it.
+
+- #### Singleton class
+
+  To prevent the constant initialization of class. It creates a single instance of a class and be that class available without initializing another class. It takes advantage of `static` in class.
+
+  The pattern is simple, It will receive a class in a static method and will have another static method returns that class.
+
+  Example:
+  to avoid the initialization problem with the container, we will contain it in a singleton class
+
+  ```php
+  <?php
+  class App{
+    protected static $appStore;
+
+    public static function setContainter(mixed $container){
+      return static::$appStore = $container;
+    }
+    public static function container(){
+      return static::$appStore;
+    }
+  }
+  ```
+
+  with this we can now use the database without initializing it everytime.
+
+  ```php
+  <?php
+  $db = App::container();
+
+  $userId = 1;
+  $query = "SELECT * FROM notes where id = :id";
+  $post = $db->query($query, ['id' => $_POST['id']])->getOrAbort();
+  ```
+
+- #### Exception
+
+  !> [!NOTE]  Usage inside namespace
+  > just like any other php specific class it must be defined with `\Exception` or state a `use Exception` at the top of the file.
+
+  **Exception** is best combine with `throw` `try catch block`. It is a class that can be thrown if you want to specify or explicit of setting an error.
+    Syntax: `Exception(string $message)`
+      `$message` : an error that you want to specify.
+
+  - ##### Behavior
+
+    - Its normal behavior is to return an error that can be _catch_ using the `catch block`.
+    - If in cases, that there is no matching `catch block` found, It will keep on **bubble up the callstack** until it finds a matching `catch block`.
+    - Once it bubbles up and encounters a `finally block` without encountering a matching `catch block`. that **finally block** will be executed.
+    - Once it reaches the global scope without encountering a matching `catch block`. It will terminate the program with a `fatal error`.
+
+  - ###### Try catch block
+
+    Syntax:
+
+      ```php
+      <?php
+      try{
+
+      } catch(error) 
+      {
+
+      } finally 
+      {
+
+      }
+      ```
+
+    - **try** is where you execute that code that _might_ or a code that you can explicitly declare an `Exception`.
+      - You can assign the returned logic to a variable or just return it.
+    - **catch** is the one responsible for catching any error thrown inside the catch block.
+    - **finally** is a block that will run **regardless** of whether the code is Promise resolve or rejected.
+      - **Behavior**
+        - the logic returned from the `try` block will only be returned/executed **after** the finally block is **executed**
 
 ### Functions
 
@@ -1131,7 +1279,7 @@ $person->greet();
 
 ---
 
-## Syntaxes
+## Php specific Syntaxes
 
 ### var_dump
 
@@ -1162,9 +1310,9 @@ It is best paired with [`die()`](<php#die()>) and a html's `<pre>` to have a rea
   die();
 ```
 
-### die
+### die or exit()
 
-Die is a function that will prevent the code after it to not execute. It is like ,in a way, a `return`.
+`Die` or `exit()` is a function that will prevent the code after it to execute. It is like ,in a way, a `return`.
 
 ### filter_var
 
@@ -1310,6 +1458,18 @@ It is useful to access certain information from server and http. Some notable Su
   */
   ```
 
+- #### `$_SESSION`
+
+  - A temporary data that persist on every file. How it works is, it will send the data from the server to your browser and store it in the cookie store.
+  - The data from cookie store is being saved in your _temp_ directory.
+  - Normally, the sesssion is not permanent meaning it will get deleted/removed after closing the browser and/or at expiration.
+  - the cookie will stay alive while the browser is active, meaning the session will keep getting updated as long as you interact with the server. hence, it the expiration count down will only execute at inactive state.
+
+- ##### session_start
+
+  - in order to start or resume the session `session_start()` needs to be called. Normally, in the root file
+  - it will trigger base on the identifier pass from `GET`, `POST` and `Cookie`
+
 ### parse_url()
 
 It will receive a url as an argument and parse it as a **associative array**
@@ -1415,7 +1575,7 @@ class foo{
 }
 ```
 
-- #### Namespace :
+- #### Namespace
 
   It is a way to organize your file, especially for those file that have the same functionality.
   You can think of it as a way to register all of the class below it to a symlink
@@ -1439,7 +1599,7 @@ class foo{
   | Traits            | Superglobals ($\_GET, $\_POST, etc)               |
   | Enums             | Static Variables                                  |
 
-- #### use :
+- #### use
 
   Is a way to **use** the registered namespace/symlink under its `name` specified in the namespace
   creating and using symlink. in our example : `Core`.
@@ -1450,13 +1610,20 @@ class foo{
   - `PDO` if the class/logic affected came from php or you dont own the naming must start with `\`. You dont need to specify the name of the namespace since it came from php, directly.
     - `/PDO` other way, if you dont use the `use` syntax to require it you can add `\` before it to be ignore in a namespace.
 
-### header
+- ### header
 
-[docs](https://www.php.net/manual/en/function.header.php)
-A way to redirect to another page.
-Syntax: `header(Location: url)`
-`Location:` - a header string
-`url` - the url
+  [docs](https://www.php.net/manual/en/function.header.php)
+  A way to redirect to another page.
+  Syntax: `header(Location: url)`
+  `Location:` - a header string
+  `url` - the url
+
+- ### call_user_func
+
+  Is a way to return the callback that i receives and its arguments.
+  Syntax: `call_user_func(callable $fn, mixed ...$args):mixed`
+    `$fn` - the function that you want to return. Only the function dont include its arguments,
+    `$args` - all the arguments of the function from `$fn`.
 
 ---
 
@@ -1548,10 +1715,13 @@ For example:
 
 ## Routing Folder Structure and Conventions
 
-- show for details page (/note/create)
-- create for creating (/note)
-- index for main Path (/notes)
-- destroy for delete requuest response controller (/destroy)
+- show for details page (/note/create). Will show a specific note
+- create for creating (/note). Will show a form to create(view model for store)
+- store will be responsible for POST request. THe one that will be hit after the submission from `create`
+- index for main Path (/notes). Will show all of the resource
+- destroy for deleting request response controller (/destroy)
+- edit : the view model for showing the edit page.
+- update: is the PATCH request. the one that will be hit once the form is submitted from `edit` view model.
 
 controller naming Following REST Conventions:
 

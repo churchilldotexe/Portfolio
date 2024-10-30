@@ -8,11 +8,51 @@ slug: db-syntax
 
 ## Connecting a localhost
 
+### for linux using ubuntu
+
+1. Install :
+
+```bash
+sudo apt install mysql-server
+```
+
+2. check mysql service status:
+
+```bash
+sudo systemctl status mysql.service # check status
+
+sudo systemctl start mysql.service # if the status is not active
+```
+
+3. start mysql
+
+```bash
+sudo mysql -uroot
+```
+
+by default,`root` is the user and no password. To Alter the user do the following.
+
+```bash
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'yourPassword';
+```
+
+- `root` : the user.
+- `localhost` : the address
+- `yourPassword` : the password.
+
+after altering the **USER** you can start mysql like this:
+
+```bash
+sudo mysql -u root -p
+```
+
+> this is mostly for testing and scaffoling setup. If you want to run a dev/prod development.
+> run `sudo mysql_secure_installation
+
+this will be the prompts on running that command.
 
 ```bash
 
- .config  sudo mysql_secure_installation
 
 Securing the MySQL server deployment.
 
@@ -65,16 +105,12 @@ Success.
 All done!
 ```
 
-```bash
-sudo mysql -u root -p
-```
-
 ## Basic syntax
 
-difference between __""__ and __''__
+difference between **""** and **''**
 
-- __""__ : use for identifiers
-- __''__ : use for strings and values
+- **""** : use for identifiers
+- **''** : use for strings and values
 
 - Create table
   - two ways of creating unique constraints through inline/during creation of table and creating a unique index for the particular column or multiple columns.
@@ -139,7 +175,7 @@ ON UPDATE and ON DELETE -> orphans
   - #### GET request
 
     The most common security breach in a sql queries. What it does is it can modify your database by adding or modifying the structure of your intended query.
-    This is especially common when a paramter or a variable is being passed __Inline__ to a database query.
+    This is especially common when a paramter or a variable is being passed **Inline** to a database query.
 
     Example using query paramater:
     The [class and config used in this example](#query-example-structure-and-config)
@@ -188,11 +224,11 @@ ON UPDATE and ON DELETE -> orphans
     to prevent the attacker to do something Malicious to your sql query. Php `PDO` `execute` method have an option to pass an `array`.
       The accepted argument for `execute` method:
 
-    - __associated array__ with __wildcard__ : we use wild card as an identifier for sql query values. and we will use that wild card as a `key/property` and `variable` as the value. (example below)
+    - **associated array** with **wildcard** : we use wild card as an identifier for sql query values. and we will use that wild card as a `key/property` and `variable` as the value. (example below)
 
-    - __array__ with `?` : if we want to use just the array there are things to keep in mind.
+    - **array** with `?` : if we want to use just the array there are things to keep in mind.
       1. `?` : use ? as a placeholder for the values of your sql queries
-      2. sequence : if we use the `?` we have to be mindful of the __sequence__ of the values.
+      2. sequence : if we use the `?` we have to be mindful of the **sequence** of the values.
 
     ```php
     <?php

@@ -632,6 +632,9 @@ composer require --dev barryvdh/laravel-ide-helper
 
 ### Equality
 
+<!--TODO: -->
+- (bool)
+
 - **php**
 
   - `=` for assignment
@@ -1843,6 +1846,13 @@ class Router {
     $this->routes[]=compact(['path','controller','method','middleware']);
     return $this // so you can chain
   }
+   
+    protected function abort(int $code = 404): void
+    {
+        http_response_code($code);
+        require base_path("views/{$code}.view.php");
+        exit();
+    }
 
   public function get(string $path, string $controller){
     return $this->addRoute($path,$controller,'GET');
@@ -1874,9 +1884,12 @@ class Router {
         Middleware::resolve($route['middleware']); 
 
         // if all good now we can now route to the controller 
-        require base_path($route['controller']);
-        exit();
+        return require base_path($route['controller']); 
+        // return so that the code below on where this is invoke can still run
       }
+
+      $this->abort();
+
     }
 
   }
@@ -1953,5 +1966,60 @@ class Guest{
     }
   }
 }
+```
+
+## PRG pattern
+
+There are times when implementing a `POST` request can cause problems.
+
+- On Form submission, This is common especially if the form have validation errors where you display an error to the user.
+    When the user failed the validation, The page already sent a Post request and following a `RESTFUL` convention the **url** is now a post request.
+    So when the user refresh the page it will send another post request to the endpoint which is a problem because there will be **multiple request**.
+
+- On Page Revisit, if the user receives an error and they change the url like go to another page and press the back button to revisit the page and since the previous page, which was the `POST` request, it will render an expired page.
+
+Cause:
+The problem here is not the validation but the way POST is being handle. Since, we did a  
+POST request the page now is a `POST` request page not a `GET` request so any action like reloading and revisiting the page will trigger a `POST` request.
+
+To resolve this issue, `PRG`:
+
+- `POST` - the intended action of adding something to the resource which most likely a form post.
+
+- `Redirect` - to amend the problem, After the POST request especially when it fails it must be redirected to the `GET` request **url**.
+
+- `GET` - the page on where the `POST` request points to.
+
+### Session flashing
+
+Another issue now is how to give feedback to the user since its now GET request page.
+
+To resolve this there is a pattern cold `Session flashing`. The objective of this is to put the errors in the session store which is a `cookie store`.
+
+- **Caveat** : By default, `cookie store` will persist in an entire session, meaning you may be able to display the error successfully, the problem now is it will persist and stay in the store so even after the user is successfully validated, they can still see the error.
+
+- **Resolution** : To resolve this,  `flashing Session` must be set with a lifetime of that page. Meaning when the user change url or the page refreshes the error must be removed as long as the validation is a success.
+
+- **How it works** : The objective of `flashing session` is to set the _session_ and when the page load `unset` the session.
+
+Example:
+
+```php
+<?php
+
+class Session{
+
+
+  // __flash -> to ensure that the key is unique and avoid duplication. 
+  public static function addflash(string $key, mixed $value){
+    $_SESSION['__flash'][$key] = $value;
+  }
+
+  public static function unflash(){
+    unset($_SESSION['__flash']); // will remove the values of session __flash.
+  }
+
+}
+
 ```
 

@@ -954,6 +954,34 @@ $person->greet();
 
 ```
 
+- #### Chaining class
+
+  A class that can chain its method. What it does is the methods either return the current instance `$this` or return another method as long as it returns it can be chain.
+  It is useful on creating middleware where you have to chain the method to intercept the router to perfom some additional logic/validation.
+
+  ```php
+  <?php
+  class Router {
+    protected $routes = [];
+
+    protected function addRoute (string $path, string $method, string $controller){
+      $middleware = null;
+      $this->routes[]=[ 'path','method','controller','middleware' ];
+
+      return $this; // so you can chain it
+    }
+
+    public function get(string $path, string $controller){
+      return $this->addRoute($path,'GET',$controller);
+    }
+
+    // simple middleware logic to restric un auth user to visit a certain view/page
+    public function only(string $key){
+      return $this->routes[array_key_last($this->routes)]['middleware'] = $key;
+    }
+  }
+  ```
+
 - #### Defining constant in class
 
   - There are some cases where you want to define a _read only_ variable or constant.
@@ -1470,6 +1498,12 @@ It is useful to access certain information from server and http. Some notable Su
   - in order to start or resume the session `session_start()` needs to be called. Normally, in the root file
   - it will trigger base on the identifier pass from `GET`, `POST` and `Cookie`
 
+- ##### session_destroy()
+
+setcookie
+session_get_cookie_params
+session_regenerate_id
+
 ### parse_url()
 
 It will receive a url as an argument and parse it as a **associative array**
@@ -1559,7 +1593,29 @@ spl_autoload_register(function ($class) {
 
 ### Compact
 
-<!--TODO:-->
+the exact opposite of [extract](#extract).
+Syntax: `compact(array|string $var_name, array|string ...$var_names)`
+  `$var_name` - will take in a string or array of string that corresponds the **variables name**
+
+```php
+<?php
+$foo = "hello";
+$bar = 1;
+$baz = true;
+
+$arr = array("bar", "baz");
+$result = compact('foo', $arr);
+```
+
+outputs:
+
+```php
+Array (
+  [foo] => "hello";
+  [bar] => 1;
+  [baz] => true;
+)
+```
 
 ### Namespace and use
 
@@ -1711,22 +1767,32 @@ For example:
 
   with this terminal code you can now bypass the frontend and send a post request to the server using `curl` without interacting to the frontend.
 
+## Proper handling of passwords
+
+- password_hash(string $password, int|null|string|$algo, array $options); `PASSWORD_BCRYPT` built-in salt uf thrid params omitted
+
+- password_verify(string $password, string $hash):bool
+  - $password
+  - $hash - the hashed password
+
 ---
 
 ## Routing Folder Structure and Conventions
 
-- show for details page (/note/create). Will show a specific note
-- create for creating (/note). Will show a form to create(view model for store)
-- store will be responsible for POST request. THe one that will be hit after the submission from `create`
-- index for main Path (/notes). Will show all of the resource
-- destroy for deleting request response controller (/destroy)
-- edit : the view model for showing the edit page.
-- update: is the PATCH request. the one that will be hit once the form is submitted from `edit` view model.
+- `show` for details page (/note/create). Will show a specific note
+- `create` for creating (/note). Will show a form to create(view model for store)
+- `store` will be responsible for POST request. THe one that will be hit after the submission from `create`
+- `index` for main Path (/notes). Will show all of the resource
+- `destroy` for deleting request response controller (/destroy)
+- `edit`  the view model for showing the edit page.
+- `update` is the PATCH request. the one that will be hit once the form is submitted from `edit` view model.
 
 controller naming Following REST Conventions:
-
-- DELETE - will have a name something like `destroy`.
-- POST - add the resources to the parent and controller name will be like `strong`. have the same resource with GET.. <!--TODO: elaborate this-->
+<!--TODO: make it more clear -->
+- DELETE - will have a name something like `destroy`. Common url format is,
+- POST - add the resources to the parent and controller name will be like `store`. have the same resource with GET. It will be like `GET` the resource for this page meanwhile `POST` resource to this page. That is why they normally share the same `uri path`.
+- GET - get the resources from the parent and normally, the controller name will be `index` or the root path of the `uri`.
+- PATCH - update part of the resource. have a normal control name is like`update`. The **uri** path pattern will be like `/user/{id}`. will be taking the wildcard spot
 
 ## Thinking about folder security
 
@@ -1758,3 +1824,134 @@ To secure the root it is recommended to create a `public` folder that will isola
 ├── routes.php
 └── views
 ```
+
+## Router class logic
+
+A simple Router class that handles the CRUD operation routing and middleware
+
+[Router logic](https://github.com/churchilldotexe/php-router/blob/main/Core/Router.php)
+
+What it does is it creates a **assoc_arr** that stores and handles all routes. It has a every methods for `CRUD` operations (except put) and a Router logic
+
+```php
+<?php 
+class Router {
+  protected $routes = [];
+
+  protected function addRoute(string $path, string $controller, string $method){
+    $middleware = null;
+    $this->routes[]=compact(['path','controller','method','middleware']);
+    return $this // so you can chain
+  }
+
+  public function get(string $path, string $controller){
+    return $this->addRoute($path,$controller,'GET');
+  }
+
+  public function post(string $path, string $controller){
+    return $this->addRoute($path,$controller,'POST');
+  }
+  public function delete(string $path, string $controller){
+    return $this->addRoute($path,$controller,'DELETE');
+  }
+  public function patch(string $path, string $controller){
+    return $this->addRoute($path,$controller,'PATCH');
+  }
+
+  // handle signing middleware auth
+  public function only(string $key){
+    return $this->routes[array_key_last($this->routes)]['middleware'] = $key;
+  }
+
+  handle the routing logic
+
+  public function router(string $path, string $controller, string $method){
+
+    foreach ($this->routes as $route){
+      if($route['path'] === $path && $route['$method'] === strtoupper($method)){
+
+        // this will intercept the controller for validation 
+        Middleware::resolve($route['middleware']); 
+
+        // if all good now we can now route to the controller 
+        require base_path($route['controller']);
+        exit();
+      }
+    }
+
+  }
+}
+```
+
+## middleware
+
+is a way to intercept a routes of controller before sending it to the user. It is useful on creating a validation or protection to restrict a page visit.
+For example,
+
+**Scenario** : You want a page to be only accessible to a loggedin user.
+In order to do that before we do the logic from the controller .
+
+  1. You intercept it with middleware to check the sessions/cookies if the user is logged in
+  2. If not logged in, you can redirect it to login page or somewhere you want
+  3. If the user is logged in or authenticated you can safely continue to fetch/require the controller to do its own logic/display the view.
+
+  Example:
+
+  ```php
+  <?php 
+  class Middleware{
+    protected const MAP = [
+      'guest' => Guest::class;
+      'auth' => Auth::class;
+    ]
+  }
+
+  public static function resolve(string|null $key){
+
+      // for the routes that dont have middleware with them
+      if(!key){
+        return;
+      }
+
+      $middleware = static::MAP[$key]?? false; // in case of not finding a corresponding map it will be default to false 
+
+      if(! $middleware){
+        throw new \Exception("I cannot find your {$key}.")
+      }
+
+
+      // since our $middleware variable now is a class we can instantiate it and call its method
+      (new $middleware)->redirect();
+    }
+  ```
+
+useful for protected routes to only allow loggedin user.
+
+```php
+<?php
+class Auth{
+  public function redirect(){
+    // if no cookie for the user meaning not login
+    if(! isset( $_SESSION['user'] ) ?? false ){
+      header('location: /'); // you can also redirect to login page.
+      exit();
+    }
+  }
+}
+```
+
+useful for login page where you dont want the logged in user to visit that page.
+
+```php
+<?php
+class Guest{
+  public function redirect(){
+    // if there is a cookie  meaning logged in
+    if($_SESSION['user'] ?? false ){
+      header('location: /'); // you can also redirect to login page.
+      exit();
+    }
+  }
+}
+```
+

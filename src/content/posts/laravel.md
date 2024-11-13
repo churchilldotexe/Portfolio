@@ -63,4 +63,84 @@ Example:
 
 To resolve a conflict with slot in order to tell blade which slot to use the naming `<x-slot:title>` important, this way we can tell blade that the content inside the slot title will be render on where `$title` variable is.
 
+### $attributes
 
+is a helper to pass down the props to the component. Meaning, once set in the component you can use the **Official** attribute of the html tag it was passed to.
+
+Example:
+
+```blade
+
+<!-- component -->
+<div {{$attributes}}>
+   {{$slot}}
+</div>
+
+<!-- usage -->
+<x-component class="text-red-100"></x-component>
+
+```
+
+- Merge
+  is a method of `$attributes` to merge your component's attribute to the attribute on where the component is being use.
+
+  Example
+
+  ```blade
+   <!-- component -->
+  <div {{$attributes->merge(['class'=> 'bg-red-500 text-white'])}}>{{$slot}}</div>
+
+   <!-- usage -->
+  <x-component class='text-blue-500'>foo</x-component>
+
+  <!-- output -->
+
+  <div class='bg-red-500 text-blue-500'>foo</div>
+  ```
+
+- Get
+  is another method of `$attributes`, it gets the value of the attribute. You can also define a fallback.
+  This is good if you want to create a fallback for components that needs an attributes.
+
+  Example:
+
+  ```blade
+  <!-- component -->
+  <div class="{{$attributes->get('class','bg-red-500')}}">
+     {{$slot}}
+  </div>
+
+  <!-- usage -->
+  <x-component class="text-blue-500">foo</x-component>
+  ```
+
+### $props
+
+has the same usage as attributes, you can define it inline.
+If _named slot_ you can define as a children
+_props_ can define inline.
+It has the same characteristic with **named slot** but the usage is the same with **$attributes**
+
+You can define the props in the component through laravel helper `@props()` function.
+
+```blade
+<!-- component -->
+{{@props(['foo'=>true])}} <!--array or assoc array to provide default-->
+
+<div class="{{foo? bg-red-500 : bg-blue-500}}"></div>
+```
+
+#### :
+
+By Default, if you pass a value through props or attribute it is consider as a string.
+To pass the actual data type to the component `:` must be used before the prop.
+
+```blade
+<!-- usage  -->
+<x-component :foo="true" >bar</x-component>
+```
+
+### $props vs $attributes
+
+props is for your custom attributes
+attrbiutes is the the official attributes

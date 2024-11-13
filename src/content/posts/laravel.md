@@ -142,5 +142,57 @@ To pass the actual data type to the component `:` must be used before the prop.
 
 ### $props vs $attributes
 
-props is for your custom attributes
-attrbiutes is the the official attributes
+props is for custom attributes
+attrbiutes is the official attributes
+
+## Helpers
+
+A helper functions and classes directly from laravel.
+
+### request
+
+[docs](https://laravel.com/docs/11.x/requests)
+Is a helper that returns the current request(http request) instance.
+
+- #### is method
+
+  A part of request method that checks the **path** and return a boolean if it matches the path.
+  Example:
+
+  ```blade
+  <h1>
+     @if(request()->is('/'))
+        Im home
+     @endif
+
+     Not Home
+  </h1>
+  ```
+
+  **wildcard** can also be used to match more/subsequent path.
+
+```php
+<?php
+   request()->is('/dashboard/*');
+```
+
+<!-- TODO:  add more .-->
+
+## Eloquent
+
+Laravel ORM. It handles a lot of things when it comes to mapping database to your code such as :
+
+- migration schema - you can define your tables in Database folder
+- factory - fast setup and scaffold your database data.
+- seed - Best pair with _factory_ and also pairs well with `migrate:fresh --seed`.
+- Model
+
+  - defining relationship - using Model to define relationship between tables.
+  - setting up pagination.
+  - can setup lazy or eager loading.
+
+  <!-- TODO:  better deepdive on this topic especially how to use model methods. read the docs-->
+
+## Terminal Php artisan
+
+   <!-- TODO:  deep dive on this too-->

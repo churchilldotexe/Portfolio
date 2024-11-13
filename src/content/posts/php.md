@@ -4,6 +4,7 @@ date: 2024-10-22T00:00:00.000Z
 description: A side by side comparison of php and Javascript
 slug: php-js
 ---
+
 # Php and Javascript Side by side
 
 ## Setting up the Environment
@@ -633,6 +634,7 @@ composer require --dev barryvdh/laravel-ide-helper
 ### Equality
 
 <!--TODO: -->
+
 - (bool)
 
 - **php**
@@ -1087,7 +1089,7 @@ $person->greet();
   Container is a way to encapsulate/wrap a repeated logics/class to lessen complexity. Like a container it will just stores your logic with identifier and then call it
 
   ```php
-  <?php 
+  <?php
   namespace Core; // to be easily accessible
 
   class Container{
@@ -1116,7 +1118,7 @@ $person->greet();
     database example code is from [owning class section](#owning-and-wrapping-a-predefined-methods)
 
     ```php
-    <?php 
+    <?php
     use Core\Container;
     use Core\Database;
 
@@ -1180,12 +1182,13 @@ $person->greet();
 
 - #### Exception
 
-  !> [!NOTE]  Usage inside namespace
+  !> [!NOTE] Usage inside namespace
+
   > just like any other php specific class it must be defined with `\Exception` or state a `use Exception` at the top of the file.
 
   **Exception** is best combine with `throw` `try catch block`. It is a class that can be thrown if you want to specify or explicit of setting an error.
-    Syntax: `Exception(string $message)`
-      `$message` : an error that you want to specify.
+  Syntax: `Exception(string $message)`
+  `$message` : an error that you want to specify.
 
   - ##### Behavior
 
@@ -1198,18 +1201,18 @@ $person->greet();
 
     Syntax:
 
-      ```php
-      <?php
-      try{
+    ```php
+    <?php
+    try{
 
-      } catch(error) 
-      {
+    } catch(error)
+    {
 
-      } finally 
-      {
+    } finally
+    {
 
-      }
-      ```
+    }
+    ```
 
     - **try** is where you execute that code that _might_ or a code that you can explicitly declare an `Exception`.
       - You can assign the returned logic to a variable or just return it.
@@ -1257,6 +1260,32 @@ $person->greet();
      return $foo;
   };
   ?>
+  ```
+
+  - `fn` shorthand
+    you can define the function with just `fn`. This is useful if you **need** to access a variable/data outside of the function.
+    Since, php is a functional scope **by default**,you cannot really get/reference a value outside.
+
+  example:
+
+  ```php
+   <?php
+   $accessMe = 'foo';
+
+   // will become undefined
+   function bar (){
+      return $accessMe;
+   }
+
+   //using `use` work around
+   function bar() use($accessMe){
+      return $accessMe;
+   }
+
+   // or even better
+
+   $bar = fn() => $accessMe;
+
   ```
 
 - **Javascript**
@@ -1598,7 +1627,7 @@ spl_autoload_register(function ($class) {
 
 the exact opposite of [extract](#extract).
 Syntax: `compact(array|string $var_name, array|string ...$var_names)`
-  `$var_name` - will take in a string or array of string that corresponds the **variables name**
+`$var_name` - will take in a string or array of string that corresponds the **variables name**
 
 ```php
 <?php
@@ -1681,8 +1710,8 @@ class foo{
 
   Is a way to return the callback that i receives and its arguments.
   Syntax: `call_user_func(callable $fn, mixed ...$args):mixed`
-    `$fn` - the function that you want to return. Only the function dont include its arguments,
-    `$args` - all the arguments of the function from `$fn`.
+  `$fn` - the function that you want to return. Only the function dont include its arguments,
+  `$args` - all the arguments of the function from `$fn`.
 
 ---
 
@@ -1787,11 +1816,13 @@ For example:
 - `store` will be responsible for POST request. THe one that will be hit after the submission from `create`
 - `index` for main Path (/notes). Will show all of the resource
 - `destroy` for deleting request response controller (/destroy)
-- `edit`  the view model for showing the edit page.
+- `edit` the view model for showing the edit page.
 - `update` is the PATCH request. the one that will be hit once the form is submitted from `edit` view model.
 
 controller naming Following REST Conventions:
+
 <!--TODO: make it more clear -->
+
 - DELETE - will have a name something like `destroy`. Common url format is,
 - POST - add the resources to the parent and controller name will be like `store`. have the same resource with GET. It will be like `GET` the resource for this page meanwhile `POST` resource to this page. That is why they normally share the same `uri path`.
 - GET - get the resources from the parent and normally, the controller name will be `index` or the root path of the `uri`.
@@ -1837,7 +1868,7 @@ A simple Router class that handles the CRUD operation routing and middleware
 What it does is it creates a **assoc_arr** that stores and handles all routes. It has a every methods for `CRUD` operations (except put) and a Router logic
 
 ```php
-<?php 
+<?php
 class Router {
   protected $routes = [];
 
@@ -1846,7 +1877,7 @@ class Router {
     $this->routes[]=compact(['path','controller','method','middleware']);
     return $this // so you can chain
   }
-   
+
     protected function abort(int $code = 404): void
     {
         http_response_code($code);
@@ -1880,11 +1911,11 @@ class Router {
     foreach ($this->routes as $route){
       if($route['path'] === $path && $route['$method'] === strtoupper($method)){
 
-        // this will intercept the controller for validation 
-        Middleware::resolve($route['middleware']); 
+        // this will intercept the controller for validation
+        Middleware::resolve($route['middleware']);
 
-        // if all good now we can now route to the controller 
-        return require base_path($route['controller']); 
+        // if all good now we can now route to the controller
+        return require base_path($route['controller']);
         // return so that the code below on where this is invoke can still run
       }
 
@@ -1904,39 +1935,39 @@ For example,
 **Scenario** : You want a page to be only accessible to a loggedin user.
 In order to do that before we do the logic from the controller .
 
-  1. You intercept it with middleware to check the sessions/cookies if the user is logged in
-  2. If not logged in, you can redirect it to login page or somewhere you want
-  3. If the user is logged in or authenticated you can safely continue to fetch/require the controller to do its own logic/display the view.
+1. You intercept it with middleware to check the sessions/cookies if the user is logged in
+2. If not logged in, you can redirect it to login page or somewhere you want
+3. If the user is logged in or authenticated you can safely continue to fetch/require the controller to do its own logic/display the view.
 
-  Example:
+Example:
 
-  ```php
-  <?php 
-  class Middleware{
-    protected const MAP = [
-      'guest' => Guest::class;
-      'auth' => Auth::class;
-    ]
-  }
+```php
+<?php
+class Middleware{
+  protected const MAP = [
+    'guest' => Guest::class;
+    'auth' => Auth::class;
+  ]
+}
 
-  public static function resolve(string|null $key){
+public static function resolve(string|null $key){
 
-      // for the routes that dont have middleware with them
-      if(!key){
-        return;
-      }
-
-      $middleware = static::MAP[$key]?? false; // in case of not finding a corresponding map it will be default to false 
-
-      if(! $middleware){
-        throw new \Exception("I cannot find your {$key}.")
-      }
-
-
-      // since our $middleware variable now is a class we can instantiate it and call its method
-      (new $middleware)->redirect();
+    // for the routes that dont have middleware with them
+    if(!key){
+      return;
     }
-  ```
+
+    $middleware = static::MAP[$key]?? false; // in case of not finding a corresponding map it will be default to false
+
+    if(! $middleware){
+      throw new \Exception("I cannot find your {$key}.")
+    }
+
+
+    // since our $middleware variable now is a class we can instantiate it and call its method
+    (new $middleware)->redirect();
+  }
+```
 
 useful for protected routes to only allow loggedin user.
 
@@ -1973,8 +2004,8 @@ class Guest{
 There are times when implementing a `POST` request can cause problems.
 
 - On Form submission, This is common especially if the form have validation errors where you display an error to the user.
-    When the user failed the validation, The page already sent a Post request and following a `RESTFUL` convention the **url** is now a post request.
-    So when the user refresh the page it will send another post request to the endpoint which is a problem because there will be **multiple request**.
+  When the user failed the validation, The page already sent a Post request and following a `RESTFUL` convention the **url** is now a post request.
+  So when the user refresh the page it will send another post request to the endpoint which is a problem because there will be **multiple request**.
 
 - On Page Revisit, if the user receives an error and they change the url like go to another page and press the back button to revisit the page and since the previous page, which was the `POST` request, it will render an expired page.
 
@@ -1998,7 +2029,7 @@ To resolve this there is a pattern cold `Session flashing`. The objective of thi
 
 - **Caveat** : By default, `cookie store` will persist in an entire session, meaning you may be able to display the error successfully, the problem now is it will persist and stay in the store so even after the user is successfully validated, they can still see the error.
 
-- **Resolution** : To resolve this,  `flashing Session` must be set with a lifetime of that page. Meaning when the user change url or the page refreshes the error must be removed as long as the validation is a success.
+- **Resolution** : To resolve this, `flashing Session` must be set with a lifetime of that page. Meaning when the user change url or the page refreshes the error must be removed as long as the validation is a success.
 
 - **How it works** : The objective of `flashing session` is to set the _session_ and when the page load `unset` the session.
 
@@ -2010,7 +2041,7 @@ Example:
 class Session{
 
 
-  // __flash -> to ensure that the key is unique and avoid duplication. 
+  // __flash -> to ensure that the key is unique and avoid duplication.
   public static function addflash(string $key, mixed $value){
     $_SESSION['__flash'][$key] = $value;
   }
@@ -2022,4 +2053,3 @@ class Session{
 }
 
 ```
-

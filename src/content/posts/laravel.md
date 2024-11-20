@@ -191,8 +191,186 @@ Laravel ORM. It handles a lot of things when it comes to mapping database to you
   - setting up pagination.
   - can setup lazy or eager loading.
 
-  <!-- TODO:  better deepdive on this topic especially how to use model methods. read the docs-->
+  <!-- TODO:  better deep dive on this topic especially how to use model methods. Read the docs-->
 
 ## Terminal Php artisan
 
-   <!-- TODO:  deep dive on this too-->
+A terminal helper that can scaffold a code depending on what you need.
+For example it can help create a model which you can also create migration,factory and test for you in a single `php artisan make:model` And through this, you can define your table columns through the migration and factory so that you can use the helper again to migrate it for you and seed it as well with a single command `php artisan migrate --seed`
+
+There are a lot of artisan command but you can define `help` before the command of the one that you need a help with to check the available flags and options .
+Example:
+`php artisan help migrate` will give you the flags and options in migrating your schema to the database .
+
+Alternatively, you can run the command `php artisan help` to list all the artisan command.
+
+## model
+
+This is where your database connections, authentication , tables relationship like foreign keys relationship and even CRUD operation
+
+It binds your database table throught Eloquent and connect it to your Laravel code so that you can call it to query in your code base instead of querying directly to your database.
+
+It also binds it to other class like policies(authorization), your Auth facade(authentication), or to your controller
+
+You can define the model by using the terminal command `php artisan make:model` . Where you'll be prompted with questions like names
+
+Example model:
+
+```php
+<?php
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory;
+    use Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+```
+
+This is a model that extends the Authenticatable which is responsible for authentication and the class that connects your User Model to the authentication related helpers provided by laravel, [more info About authentication. ](#authenticaton)
+
+Another example that extends the model
+
+```php
+<?php
+
+class Job extends Model
+{
+    use HasFactory;
+    protected $table = 'job_listings';
+
+    // protected $fillable = ['salary','title','employer_id','created_at','updated_at'];
+    // or
+    protected $guarded = ['id'];
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<App\Models\Employer,App\Models\Job>
+     */
+    public function employer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Employer::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<App\Models\Tag,App\Models\Job>
+     **/
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+
+        return $this->belongsToMany(Tag::class, foreignPivotKey: "job_listing_id");
+
+    }
+
+}
+```
+
+### Syntax /method of model class
+
+#### **HasFactory**
+
+- is from the `model` extension that binds with the factory class. This is responsible for seeding and the class that connects to the seesing class.
+
+#### **$table**
+
+- is the table name from your database. To be able to connect your orm model to the correct database table.
+
+#### **$fillable**
+
+- one of the security feature of the `model` class. To protect your database from sql injections you can set what are allowed to be filled in your database and if other field/columns were being stored in your database an _execption_ will be thrown.
+
+#### **guarded**
+
+- the same security feature like **fillable** but the way it define is the opposite. Here you will define what are the columns that must not be query/stored
+
+#### **hidden**
+
+- is another security feature for your model. It is a way to avoid the columns define here from being serialized/access when querying the table. In the example model `User` , it defined `password` and `remember_token` as hidden. This means when the user database is being queried it will not include the password and remember_token.
+
+  Example:
+
+  ```php
+  <?php
+  $user = User::find(1);
+  return response->json();
+  ```
+
+  Will return json without password and remember_token.
+
+  This is a useful feature to avoid accidental leaking of sensitive information.
+
+#### **Cast**
+
+- Is a way for laravel/eloquent on how to handle the column when it is being retrieved or stored to the database. Laravel will convert(cast) that data to a certain datatype that you need.
+
+- Usage
+  create a protected method name `cast` and return an `assoc array` where the **key** is the `table name` and the **value** is the cast types. Refer in the document for the cast types
+
+  [laravel docs about cast system](https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting)
+
+  For example(from the table above):
+
+  - Hashing the **password**, laravel will hash the password when it is being stored to the database
+    and, for example, the user login with the password laravel will also convert it and with the help of `Auth` facade it will compare both of the password to authenticate the user.
+
+### Binding
+
+To bind your route with the model to automatically query your database.
+This is helpful to lessen the logic since you can use the binded model for your CRUD operation.
+Most used in a route with a wild card.
+
+- Usage
+  Just need to define your model as a **type**.
+
+Example:
+
+```php
+<?php
+    //this
+    public function show(Job $job): View
+    {
+        return view('jobs.show', ['job' => $job  ]);
+    }
+
+    // instead of this
+    public function show($job): View
+    {
+        $job = Job::query->find($job);
+        return view('jobs.show', ['job' => $job  ]);
+    }
+```
+
+## Authenticaton

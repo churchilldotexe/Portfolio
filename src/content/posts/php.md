@@ -5,6 +5,75 @@ description: A side by side comparison of php and Javascript
 slug: php-js
 ---
 
+<!--toc:start-->
+
+- [Php and Javascript Side by side](#php-and-javascript-side-by-side)
+  - [Setting up the Environment](#setting-up-the-environment)
+    - [simple Php setup](#simple-php-setup)
+    - [Php with laravel](#php-with-laravel)
+    - [Javascript](#javascript)
+      - [Extras and helpers](#extras-and-helpers)
+  - [Basic setup and Scaffolding](#basic-setup-and-scaffolding)
+  - [Separate logic from template](#separate-logic-from-template)
+  - [Scoping and hoisting](#scoping-and-hoisting)
+  - [Basic data types](#basic-data-types)
+    - [String](#string)
+      - [helper methods and functions](#helper-methods-and-functions)
+- [Concat](#concat) - [Boolean and Conditionals](#boolean-and-conditionals) - [if-else statement](#if-else-statement) - [ternary operator](#ternary-operator) - [Equality](#equality)
+  - [Complex data types](#complex-data-types)
+    - [Array](#array)
+      - [Iteration](#iteration)
+        - [Caveat of looping](#caveat-of-looping)
+      - [built ins](#built-ins)
+      - [Iteration](#iteration)
+      - [Built-in filter](#built-in-filter)
+    - [Associative array](#associative-array)
+      - [array_key_exists()](#arraykeyexists)
+        - [hasOwnProperty()](#hasownproperty)
+    - [Class](#class)
+      - [Chaining class](#chaining-class)
+      - [Defining constant in class](#defining-constant-in-class)
+      - [Defining static in class](#defining-static-in-class)
+      - [Owning and wrapping a predefined methods](#owning-and-wrapping-a-predefined-methods)
+      - [Container](#container)
+      - [Singleton class](#singleton-class)
+      - [Exception](#exception)
+        - [Behavior](#behavior)
+          - [Try catch block](#try-catch-block)
+    - [Functions](#functions)
+      - [lambda Functions](#lambda-functions)
+  - [Php specific Syntaxes](#php-specific-syntaxes)
+    - [var_dump](#vardump)
+    - [die or exit()](#die-or-exit)
+    - [filter_var](#filtervar)
+    - [Superglobals](#superglobals)
+      - [`$_SERVER` : contains information like headers, url path and query, request methods and more](#server-contains-information-like-headers-url-path-and-query-request-methods-and-more)
+      - [`$_GET`](#get)
+      - [`$_POST`](#post)
+      - [`$_SESSION`](#session)
+        - [session_start](#sessionstart)
+        - [session_destroy()](#sessiondestroy)
+    - [parse_url()](#parseurl)
+    - [http_response_code(404)](#httpresponsecode404)
+    - [**DIR**](#dir)
+    - [DIRECTORY_SEPARATOR](#directoryseparator)
+    - [Extract](#extract)
+    - [Compact](#compact)
+    - [Namespace and use](#namespace-and-use)
+      - [Namespace](#namespace)
+      - [use](#use)
+    - [header](#header)
+    - [call_user_func](#calluserfunc)
+  - [Connecting to database](#connecting-to-database)
+  - [Validation and Authorization](#validation-and-authorization)
+  - [Proper handling of passwords](#proper-handling-of-passwords)
+  - [Routing Folder Structure and Conventions](#routing-folder-structure-and-conventions)
+  - [Thinking about folder security](#thinking-about-folder-security)
+  - [Router class logic](#router-class-logic)
+  - [middleware](#middleware)
+  - [PRG pattern](#prg-pattern) - [Session flashing](#session-flashing)
+  <!--toc:end-->
+
 # Php and Javascript Side by side
 
 ## Setting up the Environment
@@ -528,7 +597,7 @@ composer require --dev barryvdh/laravel-ide-helper
     - `string_replace`:
     - `stringtoupper`;
 
-    # TODO
+    <!-- # TODO -->
 
   the first one will render `hello world` while the second one (single qoute) will render `$greet world`
 

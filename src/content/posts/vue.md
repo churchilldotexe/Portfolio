@@ -91,11 +91,7 @@ But the distinct difference between the two is how they re-render
 
   - `v-bind:class` or `:class` - usage
 
-    `v-on:` - is for event handlers to connect the handlers and make it dynamic
-
-  - `@` -shorthand
-
-  - `v-on:click` or `@click` - usage
+  `v-on:` - [explained in the event handling section](#event-handling-and-passing-data-from-child-to-parent)
 
   example:
 
@@ -460,5 +456,345 @@ export default App;
 
     ReactDOM.render(<App />, document.getElementById("root"));
     ```
+
+## Props
+
+- #### Vue `props`
+
+  - Vue uses `props` to pass data from a parent component to a child component or data outside/external to the component.
+  - it is defined in a `props` object inside the component props.
+  - it receives the following key-value pairs:
+    - `type` - the type of the prop. **Constructor** types
+    - `required` - whether the prop is required or not. **Boolean**
+    - `default` - the default value of the prop. if this is defined and the prop is not passed, this default value will be used.
+    - `validator` - a function that validates the prop value. It is a **Function** that returns a **Boolean**.
+      - if returns **false**. Vue will throw an warning|error in the console and the prop will not work.
+
+  Example:
+
+  ```vue
+  <script>
+  export default {
+    template: ` 
+     <button 
+        :class="{
+           'bg-gray-500': variant==='muted',
+           'bg-blue-500': variant==='primary'
+        }"
+        >
+           <slot/>
+     </button> 
+     `,
+
+    props: {
+      variant: {
+        type: String,
+        default: "primary",
+        validator: (value) => {
+          const variants = new Set(["primary", "muted"]);
+          return variants.has(value);
+        },
+      },
+    },
+  };
+  </script>
+  ```
+
+  Usage:
+
+  ```vue
+  <!-- // will work -->
+  <button-component variant="primary">
+    Primary
+  </button-component>
+
+  <!-- //will not work -->
+  <button-component variant="secondary">
+    Secondary
+  </button-component>
+  ```
+
+  Vue error:
+
+  ```bash
+   [Vue warn]: Invalid prop: custom validator check failed for prop "variant".
+   at <Foo class="px-4 py-2 rounded" variant="secondary" >
+   at <App>
+
+  ```
+
+- #### React `props`
+
+  - React uses `props` to pass data from a parent component to a child component.
+  - Props are defined as a paramater in the component function or as properties in class components.
+  - if using with typescript, validation is defined by using types if with vanila js you probably need a functon to validate the prop.
+
+  Example:
+
+  using javascript:
+
+  ```jsx
+  import React from "react";
+
+  const ButtonComponent = ({ variant, children }) => {
+    const variants = new Set(["primary", "muted"]);
+
+    if (!variants.has(variant)) {
+      throw new Error(`Invalid variant: ${variant}`);
+    }
+
+    const variantClasses = {
+      muted: "bg-gray-500",
+      primary: "bg-blue-500",
+    };
+
+    return (
+      <button className={`${variantClasses[variant] || variantClasses["primary"]}`}>
+        {children}
+      </button>
+    );
+  };
+
+  export default ButtonComponent;
+  ```
+
+  using typescript:
+
+  ```tsx
+  import React from "react";
+  import PropTypes from "prop-types";
+
+  type ButtonProps = {
+    variant: "primary" | "muted";
+    children: React.ReactNode;
+  };
+
+  const ButtonComponent = ({ variant, children }) => {
+    const variantClasses = {
+      muted: "bg-gray-500",
+      primary: "bg-blue-500",
+    };
+
+    return (
+      <button className={`${variantClasses[variant] || variantClasses["primary"]}`}>
+        {children}
+      </button>
+    );
+  };
+
+  export default ButtonComponent;
+  ```
+
+  Usage:
+
+  ```jsx
+  function App() {
+    return (
+      <div>
+        {/* will work */}
+        <ButtonComponent variant="primary">Primary</ButtonComponent>
+
+        {/* will not work */}
+        <ButtonComponent variant="secondary">Muted</ButtonComponent>
+      </div>
+    );
+  }
+  ```
+
+  Error :
+  for javascript:
+
+  (most likely you will get this error)
+
+  ```bash
+  Error: Invalid variant: secondary
+  ```
+
+  for typescript:
+
+  ```bash
+    Warning: Failed prop type: Invalid prop `variant` of type `string` supplied to `ButtonComponent`, expected `one of: primary, muted`.
+    in ButtonComponent (at App.js:12)
+    in App (at App.js:8)
+  ```
+
+## Event Handling and Passing data from child to parent
+
+- #### Vue `v-on` and `this.$emit`
+
+  - Vue uses `v-on` to attach event handlers to component or html elements.
+    is for event handlers to connect the handlers and make it dynamic
+
+  - `@` -shorthand
+
+  - `v-on:click` or `@click` - usage
+
+  - must be defined under the `methods` object.
+    - inside the `methods` object, you can define the event handler the same way as you define a function.
+
+  ```js
+
+  template: `<button v-on:click="handleClick">Click Me</button>`,
+
+  methods: {
+    handleClick() {
+      console.log('clicked!');
+    },
+  },
+
+  ```
+
+  - **$emit** - is a special method that can pass an event and a payload(data) to the parent component.
+
+    - by doing this, it allows communication between parent and child components very easily.
+
+    - syntax: `$emit('eventName', payload)` ,
+
+      - when used inline in the attribute. or
+
+    - `this.$emit('eventName', payload)`
+
+      - when used inside the method object
+
+      - the `eventName` (**`string`**) representing the name of the function/method/event that will be called/passed in the parent component.
+      - `payload` (**`optional`**): Data passed with the event. This can be any data type—string, number, object, etc.
+        - it can be one or multiple arguments. separated by a comma.
+
+  example:
+
+  - in the child component
+
+  ```js
+   <template>
+      <button @click="handleClick">Click Me</button>
+   </template>
+
+   <script>
+   export default {
+   methods: {
+      handleClick() {
+         this.$emit('custom-event', 'Hello from Child');
+      },
+   },
+   };
+   </script>
+  ```
+
+  or directly in the html
+
+  ```vue
+  <button @click="$emit('custom-event', 'Hello from Child')">Click Me</button>
+  ```
+
+  - in the parent component
+
+  ```vue
+  <template>
+    <div>
+      <ChildComponent @custom-event="handleCustomEvent" />
+    </div>
+  </template>
+
+  <script>
+  import ChildComponent from "./ChildComponent.vue";
+
+  export default {
+    components: { ChildComponent },
+    methods: {
+      // or can be any name other than payload.
+      handleCustomEvent(payload) {
+        console.log(payload); // Logs: "Hello from Child"
+      },
+    },
+  };
+  </script>
+  ```
+
+- #### React `onClick` and `props` Callback Functions
+
+  - React uses the `on`+`<handler>` attribute to attach event handlers to components or HTML elements.
+
+    - `<handler>` in this manner is the name of the event handler function.
+      E.g. `onClick` , `onChange` , `onSubmit` etc.
+
+    - It allows components to listen for user interactions and handle events dynamically.
+
+  - **`on` + `handler` Usage:**
+    - can be used inline in the attribute or can be used as a reference to a function
+
+  ```jsx
+  import React from "react";
+
+  function Button() {
+    const handleClick = () => {
+      console.log("Button clicked!");
+    };
+
+    return <button onClick={handleClick}>Click Me</button>;
+  }
+
+  export default Button;
+  ```
+
+  or inline in the html
+
+  ```jsx
+  import React from "react";
+
+  function Button() {
+    return <button onClick={() => console.log("Button clicked!")}>Click Me</button>;
+  }
+  ```
+
+  - **Passing Data to Parent Using Callback Props:**
+
+  - In React, child components can communicate with their parent components by invoking callback functions passed as props.
+
+  - This is similar to Vue's $emit, where data is passed to the parent through an event.
+    the difference is it is define from the parent to the child then the child can use it.
+
+    - it is more of like the parent is in control.
+
+  - Syntax: props.onEventName(data)
+    - onEventName: A function passed from the parent as a prop.
+    - data: Any payload (string, object, etc.) passed from the child to the parent.
+
+  Example:
+
+  parent component
+
+  ```jsx
+  import React from "react";
+  import ChildComponent from "./ChildComponent";
+
+  function ParentComponent() {
+    const handleCustomEvent = (payload) => {
+      console.log(payload); // Logs: "Hello from Child"
+    };
+
+    return (
+      <div>
+        <ChildComponent onCustomEvent={handleCustomEvent} />
+      </div>
+    );
+  }
+  ```
+
+  child component
+
+  ```jsx
+  import React from "react";
+
+  function ChildComponent({ onCustomEvent }) {
+    const handleClick = () => {
+      // Passing data to the parent via callback prop
+      onCustomEvent("Hello from Child");
+    };
+
+    return <button onClick={handleClick}>Click Me</button>;
+  }
+
+  export default ChildComponent;
+  ```
 
 ---

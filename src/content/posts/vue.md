@@ -15,34 +15,132 @@ But the distinct difference between the two is how they re-render
 
 - Vue is **OPT-OUT** reactivity. Meaning, it is doing a **Granular Rerender** where it will only re-render the part of the code that actually change.
 
-## Syntaxes
+## Syntaxes and concepts
 
 ### V-model
 
 - #### Vue Implementation
 
-  Is a two way binding directive from vue.
-  It is being passed as an **attributes**.
-  By two way means, it is reactive if either of the reference changes state the other one will change as well.
+  - [V-model Documentation.l](https://vuejs.org/guide/components/v-model.html#multiple-v-model-bindings) Where you can find other uses of v-model like multiple v-model binding and handling it.
 
-  ```vue
-  <div>
-     <input type="text" v-model="greeting"/>
-     <p>{{ greeting }}</p>
-  </div>
+  - ##### Definition
 
-  <script>
-  Vue.createApp({
+    - Is a two way binding directive from vue.
+    - It is being passed as an **attributes**.
+
+      - By two way means, it is reactive if either of the reference changes state the other one will change as well.
+
+    ```vue
+    <div>
+       <input type="text" v-model="greeting"/>
+       <p>{{ greeting }}</p>
+    </div>
+
+    <script>
+    Vue.createApp({
+      data() {
+        return {
+          greeting: "hello, world",
+        };
+      },
+    });
+    </script>
+    ```
+
+    Whats happening here is the initial state of input now is **"hello, world"** but when you start typing in the input the `p` tag's _hello world_ will also change base on the value that you typed likewise if you manually/dynamically change the `greeting` directly in the `data function` the input's `value` and the `p` tag will also change
+
+  - ##### V-model the under the hood
+
+    - input
+
+    ```vue
+    <script>
+    template:`
+       <input :value="greeting" @input="greeting = $event.target.value" />
+       <p>{{ greeting }}</p>
+    `,
+
     data() {
-      return {
-        greeting: "hello, world",
-      };
+       return {
+          greeting: "hello, world",
+       };
     },
-  });
-  </script>
-  ```
+    </script>
+    ```
 
-  What will happen here is the initial state of input now is **"hello, world"** but when you start typing in the input the `p` tag's _hello world_ will also change base on the value that you typed likewise if you manually/dynamically change the greeting directly in the js/script tag the input's `value` and the `p` tag will also change
+    This is the longer version of v-model, where we have to define and bind the `value` and setup a `v-on:input` or `@input` to listen to the changes in the input and assign it to `greeting` using `$event`.
+    [You can find the event handling in this section](#vues-v-binding-and-v-on)
+
+  - ##### V-model for parent-child component syncing
+
+    - v-model can also be use to create a communicate between parent and its child component.
+    - [this is the implementation without using v-model](#vue-v-on-thisemit-and-event)
+
+    - Usage:
+
+      - define the v-model in the parent component
+
+      ```js
+      import AssignmentTags from "./AssignmentTags.js";
+
+      export default {
+        components: {
+          AssignmentTags,
+        },
+        template: `
+            <assignment-tags v-model:currentTag="currentTag" :initial-tags="assignments.map(a=>a.tag)" ></assignment-tags>
+         `,
+        props: {
+          assignments: Array,
+        },
+        data() {
+          return {
+            currentTag: "all",
+          };
+        },
+        computed: {
+          filteredAssignments() {
+            if (this.currentTag === "all") {
+              return this.assignments;
+            }
+
+            return this.assignments.filter((a) => a.tag === this.currentTag);
+          },
+        },
+      };
+      ```
+
+      You can also alias it like the one above. `foo` is the alias
+
+      - using it in the child component
+
+      ```js
+      export default {
+        template: `
+               <div 
+                  class="flex gap-2 text-xs"
+                  >
+                     <button 
+                     @click="$emit('update:currentTag', tag )"
+                     v-for="tag in tags" 
+                     class="px-1 py-px border border-slate-600 rounded"
+                     :class="{'text-blue-600 ': tag === currentTag}"
+                     >
+                        {{ tag }}
+                     </button>
+               </div>
+            `,
+        props: {
+          initialTags: Array,
+          currentTag: String,
+        },
+        computed: {
+          tags() {
+            return ["all", ...new Set(this.initialTags)];
+          },
+        },
+      };
+      ```
 
 - #### React Implementation state + event listener(onChange)
 
@@ -294,59 +392,66 @@ But the distinct difference between the two is how they re-render
   }
   ```
 
-```tsx
-import React, { useMemo } from "react";
+  ```tsx
+  import React, { useMemo } from "react";
 
-const App = () => {
-  const assignments = [
-    { name: "Finish project", completed: false },
-    { name: "Read documentation", completed: true },
-  ];
+  const App = () => {
+    const assignments = [
+      { name: "Finish project", completed: false },
+      { name: "Read documentation", completed: true },
+    ];
 
-  // although in this context it is unnecessary to use useMemo
-  // but for the sake of comparison, it is being used here
-  const completedAssignments = useMemo(() => assignments.filter((a) => a.completed), [assignments]);
+    // although in this context it is unnecessary to use useMemo
+    // but for the sake of comparison, it is being used here
+    const completedAssignments = useMemo(
+      () => assignments.filter((a) => a.completed),
+      [assignments]
+    );
 
-  const inProgressAssignments = useMemo(
-    () => assignments.filter((a) => !a.completed),
-    [assignments]
-  );
+    const inProgressAssignments = useMemo(
+      () => assignments.filter((a) => !a.completed),
+      [assignments]
+    );
 
-  return (
-    <section>
-      {inProgressAssignments.length > 0 && (
-        <fieldset>
-          <legend>Not Accomplished</legend>
-          {inProgressAssignments.map((assignment) => (
-            <label key={assignment.name}>
-              {assignment.name}
-              <input type="checkbox" defaultChecked={assignment.completed} />
-            </label>
-          ))}
-        </fieldset>
-      )}
+    return (
+      <section>
+        {inProgressAssignments.length > 0 && (
+          <fieldset>
+            <legend>Not Accomplished</legend>
+            {inProgressAssignments.map((assignment) => (
+              <label key={assignment.name}>
+                {assignment.name}
+                <input type="checkbox" defaultChecked={assignment.completed} />
+              </label>
+            ))}
+          </fieldset>
+        )}
 
-      {completedAssignments.length > 0 && (
-        <fieldset>
-          <legend>Accomplished</legend>
-          {completedAssignments.map((assignment) => (
-            <label key={assignment.name}>
-              {assignment.name}
-              <input type="checkbox" defaultChecked={assignment.completed} />
-            </label>
-          ))}
-        </fieldset>
-      )}
-    </section>
-  );
-};
+        {completedAssignments.length > 0 && (
+          <fieldset>
+            <legend>Accomplished</legend>
+            {completedAssignments.map((assignment) => (
+              <label key={assignment.name}>
+                {assignment.name}
+                <input type="checkbox" defaultChecked={assignment.completed} />
+              </label>
+            ))}
+          </fieldset>
+        )}
+      </section>
+    );
+  };
 
-export default App;
-```
+  export default App;
+  ```
 
-## Custom components
+---
 
-- #### Vue `custom components` , `template` and `slot`
+## Components, events and props
+
+### Custom components
+
+- #### Vue `custom components` , `template` , `slot`, `named slots` and `flags`
 
   - **`custom Components`** - Vue uses the syntax `components` to create reusable and custom html elements.
 
@@ -403,6 +508,61 @@ export default App;
   </script>
   ```
 
+  - **`named slots`**
+
+    - If you need to render multiple slots and also want to optionally render them, like for example, you're using your component in different places.
+
+    - syntax: `<slot name="slotName" />`
+    - usage: `<template #slotName></template>` or `<template v-slot:slotName></template>`
+
+      - the `#` is the shorthand for `v-slot`
+
+    - example:
+
+    ```vue
+    <template>
+      <header>
+        <h1>
+          <slot name="header" />
+        </h1>
+      </header>
+       <main>
+        <slot />
+      </main
+      <footer>
+        <div>
+          <slot name="footer" />
+        </div>
+      </footer>
+    </template>
+    ```
+
+    - Usage:
+
+    ```vue
+    <template>
+      <div>
+        <!-- will render header and default but not footer -->
+        <my-component>
+          <template #header> Header </template>
+          <p>im default</p>
+        </my-component>
+
+        <!-- will render all of them -->
+        <my-component>
+          <template #header> Header </template>
+          <p>im default</p>
+          <template #footer> Footer </template>
+        </my-component>
+      </div>
+    </template>
+    ```
+
+    - **flags**
+
+      - Vue uses flags to control the behavior of the component.
+      - to make it more composable, like if you want to conditionally render a component base of a prop.
+
 - #### React `components`, `JSX`, and `children`
 
   - **`Components`** - React uses components as the building blocks for creating reusable and custom UI elements.
@@ -457,7 +617,7 @@ export default App;
     ReactDOM.render(<App />, document.getElementById("root"));
     ```
 
-## Props
+### Props
 
 - #### Vue `props`
 
@@ -618,16 +778,19 @@ export default App;
     in App (at App.js:8)
   ```
 
-## Event Handling and Passing data from child to parent
+### Event Handling and Passing data from child to parent
 
-- #### Vue `v-on` and `this.$emit`
+- #### Vue `v-on` , `this.$emit` and `$event`
 
   - Vue uses `v-on` to attach event handlers to component or html elements.
     is for event handlers to connect the handlers and make it dynamic
 
   - `@` -shorthand
 
-  - `v-on:click` or `@click` - usage
+  - Usaged:
+
+    - `v-on:click` or `@click`
+    - `$event` ,when used _inline_, it is the event object that can be use to access the DOM event properties and can also be use to access the data that came from $emit component instance of the child component.
 
   - must be defined under the `methods` object.
     - inside the `methods` object, you can define the event handler the same way as you define a function.
@@ -644,21 +807,41 @@ export default App;
 
   ```
 
-  - **$emit** - is a special method that can pass an event and a payload(data) to the parent component.
+  - **$emit** - is a special component instance that can pass an event and a payload(data) to the parent component. [more of component instance here](https://vuejs.org/api/component-instance.html#component-instance)
 
     - by doing this, it allows communication between parent and child components very easily.
 
-    - syntax: `$emit('eventName', payload)` ,
+      - when used inline in the attribute.
 
-      - when used inline in the attribute. or
-
-    - `this.$emit('eventName', payload)`
+        - **syntax**: `$emit('eventName', payload)` ,
 
       - when used inside the method object
 
+        - **syntax**: `this.$emit('eventName', payload)`
+
       - the `eventName` (**`string`**) representing the name of the function/method/event that will be called/passed in the parent component.
       - `payload` (**`optional`**): Data passed with the event. This can be any data type—string, number, object, etc.
-        - it can be one or multiple arguments. separated by a comma.
+      - it can be one or multiple arguments. separated by a comma.
+
+    - **Accessing the event in the parent component**
+
+      - when used inline in the attribute.
+
+        - **syntax**: `<div @eventName="foo = $event"></div>`
+
+          - assuming _foo_ here is a variable in data property of the parent component.
+          - the `$event` is the accessible data(payload) that was defined in the `$emit` component instance that came from child component.
+
+      - when used inside the method object
+
+        - **syntax**: `<div @eventName="funcFoo"></div>`
+
+          - assuming _funcFoo_ here is a function in methods property of the parent component
+
+  ##### Take Note:
+
+  > [!NOTE]
+  > The `eventName` must be **`CamelCase`** and when used in the parent component, it must be **`kebab-case`**. **The same way with props and components**
 
   example:
 
@@ -716,6 +899,8 @@ export default App;
 
     - `<handler>` in this manner is the name of the event handler function.
       E.g. `onClick` , `onChange` , `onSubmit` etc.
+
+    - `event` can be accessed by adding a parameter to a event handler function. It is use to access properties from the DOM.
 
     - It allows components to listen for user interactions and handle events dynamically.
 
@@ -798,3 +983,271 @@ export default App;
   ```
 
 ---
+
+## Lifecycles
+
+- ### How lifecycles work in Vue
+
+  - [illustration on what/how lifecycles work in vue](https://vuejs.org/guide/essentials/lifecycle.html)
+  - ![Lifecycles in Vue](https://vuejs.org/assets/lifecycle.MuZLBFAS.png)
+
+  - Vue lifecyles are the initialization steps of a component. You can think of it as the steps needs to take to mount your component in the screen.
+    By knowing the `initialization steps` of a component, you can take advantage of the `lifecycle hooks` to control the component's behavior or to do some logic before,during or after the component is mounted.
+
+    Common Lifecycles:
+
+    - `created` - before your code is _compiled_.
+
+      - **Best thing to do**:
+        - Usually the good time to do some **fetching** of your data..
+        - Best time to Setup initial state of your component.
+      - **Things to avoid**:
+        - DOM manipulation(Component is not rendered yet, try `mounted` instead)
+
+    - `beforeMount` - right before DOM is _rendered_.
+    - `mounted` - after your component is _rendered_ in the DOM.
+      - **Best thing to do**:
+        - DOM manipulation.
+
+  - `beforeUpdate` - _before_ the DOM updates due to reactivity changes.
+  - `updated` - _after_ the DOM updates due to reactivity changes.
+  - `beforeUnmount` - before your component unmounts from the DOM.
+    - **Best thing to do**:
+      - resource cleanup like remove event listeners or timers.
+  - `unmounted` - after your component is removed from the DOM.
+
+---
+
+## About Files and Routing
+
+- ### Vue `single file components`
+
+  - Vue uses single file components to split your code into smaller, reusable pieces.
+  - it contains the template, script and style to encapsulate them in 1 file. It is not required that all of them must be in a single file, you can omit some.
+
+- ### Vue `routing`
+
+  - Vue uses `routing` to navigate between different pages or views, _without a full page reload_ .
+    This is the feature of SPA(Single Page Application) using javascript to intercept the traditional multiple page serving.
+
+  - **Defining Routes**
+
+    - Vue uses its official `vue-router` package to handle SPA routing.
+
+    - **Usage**:
+
+      - You can define your paths and views in the `routes` array, where it is inside the `createRouter` method.
+        like so:
+
+        ```jsx
+        import { createRouter, createWebHistory } from "vue-router";
+
+        // call the createRouter method
+        const router = createRouter({
+          history: createWebHistory(import.meta.env.BASE_URL),
+          // here you can define the routes
+          routes: [
+            {
+              path: "/", // the path it corresponds to like "/"  which will be like https://example.com/
+              name: "home",
+              component: HomeView, // the view or .vue file that you want that page to show
+            },
+            {
+              path: "/contact",
+              name: "contacts",
+              // route level code-splitting
+              // this generates a separate chunk (About.[hash].js) for this route
+              // which is lazy-loaded when the route is visited.
+              component: () => import("../views/ContactView.vue"),
+            },
+          ],
+        });
+        ```
+
+  - **Using the router**
+
+  - Vue uses `<RouterView />` to render the component that was defined the `routes` array.
+    It acts the same way like a `<slot/>` but for the vue or the component that was declared as a view.
+
+  - `RouterLink` is used to navigate between pages. It is a improved version of the `<a>` tag.
+    Although, you can still use the `<a>` tag to navigate between pages but it is not recommended since it is against the SPA feature of vue-router(it will cause a full page reload).
+
+    - **`to`** - the attribute that is the substitute `href`, they have the same functionality.
+
+  Example:
+
+  ```vue
+  <template>
+    <header>
+      <div class="wrapper">
+        <!-- this is where the navigation -->
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+          <RouterLink to="/contact">Contact</RouterLink>
+        </nav>
+      </div>
+    </header>
+
+    <!-- this is where the content will be rendered -->
+    <RouterView />
+  </template>
+  ```
+
+---
+
+## 📝 Vue 3 Composition API
+
+- ### Syntax changes vs options API
+
+  - `setup()` is the new way to define a component and the entry point of compositon API.
+
+    It can receive two arguments:
+
+    - the `props` object. [docs here](https://vuejs.org/api/composition-api-setup.html#accessing-props)
+
+      - the `props` object that gives you access to the props passed to the component.
+        > [!NOTE]
+        > Props are reactive meaning if it is destrcutured it will not be reactive anymore.
+        > to make it reactive you need to use `toRefs` (making the destructured object a refs) or `toRef` turning it to a single props.
+
+    - the `context` object. [docs here](https://vuejs.org/api/composition-api-setup.html#setup-context)
+
+      - a non-reactive object that can give you access to the global context of the component.
+      - not reactive so it is okay to desctructure.
+        Example context are `attrs` and `slots` which you can then access the same way with [global component instances](https://vuejs.org/api/component-instance.html#attrs)
+
+        > [!NOTE]
+        > you can destructure the context object but you musnt destructure attrs and slots since
+        > they are stateful object which changes value depending on the component.
+        > access them normally, `attrs.class` or `slots.default`
+
+  - **Creating and accessing reactivity**
+
+    - the setup function can return a reactive object that then can be access in the `template` or outside of setup function using the `this` directive.
+
+    example:
+
+    ```vue
+    <script>
+    import { ref, reactive, toRefs } from "vue";
+
+    export default {
+      setup() {
+        const count = ref(0); // making the count variable reactive
+
+        function increment() {
+          count.value++; // to access and mutate the value of the count variable
+        }
+
+        return {
+          count, // so that you can use it outside of the setup function
+          increment, // same here
+        };
+      },
+      mounted() {
+        console.log(this.count); // to access the count without using the .value
+      },
+    };
+    </script>
+
+    <template>
+      <div>
+        <!-- same with this.count but this time you can directly access it. -->
+        <p>Count: {{ count }}</p>
+        <button @click="increment">Increment</button>
+      </div>
+    </template>
+    ```
+
+- ### Reactivity Fundamentals
+
+  - #### `ref` and `reactive`
+
+    - `ref` the recommended way to declare a variable to be **reactive**.
+
+      - good for a primitive types like `string`, `number`, `boolean` etc.
+      - syntax: `const <variable> = ref(<value>)`
+      - example: [you can check the last section of syntax changes](#syntax-changes-vs-options-api)
+
+      - ** accessing `ref` **
+
+        - inside the `setup` function: `<variable>.value`
+          - example: `count.value++` , you can directly mutate this.
+        - accessing outside the function :
+
+          - outside the `setup` function: `this.<variable>`
+          - inside the `template`: `{{ <variable> }}`
+
+          If accessing outside the `setup` function, `refs` are automatically unwrapped and you can then mutate it directly too (when inside the `<template>`)
+          like so: ([variable used here is base on the example from syntax changes section](#syntax-changes-vs-options-api))
+
+          ```vue
+          <template>
+            <button @click="count++">{{ count }}</button>
+          </template>
+          ```
+
+          > [!NOTE]
+          > mutating the _reactive ref variable_ inside the `<template>` comes with a caveat.
+          > You can mutate it if it is **top level** but if the ref declaration is inside a **nested** object, you can't mutate it.
+
+          To resolve this you can destructure that nested object to make it a top level.
+          example here:
+
+          ```js
+          const count = ref(1);
+          const foo = { bar: ref(1) };
+          ```
+
+          ```vue
+          // works
+          <button @click="count++">{{ count }}</button>
+          // doesn't work
+          <button @click="foo.bar++">{{ foo.bar }}</button>
+          ```
+
+          ```js
+          const { bar } = foo; // now it is a top level
+
+          <button @click="bar++">{{ bar }}</button>
+
+          ```
+
+      - ##### Typing `ref`
+
+        There are three ways to declare types for the `ref`.
+
+        - automatic inference. if no types declared it will get the type of the argument and infer it.
+
+        ```js
+        const year = ref("2020"); // will be type string
+        ```
+
+        - Importing the `Ref` type froom vue
+
+        ```js
+         import { ref } from 'vue'
+         import type { Ref } from 'vue'
+
+         const year: Ref<string | number> = ref('2020')
+
+         year.value = 2020 // ok!
+        ```
+
+        - directly using Generics argument
+
+        ```js
+         import { ref } from 'vue'
+         import type { Ref } from 'vue'
+
+         const year = ref<string | number>('2020')
+
+         year.value = 2020 // ok!
+        ```
+
+        or if the generic argument is not the same to the type that is being passed inside the ref method. it will become a union of the **type from argument and the type undefined**
+
+        ```jsx
+         const year = ref<string>(); // will be <string | undefined>
+        ```

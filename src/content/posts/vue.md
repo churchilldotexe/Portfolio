@@ -998,7 +998,7 @@ But the distinct difference between the two is how they re-render
 
     - `created` - before your code is _compiled_.
 
-      - **Best thing to do**:
+      - **Best usage**:
         - Usually the good time to do some **fetching** of your data..
         - Best time to Setup initial state of your component.
       - **Things to avoid**:
@@ -1006,15 +1006,36 @@ But the distinct difference between the two is how they re-render
 
     - `beforeMount` - right before DOM is _rendered_.
     - `mounted` - after your component is _rendered_ in the DOM.
-      - **Best thing to do**:
-        - DOM manipulation.
 
-  - `beforeUpdate` - _before_ the DOM updates due to reactivity changes.
-  - `updated` - _after_ the DOM updates due to reactivity changes.
-  - `beforeUnmount` - before your component unmounts from the DOM.
-    - **Best thing to do**:
-      - resource cleanup like remove event listeners or timers.
-  - `unmounted` - after your component is removed from the DOM.
+      - **Best usage**:
+        - DOM manipulation.
+          Example: (composition api)
+        ```js
+        // Lifecycle hook to add event listener when the component mounts
+        onMounted(() => {
+          console.log("Component mounted: Adding event listener");
+          window.addEventListener("keydown", handleKeyDown);
+        });
+        ```
+
+    - `beforeUnmount` - before your component unmounts from the DOM.
+
+      - **Best usage**:
+
+        - resource cleanup like remove event listeners or timers.
+          Example: (composition api and following the example above)
+
+        ```js
+        // Lifecycle hook to remove event listener when the component unmounts
+        onBeforeUnmount(() => {
+          console.log("Component unmounted: Removing event listener");
+          window.removeEventListener("keydown", handleKeyDown);
+        });
+        ```
+
+    - `beforeUpdate` - _before_ the DOM updates due to reactivity changes.
+    - `updated` - _after_ the DOM updates due to reactivity changes.
+    - `unmounted` - after your component is removed from the DOM.
 
 ---
 
@@ -1098,29 +1119,31 @@ But the distinct difference between the two is how they re-render
 
 ## 📝 Vue 3 Composition API
 
-- ### Syntax changes vs options API
+- ### Syntax and changes vs options API
 
-  - `setup()` is the new way to define a component and the entry point of compositon API.
+  #### `setup()`
 
-    It can receive two arguments:
+  is the new way to define a component and the entry point of compositon API.
 
-    - the `props` object. [docs here](https://vuejs.org/api/composition-api-setup.html#accessing-props)
+  It can receive two arguments:
 
-      - the `props` object that gives you access to the props passed to the component.
-        > [!NOTE]
-        > Props are reactive meaning if it is destrcutured it will not be reactive anymore.
-        > to make it reactive you need to use `toRefs` (making the destructured object a refs) or `toRef` turning it to a single props.
+  - the `props` object. [docs here](https://vuejs.org/api/composition-api-setup.html#accessing-props)
 
-    - the `context` object. [docs here](https://vuejs.org/api/composition-api-setup.html#setup-context)
+    - the `props` object that gives you access to the props passed to the component.
+      > [!NOTE]
+      > Props are reactive meaning if it is destrcutured it will not be reactive anymore.
+      > to make it reactive you need to use `toRefs` (making the destructured object a refs) or `toRef` turning it to a single props.
 
-      - a non-reactive object that can give you access to the global context of the component.
-      - not reactive so it is okay to desctructure.
-        Example context are `attrs` and `slots` which you can then access the same way with [global component instances](https://vuejs.org/api/component-instance.html#attrs)
+  - the `context` object. [docs here](https://vuejs.org/api/composition-api-setup.html#setup-context)
 
-        > [!NOTE]
-        > you can destructure the context object but you musnt destructure attrs and slots since
-        > they are stateful object which changes value depending on the component.
-        > access them normally, `attrs.class` or `slots.default`
+    - a non-reactive object that can give you access to the global context of the component.
+    - not reactive so it is okay to desctructure.
+      Example context are `attrs` and `slots` which you can then access the same way with [global component instances](https://vuejs.org/api/component-instance.html#attrs)
+
+      > [!NOTE]
+      > you can destructure the context object but you musnt destructure attrs and slots since
+      > they are stateful object which changes value depending on the component.
+      > access them normally, `attrs.class` or `slots.default`
 
   - **Creating and accessing reactivity**
 
@@ -1162,92 +1185,255 @@ But the distinct difference between the two is how they re-render
 
 - ### Reactivity Fundamentals
 
-  - #### `ref` and `reactive`
+  - #### `ref`
 
-    - `ref` the recommended way to declare a variable to be **reactive**.
+    The recommended way to declare a variable to be **reactive**.
 
-      - good for a primitive types like `string`, `number`, `boolean` etc.
-      - syntax: `const <variable> = ref(<value>)`
-      - example: [you can check the last section of syntax changes](#syntax-changes-vs-options-api)
+    - good for a primitive types like `string`, `number`, `boolean` etc.
+    - syntax: `const <variable> = ref(<value>)`
+    - example: [you can check the example here](#setup)
 
-      - ** accessing `ref` **
+    - ** accessing `ref` **
 
-        - inside the `setup` function: `<variable>.value`
-          - example: `count.value++` , you can directly mutate this.
-        - accessing outside the function :
+      - inside the `setup` function: `<variable>.value`
+        - example: `count.value++` , you can directly mutate this.
+      - accessing outside the function :
 
-          - outside the `setup` function: `this.<variable>`
-          - inside the `template`: `{{ <variable> }}`
+        - outside the `setup` function: `this.<variable>`
+        - inside the `template`: `{{ <variable> }}`
 
-          If accessing outside the `setup` function, `refs` are automatically unwrapped and you can then mutate it directly too (when inside the `<template>`)
-          like so: ([variable used here is base on the example from syntax changes section](#syntax-changes-vs-options-api))
+        If accessing outside the `setup` function, `refs` are automatically unwrapped and you can then mutate it directly too (when inside the `<template>`)
+        like so: ([variable used here is base on the example from syntax changes section](#syntax-changes-vs-options-api))
 
-          ```vue
-          <template>
-            <button @click="count++">{{ count }}</button>
-          </template>
-          ```
-
-          > [!NOTE]
-          > mutating the _reactive ref variable_ inside the `<template>` comes with a caveat.
-          > You can mutate it if it is **top level** but if the ref declaration is inside a **nested** object, you can't mutate it.
-
-          To resolve this you can destructure that nested object to make it a top level.
-          example here:
-
-          ```js
-          const count = ref(1);
-          const foo = { bar: ref(1) };
-          ```
-
-          ```vue
-          // works
+        ```vue
+        <template>
           <button @click="count++">{{ count }}</button>
-          // doesn't work
-          <button @click="foo.bar++">{{ foo.bar }}</button>
-          ```
+        </template>
+        ```
 
-          ```js
-          const { bar } = foo; // now it is a top level
+        > [!NOTE]
+        > mutating the _reactive ref variable_ inside the `<template>` comes with a caveat.
+        > You can mutate it if it is **top level** but if the ref declaration is inside a **nested** object, you can't mutate it.
 
-          <button @click="bar++">{{ bar }}</button>
-
-          ```
-
-      - ##### Typing `ref`
-
-        There are three ways to declare types for the `ref`.
-
-        - automatic inference. if no types declared it will get the type of the argument and infer it.
+        To resolve this you can destructure that nested object to make it a top level.
+        example here:
 
         ```js
-        const year = ref("2020"); // will be type string
+        const count = ref(1);
+        const foo = { bar: ref(1) };
         ```
 
-        - Importing the `Ref` type froom vue
+        ```vue
+        // works
+        <button @click="count++">{{ count }}</button>
+        // doesn't work
+        <button @click="foo.bar++">{{ foo.bar }}</button>
+        ```
 
         ```js
-         import { ref } from 'vue'
-         import type { Ref } from 'vue'
+        const { bar } = foo; // now it is a top level
 
-         const year: Ref<string | number> = ref('2020')
+        <button @click="bar++">{{ bar }}</button>
 
-         year.value = 2020 // ok!
         ```
 
-        - directly using Generics argument
+    - ##### Typing `ref`
 
-        ```js
-         import { ref } from 'vue'
-         import type { Ref } from 'vue'
+      There are three ways to declare types for the `ref`.
 
-         const year = ref<string | number>('2020')
+      - automatic inference. if no types declared it will get the type of the argument and infer it.
 
-         year.value = 2020 // ok!
-        ```
+      ```js
+      const year = ref("2020"); // will be type string
+      ```
 
-        or if the generic argument is not the same to the type that is being passed inside the ref method. it will become a union of the **type from argument and the type undefined**
+      - Importing the `Ref` type froom vue
 
-        ```jsx
-         const year = ref<string>(); // will be <string | undefined>
-        ```
+      ```js
+       import { ref } from 'vue'
+       import type { Ref } from 'vue'
+
+       const year: Ref<string | number> = ref('2020')
+
+       year.value = 2020 // ok!
+      ```
+
+      - directly using Generics argument
+
+      ```js
+       import { ref } from 'vue'
+       import type { Ref } from 'vue'
+
+       const year = ref<string | number>('2020')
+
+       year.value = 2020 // ok!
+      ```
+
+      or if the generic argument is not the same to the type that is being passed inside the ref method. it will become a union of the **type from argument and the type undefined**
+
+      ```jsx
+       const year = ref<string>(); // will be <string | undefined>
+      ```
+
+  - ##### `reactive`
+
+  Another way to declare a variable to be reactive.
+
+  - good for a complex types like `object`, `array` etc.
+  - syntax: `const <variable> = reactive(<value>)`
+  - example: [you can check the last section of syntax changes](#syntax-changes-vs-options-api)
+
+     <!-- TODO add more -->
+
+- ### Reusable Reactive Code
+
+  - #### `Composables`
+
+  If you need to reuse your reactive code to another component `composables` is the way to go.
+  It is not only limited to reactivity but the whole composition API, itself.
+  It also not limited for reusing your logic to another component, it can also be used for refactoring and code organization.
+
+  - **creating one**:
+    You just need to create a new file and export the function or logic.
+
+    - The convention is to name the function in CamelCase with the `use` prefix. e.g. `useCount`.
+    - since it is a normal function, it can receive arguments as well. It can receive a reactive argument, function, or just a value.
+
+      > use `toValue` to normalize the argument value. [more info here](#tovalue)
+      > and pair it with `watchEffect` .
+
+    Example:
+
+    ```js
+    // count.js
+    import { ref, reactive } from "vue";
+
+    export function useCount() {
+      const count = ref(0);
+
+      function increment() {
+        count.value++;
+      }
+
+      return {
+        count,
+        increment,
+      };
+    }
+    ```
+
+    then to use it in another component:
+
+    ```js
+    import { useCount } from "./count";
+
+    export default {
+      setup() {
+        const { count, increment } = useCount();
+
+        return {
+          count,
+          increment,
+        };
+      },
+    };
+    ```
+
+    or if with setup macro:
+
+    ```vue
+    <script setup>
+    import { useCount } from "./count";
+
+    const { count, increment } = useCount();
+    </script>
+    ```
+
+  - #### `Mixins`
+
+    - although not recommended in composition API(vue3), mixins is another way to reuse reactive code.
+      [docs fot mixins](https://vuejs.org/api/options-composition.html#mixins)
+
+### Utility Functions and Helpers
+
+- #### toRef
+
+  is a utility helper that can transform the value into a ref.
+  Its general use if to create a reference to a reactive object or value making it reactive.
+  Since, it creates a reference, it is now a **two way binding**.
+
+  - core concept:
+
+    - if the value passed is a ref, it will return existing refs(with two way binding).
+
+      example:
+
+      ```js
+      const foo = ref(1);
+
+      // have two way binding
+      const bar = toRef(foo);
+
+      bar.value++;
+      console.log(foo.value); // 2 and vice versa
+      ```
+
+    <!-- TODO: understand this more -->
+
+    - if the value passed is a prop, it will create a read only ref of that prop.
+
+    - if the value passed is a raw/normal value, it will create a ref of that value similar to [ref](#ref) and still make it reactive but a new ref(no two way binding.)
+
+      example:
+
+      ```js
+      const foo = 1;
+
+      // bar will be reactive but it acts like (const bar = ref(foo))
+      const bar = toRef(foo); // will create a new ref
+
+      bar.value++;
+      console.log(foo); // 1 ; no reference to foo and vice versa
+      ```
+
+  works well with [reactive](#reactive) especially when destructuring reactive objects.
+  creating a two way binding with `toRef`.
+
+  Example:
+
+  ```js
+  import { ref, reactive, toRef } from "vue";
+
+  const foo = reactive({ bar: 1 });
+
+  const bar = toRef(foo, "bar");
+
+  bar.value++;
+  console.log(foo.bar); // 2 and vice versa
+
+  const bar = ref(foo.bar);
+
+  bar.value++;
+  console.log(foo.bar); // 1 , no reference to foo
+  ```
+
+- #### toValue
+
+  Is a utility helper that can normalize and returned value.
+  It is best to use in the [composables](#composables) functions.
+
+  - vs [toRef](#toref)
+
+    - toValue unwraps the value and return it.
+    - toRef transforms the value into a ref.
+
+  - core concept:
+
+    - If the value passed in is a ref, it will return the ref's value
+
+    - If the value passed in is a function, it will call the function and return its value.
+
+    - If the value passed in is just a value, it will return that value
+
+  - syntax: `toValue(<value>)`
+    the `<value>` can be refs,function, or just a value.

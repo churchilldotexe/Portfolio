@@ -15,6 +15,74 @@ But the distinct difference between the two is how they re-render
 
 - Vue is **OPT-OUT** reactivity. Meaning, it is doing a **Granular Rerender** where it will only re-render the part of the code that actually change.
 
+## Access Point
+
+In order to connect to the Vue instance, You can either use the cdn to play around or use a package manager like npm to instal the Vue package
+
+```bash
+npm create vue@latest
+```
+
+or cdn
+
+```html
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+```
+
+Once installed, the structure typically consist of access point. the one that connects vue to html.
+like:
+
+```html
+<body class="size-full bg-white text-gray-950">
+  <!-- This is where all the content/pages will be rendered -->
+  <div id="app" class="contents"></div>
+  <!-- This is where the vue instance is located and will be mounted -->
+  <script type="module" src="/src/main.ts"></script>
+</body>
+```
+
+Vue Root instance/access point or what is called **App Level**
+
+This is where you create connection to you Top level component or layout.
+
+This is also where you can initialize the state management library like [Pinia](#pinia) or You app level [provide](#provide)
+
+```js
+// the typical root instance
+
+import "./assets/main.css"; // you css
+
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import { createPinia } from "pinia";
+
+import { ref } from "vue";
+
+// sample ref for app level provide
+const foo = ref("hi i am foo");
+
+// creating pinia instance
+const pinia = createPinia();
+
+// creating the app instance
+const app = createApp(App);
+
+// so you can use the SPA router
+app.use(router);
+
+// global dependency injection
+app.provide("about", about);
+
+// so you can use pinia
+app.use(pinia);
+
+// this corresponds to the div where all the content will be rendered
+app.mount("#app");
+```
+
+---
+
 ## Syntaxes and concepts
 
 ### V-model
@@ -1119,240 +1187,825 @@ But the distinct difference between the two is how they re-render
 
 ## 📝 Vue 3 Composition API
 
-- ### Syntax and changes vs options API
+### Syntax and changes vs options API
 
-  #### `setup()`
+#### **setup()**
 
-  is the new way to define a component and the entry point of compositon API.
+is the new way to define a component and the entry point of compositon API.
 
-  It can receive two arguments:
+It can receive two arguments:
 
-  - the `props` object. [docs here](https://vuejs.org/api/composition-api-setup.html#accessing-props)
+- The `props` object. [docs here](https://vuejs.org/api/composition-api-setup.html#accessing-props)
 
-    - the `props` object that gives you access to the props passed to the component.
-      > [!NOTE]
-      > Props are reactive meaning if it is destrcutured it will not be reactive anymore.
-      > to make it reactive you need to use `toRefs` (making the destructured object a refs) or `toRef` turning it to a single props.
+  The `props` object that gives you access to the props passed to the component.
 
-  - the `context` object. [docs here](https://vuejs.org/api/composition-api-setup.html#setup-context)
+  > **📝 NOTE**:
+  >
+  > Props are reactive meaning if it is destrcutured it will not be reactive anymore.
+  > to make it reactive you need to use `toRefs` or [ toRef ](#toref) turning it to a single props.
 
-    - a non-reactive object that can give you access to the global context of the component.
-    - not reactive so it is okay to desctructure.
-      Example context are `attrs` and `slots` which you can then access the same way with [global component instances](https://vuejs.org/api/component-instance.html#attrs)
+- the `context` object. [docs here](https://vuejs.org/api/composition-api-setup.html#setup-context)
 
-      > [!NOTE]
-      > you can destructure the context object but you musnt destructure attrs and slots since
-      > they are stateful object which changes value depending on the component.
-      > access them normally, `attrs.class` or `slots.default`
+  a non-reactive object that can give you access to the global context of the component.
 
-  - **Creating and accessing reactivity**
+  not reactive so it is okay to desctructure.
+  Example context are `attrs` and `slots` which you can then access the same way with [global component instances](https://vuejs.org/api/component-instance.html#attrs)
 
-    - the setup function can return a reactive object that then can be access in the `template` or outside of setup function using the `this` directive.
+  > **📝 NOTE**:
+  >
+  > You can destructure the context object but you musnt destructure attrs and slots since
+  > they are stateful object which changes value depending on the component.
+  > access them normally, `attrs.class` or `slots.default`
 
-    example:
+- **Creating and accessing reactivity**
+
+  The setup function can return a reactive object that then can be access in the `template` or outside of setup function using the `this` directive.
+
+  example:
+
+  ```vue
+  <script>
+  import { ref, reactive, toRefs } from "vue";
+
+  export default {
+    setup() {
+      const count = ref(0); // making the count variable reactive
+
+      function increment() {
+        count.value++; // to access and mutate the value of the count variable
+      }
+
+      return {
+        count, // so that you can use it outside of the setup function
+        increment, // same here
+      };
+    },
+    mounted() {
+      console.log(this.count); // to access the count without using the .value
+    },
+  };
+  </script>
+
+  <template>
+    <div>
+      <!-- same with this.count but this time you can directly access it. -->
+      <p>Count: {{ count }}</p>
+      <button @click="increment">Increment</button>
+    </div>
+  </template>
+  ```
+
+### Reactivity Fundamentals and core
+
+- #### **ref**
+
+  The recommended way to declare a variable to be **reactive**.
+
+  good for a primitive types like `string`, `number`, `boolean` etc.
+
+  > **📝 note**:
+  >
+  > ref creates a new reference to the value, so if you want a two-way binding, you need to use [toRef](#toref)
+
+  syntax: `const <variable> = ref(<value>)`
+
+  example: [you can check the example here](#setup)
+
+  **Accessing `ref`**
+
+  - inside the [ setup ](#setup) function: `<variable>.value`
+
+    example: `count.value++` , you can directly mutate this.
+
+  - accessing outside the function :
+
+    - outside the `setup` function: `this.<variable>`
+
+    - inside the `template`: `{{ <variable> }}`
+
+    If accessing outside the `setup` function, `refs` are automatically unwrapped and you can then mutate it directly too (when inside the `<template>`)
+
+    **Example**: ([variable used here is base on the example from syntax changes section](#syntax-and-changes-vs-options-api))
 
     ```vue
-    <script>
-    import { ref, reactive, toRefs } from "vue";
-
-    export default {
-      setup() {
-        const count = ref(0); // making the count variable reactive
-
-        function increment() {
-          count.value++; // to access and mutate the value of the count variable
-        }
-
-        return {
-          count, // so that you can use it outside of the setup function
-          increment, // same here
-        };
-      },
-      mounted() {
-        console.log(this.count); // to access the count without using the .value
-      },
-    };
-    </script>
-
     <template>
-      <div>
-        <!-- same with this.count but this time you can directly access it. -->
-        <p>Count: {{ count }}</p>
-        <button @click="increment">Increment</button>
-      </div>
+      <button @click="count++">{{ count }}</button>
     </template>
     ```
 
-- ### Reactivity Fundamentals
+    > 📝 NOTE
+    >
+    > mutating the _reactive ref variable_ inside the `<template>` comes with a caveat.
+    > You can mutate it if it is **top level** but if the ref declaration is inside a **nested** object, you can't mutate it.
 
-  - #### `ref`
+    To resolve this you can destructure that nested object to make it a top level or use [reactive](#reactive)
 
-    The recommended way to declare a variable to be **reactive**.
+    example here:
 
-    - good for a primitive types like `string`, `number`, `boolean` etc.
-    - syntax: `const <variable> = ref(<value>)`
-    - example: [you can check the example here](#setup)
+    ```js
+    const count = ref(1);
+    const foo = { bar: ref(1) };
+    ```
 
-    - ** accessing `ref` **
+    ```vue
+    // works
+    <button @click="count++">{{ count }}</button>
+    // doesn't work
+    <button @click="foo.bar++">{{ foo.bar }}</button>
+    ```
 
-      - inside the `setup` function: `<variable>.value`
-        - example: `count.value++` , you can directly mutate this.
-      - accessing outside the function :
+    ```js
+    const { bar } = foo; // now it is a top level
 
-        - outside the `setup` function: `this.<variable>`
-        - inside the `template`: `{{ <variable> }}`
+    <button @click="bar++">{{ bar }}</button>
 
-        If accessing outside the `setup` function, `refs` are automatically unwrapped and you can then mutate it directly too (when inside the `<template>`)
-        like so: ([variable used here is base on the example from syntax changes section](#syntax-changes-vs-options-api))
+    ```
 
-        ```vue
-        <template>
-          <button @click="count++">{{ count }}</button>
-        </template>
-        ```
+  - ##### Typing `ref`
 
-        > [!NOTE]
-        > mutating the _reactive ref variable_ inside the `<template>` comes with a caveat.
-        > You can mutate it if it is **top level** but if the ref declaration is inside a **nested** object, you can't mutate it.
+    There are three ways to declare types for the `ref`.
 
-        To resolve this you can destructure that nested object to make it a top level.
-        example here:
+    - automatic inference. if no types declared it will get the type of the argument and infer it.
 
-        ```js
-        const count = ref(1);
-        const foo = { bar: ref(1) };
-        ```
+    ```js
+    const year = ref("2020"); // will be type string
+    ```
 
-        ```vue
-        // works
-        <button @click="count++">{{ count }}</button>
-        // doesn't work
-        <button @click="foo.bar++">{{ foo.bar }}</button>
-        ```
+    - Importing the `Ref` type froom vue
 
-        ```js
-        const { bar } = foo; // now it is a top level
+    ```js
+     import { ref } from 'vue'
+     import type { Ref } from 'vue'
 
-        <button @click="bar++">{{ bar }}</button>
+     const year: Ref<string | number> = ref('2020')
 
-        ```
+     year.value = 2020 // ok!
+    ```
 
-    - ##### Typing `ref`
+    - directly using Generics argument
 
-      There are three ways to declare types for the `ref`.
+    ```js
+     import { ref } from 'vue'
+     import type { Ref } from 'vue'
 
-      - automatic inference. if no types declared it will get the type of the argument and infer it.
+     const year = ref<string | number>('2020')
 
-      ```js
-      const year = ref("2020"); // will be type string
-      ```
+     year.value = 2020 // ok!
+    ```
 
-      - Importing the `Ref` type froom vue
+    or if the generic argument is not the same to the type that is being passed inside the ref method. it will become a union of the **type from argument and the type undefined**
 
-      ```js
-       import { ref } from 'vue'
-       import type { Ref } from 'vue'
+    ```jsx
+     const year = ref<string>(); // will be <string | undefined>
+    ```
 
-       const year: Ref<string | number> = ref('2020')
-
-       year.value = 2020 // ok!
-      ```
-
-      - directly using Generics argument
-
-      ```js
-       import { ref } from 'vue'
-       import type { Ref } from 'vue'
-
-       const year = ref<string | number>('2020')
-
-       year.value = 2020 // ok!
-      ```
-
-      or if the generic argument is not the same to the type that is being passed inside the ref method. it will become a union of the **type from argument and the type undefined**
-
-      ```jsx
-       const year = ref<string>(); // will be <string | undefined>
-      ```
-
-  - ##### `reactive`
+- #### Reactive
 
   Another way to declare a variable to be reactive.
 
   - good for a complex types like `object`, `array` etc.
+
+  - if you want to have a store for your app, that can be used across the app, you can use `reactive` as a [state management](#state-management).
+
+    this is like the `provide` and `inject` but not just fot the parent to child component props but also for the entire application that needs it.
+
+    [it is explained here](#using-reactivereactive)
+
   - syntax: `const <variable> = reactive(<value>)`
-  - example: [you can check the last section of syntax changes](#syntax-changes-vs-options-api)
 
-     <!-- TODO add more -->
+  **Example**:
 
-- ### Reusable Reactive Code
+  ```vue
+  <script setup>
+  import { reactive } from "vue";
 
-  - #### `Composables`
+  const foo = reactive({ bar: 1 });
 
-  If you need to reuse your reactive code to another component `composables` is the way to go.
-  It is not only limited to reactivity but the whole composition API, itself.
-  It also not limited for reusing your logic to another component, it can also be used for refactoring and code organization.
+  // now can be mutated like so
+  foo.bar++;
+  </script>
+  ```
 
-  - **creating one**:
-    You just need to create a new file and export the function or logic.
+  - ##### **Typing Reactive**
 
-    - The convention is to name the function in CamelCase with the `use` prefix. e.g. `useCount`.
-    - since it is a normal function, it can receive arguments as well. It can receive a reactive argument, function, or just a value.
+    There are two ways to type reactive.
 
-      > use `toValue` to normalize the argument value. [more info here](#tovalue)
-      > and pair it with `watchEffect` .
+    1.  Implicit typing
 
-    Example:
+        The value you pass inside the function will automatically be typed.
 
-    ```js
-    // count.js
-    import { ref, reactive } from "vue";
+        ```typescript
+        import { reactive } from "vue";
 
-    export function useCount() {
-      const count = ref(0);
+        // foo = {bar: number}
+        const foo = reactive({ bar: 1 });
+        ```
 
-      function increment() {
-        count.value++;
-      }
+    2.  Explicit typing
+
+        You can create your own type and pass it in as a generic.
+
+        Useful when you're expecting
+
+        ```typescript
+        type Foo = { bar: string };
+
+        // foo = {bar: string}
+        const foo = reactive<Foo>({ bar: "bar" });
+        const bar: Foo = reactive({ bar: "bar" });
+        // these two works the same
+        ```
+
+    > Check: [ typing reactive docs](https://vuejs.org/guide/typescript/composition-api.html#typing-reactive)
+
+- #### Computed
+
+  [Docs for Computed](https://vuejs.org/api/reactivity-core.html#computed)
+
+  Takes in a callback and returns a _Read only_ computed data from a reactive.
+
+  It is the same with Options API's [computed property](#vue-v-for-v-ifv-show-key-and-computed)
+  where it will change base on data but this time it is base on reactives like [ref](#ref)
+  and with more additonal _features_
+
+  **Additonal feature**
+
+  - It can now do a _writable ref objectd_.
+    What it does is it can now take two objects **set** and **get**
+
+    **get** works the same way as read-only
+
+    **set** will create a two-way binding to its dependency reactive.
+    Where when you change the value from computed it will also change the reactive it depends to.
+
+    **Example**:
+
+    ```vue
+    <script setup>
+    import { ref, computed } from "vue";
+
+    const count = ref(1);
+
+    const plusOne = computed({
+      get: () => count.value + 1, // Derives value
+      set: (val) => (count.value = val - 1), // Custom logic on set
+    });
+
+    console.log(plusOne.value); // Output: 2
+    plusOne.value = 5; // Sets count to 4 (5 - 1)
+    console.log(count.value); // Output: 4
+    </script>
+    ```
+
+  - ##### Typing Computed
+
+  Like other [Reactivity Core](#reactivity-fundamentals-and-core)
+  It can also infer types but note that it infers the **return value**
+
+  It but you can also explicitly set a type for the returned value.
+  You can pass it in a generic.
+
+  **Example**: (basing the example above)
+
+  ```vue
+  <script setup>
+  // inferred type: ComputedRef<number>
+  const plusOne = computed({
+    get: () => count.value + 1, // Derives value
+    set: (val) => (count.value = val - 1), // Custom logic on set
+  });
+
+  const plusOne =
+    computed <
+    number >
+    {
+      //code here
+    };
+  </script>
+  ```
+
+- #### watch()
+
+  [computed](#computed) can help you do some logic that base on the reactive value.
+  But there are limitations with it. Here are few of them:
+
+  - Need to access it in order to get the value or do the logic for you.
+
+  - It is purely side effect free like async and DOM manipulation.
+
+  **watch()** solves these problems.
+
+  **Syntax**:
+
+  ```js
+  watch(source, callback, { options });
+  ```
+
+  **source**: <reactive || reactive[]> the source that you want to watch.
+
+  It can receive multiple sources as an array
+  but it is better to use [watchEffect](#watcheffect) if it became too many sources.
+
+  > 📝 NOTE:
+  >
+  > If the source is a reactive object like [props](#props) or [reactive](#reactive).
+  > It is recommended to pass them as a callback so that when the object/props changes,
+  > Itll be watched properly and optimized
+
+  > 📝 NOTE:
+  >
+  > If the reactive is passed directly it will trigger the <deep> to keep track of the changes.
+  > And you the callback wont be able to access the previous value.
+
+  Example:
+
+  ```js
+  // watching a reactive: 1 value
+  watch(count, () => );
+
+  // watching props
+  watch(()=>props, () => );
+
+  //watching a reactive: 1 value with options
+  watch(count, () => {}); // will have a deep:true imiplicitly
+
+  // watching a reactive: multiple values
+  watch([count, foo], () => );
+
+  // watching a reactive: multiple values with options
+  watch([count, foo], () => , { deep: true });
+  ```
+
+  **callback**: <function(newValue, oldValue, cleanup){}>
+
+  the callback that will be called when the source changes.
+
+  It can receive the new value as the first argument and the old value as the second argument.
+
+  - newValue: the new value of the source, if the source is array. you can receive them as an array as well
+
+  - oldValue: the old value of the source, will also be an array in the case of multiple sources.
+
+  - cleanup: a function that will be called when the watch is about to be called.
+
+    _cleanup_ is supported for async/propmises tasks
+
+  Example:
+
+  ```js
+  watch(count, (newValue, oldValue) => {});
+
+  // with multiple sources
+  watch([count, foo], ([countNewValue, fooNewValue], [countOldValue, fooOldValue]) => {});
+  ```
+
+  **options**: <object> the configuration options that can change the behavior of the watch.
+
+  - **deep**: <boolean> if it is true, it will keep track of the changes in the object/reactive.
+
+  > 📝 NOTE:
+  >
+  > if the object is many levels deep, Performance issue might occur, especially if it is a large object.
+
+  - **immediate**: <boolean> if it is true, it will run the watch immediately. Good for initialization
+
+  - **flush**: <'sync' | 'post' | 'pre'> if it is true, it will trigger the watch immediately.
+
+- ##### watchEffect()
+
+  If the watch have so many sources, watchEffect is a better option.
+
+  The tracking and the callback is now in one callback. All the reactive will now be automatically tracked.
+
+  so instead of this way:
+
+  ```js
+  watch([count, foo], () => {
+    console.log(count.value, foo.value);
+  });
+  ```
+
+  you can do this way:
+
+  ```js
+  watchEffect(() => {
+    console.log(count.value, foo.value);
+  });
+  ```
+
+  **Syntax**:
+
+  ```js
+  watchEffect(callback, { options });
+  ```
+
+  **callback**: <function(Cleanup)> the callback that will be called when the source changes.
+
+  > 📝 NOTE:
+  >
+  > You wont be able to access the previous value with watchEffect.
+
+- ##### onWatcherCleanup()
+
+  Is a helper from vue that will trigger if [watchEffect](#watcheffect) or [watch](#watch) is **about to be called** called.
+
+  This is good if you have to ensure that you'll get the latest value of the reactive.
+
+### Reusable Reactive Code
+
+- #### Composables
+
+If you need to reuse your reactive code to another component `composables` is the way to go.
+
+It is not only limited to reactivity but the whole composition API, itself.
+
+It also not limited for reusing your logic to another component, it can also be used for refactoring and code organization.
+
+- **creating one**:
+  You just need to create a new file and export the function or logic.
+
+  - The convention is to name the function in CamelCase with the `use` prefix.
+    And the file name should be the same to the function name.
+    e.g.
+
+  ```js
+  // useCount.ts
+  function useCount() {}
+  ```
+
+  - should only be used inside the `setup` function or <script setup> tag. but in some cases can be used in onmounted lifecycle hooks and follow the proper [lifecycle hooks](#how-lifecycles-work-in-vue) especially when working with DOM(do a clean up).
+
+  - since it is a normal function, it can receive arguments as well. It can receive a reactive argument, function, or just a value.
+
+    > use `toValue` to normalize the argument value. [more info here](#tovalue)
+    > and pair it with `watchEffect` .
+
+  Example:
+
+  ```js
+  // count.js
+  import { ref, reactive } from "vue";
+
+  export function useCount() {
+    const count = ref(0);
+
+    function increment() {
+      count.value++;
+    }
+
+    return {
+      count,
+      increment,
+    };
+  }
+  ```
+
+  then to use it in another component:
+
+  ```js
+  import { useCount } from "./count";
+
+  export default {
+    setup() {
+      const { count, increment } = useCount();
 
       return {
         count,
         increment,
+      };
+    },
+  };
+  ```
+
+  or if with setup macro:
+
+  ```vue
+  <script setup>
+  import { useCount } from "./count";
+
+  const { count, increment } = useCount();
+  </script>
+  ```
+
+- #### `Mixins`
+
+  - although not recommended in composition API(vue3), mixins is another way to reuse reactive code.
+    [docs fot mixins](https://vuejs.org/api/options-composition.html#mixins)
+
+### Provide/Inject and State Management
+
+When dealing with components especially with reusable one and most of the time you need to pass props to the child. Worst case scenario is you have to pass it multiple levels deep.
+
+[props is explained here](#props)
+
+- #### `Provide/Inject`
+
+  To resolve prop drilling, We can use `provide` and `inject`.
+  If you need to pass the data across your app, try [state management](#state-management) or [Pinia](#pinia) .
+
+  - ##### `provide`
+
+    Is a function where you can define the **data** that you want to pass to the children and its descendant.
+
+    The data that is passed here as an argument _can only be access to its children and its descendant._
+
+    This Can only be used inside <script setup> tag or in the `setup` function.
+
+    **Syntax**:
+
+    ```js
+      provide(key, value)`
+    ```
+
+    - key: <string> the key is the data name, the only you call to access the data.
+    - value:<payload> your payload/data that referenced by the key.
+
+    Example:
+
+    ```vue
+    <script setup>
+    import { provide } from "vue";
+
+    provide("foo", 1);
+    </script>
+    ```
+
+    **Using Provide in the APP LEVEL**
+
+    If you want to have a data that can be accessed in all components, you can define a provide in the [access point](#access-point) by using `app.provide`
+
+    **Example**:
+
+    ```js
+    // main.js
+    import { createApp } from "vue";
+    import App from "./App.vue";
+    import router from "./router";
+    import { createPinia } from "pinia";
+
+    import { ref } from "vue";
+
+    // the example
+    const foo = ref("hi i am foo");
+
+    // init codes here
+
+    // app level provide
+    app.provide("foo", about);
+    app.mount("#app");
+    ```
+
+    which now then avaiable to all components. You can access it using [inject](#inject)
+
+  - #### `Inject`
+
+    Is a function that is used to access the data that was passed from the parent.
+
+    If the data is ref, you can use it as is , this is intentional to retain reactivity.
+
+    **Example**:
+
+    ```vue
+    <script setup>
+    import { inject } from "vue";
+
+    const foo = inject("foo");
+
+    console.log(foo); // 1
+    </script>
+    ```
+
+- #### State Management
+
+  If you need to pass data not just in children but across the entire app, you can use state managers.
+  It can store the data of your component normally in the store folrder.
+
+  **Naming Convention:**
+
+  The same with [composables](#composables) ,
+  where you can name the file in PascalCase and
+  the function must have a prefix **use** and a suffix **Store**
+
+  e.g. ` useCountStore.ts`
+
+  - ##### **Using [Reactive](#reactive)**
+
+    The simplest and out of the box way to use state management.
+
+    It is good for simple project but not for large project.
+    because it has limited features and when the project complexity grows, it becomes hard to reason about.
+
+    **Example**:
+
+    ```js
+    // CounterStore.ts
+    import { reactive } from "vue";
+
+    export function useCounterStore() {
+      // state
+      const count = reactive({ value: 0 });
+
+      // methods or actions
+      function increment() {
+        count.value++;
+      }
+
+      // getters or computed
+      const doubleCount = computed(() => count.value * 2);
+
+      // need to return it
+      return {
+        count,
+        increment,
+        doubleCount,
       };
     }
     ```
 
     then to use it in another component:
 
-    ```js
-    import { useCount } from "./count";
+    ```vue
+    import { useCounterStore } from "./CounterStore";
 
-    export default {
-      setup() {
-        const { count, increment } = useCount();
+    <script setup>
+    import { useCounterStore } from "./CounterStore";
 
-        return {
-          count,
-          increment,
-        };
-      },
-    };
+    const count = useCounterStore();
+    </script>
+
+    <template>
+      <div>
+        <p>Count: {{ count.count.value }}</p>
+        <button @click="count.increment">Increment</button>
+        <p>Double Count: {{ count.doubleCount }}</p>
+      </div>
+    </template>
     ```
 
-    or if with setup macro:
+  - ##### **Pinia**
+
+    ```bash
+    npm install pinia
+    ```
+
+    Pinia is a state management library for Vue.js.
+
+    It is a store that can be used across the app, and it is also reactive. Just like the simple store but it can handle complex logics and can also access `useRoute` and `inject`(for Setup Store)
+
+    Just like vue it has two way so using and defining the store. Option store which is almost the same with vue's option API and Setup store which is the same with composition API
+    The difference between the two is
+
+    It is a good alternative to Vuex.
+
+    [Docs for installation to get started](https://pinia.vuejs.org/introduction.html#installation)
+
+    or [docs here](https://pinia.vuejs.org/core-concepts/)
+
+    - options store have built ins like $state and $patch to do a batch store update.
+
+    while
+
+    - Setup store has aaccess to composition API like `ref` and `reactive`, just like the way you write composition API and can access _global provided_ properties(inject,useRoute)
+
+      - Regarding , **[inject](#inject)**, You can only access the data that was **provided at the APP level**
+        meaning, if the **[provide](#provide)** was defined on another parent component, you cant access it.
+
+        You cant also return it (the variable that catched inject) as they dont belong in the the defineStore
+        but you can create a **two-way binding** with it using [toRef](#toref) and note ❌ ref(will not have two-way binding, [more info here](#ref))
+
+        **Here is what i mean:**
+
+        The root or the Access point
+
+        ```js
+        //main.js
+        import { createApp } from "vue";
+        import App from "./App.vue";
+        import router from "./router";
+        import { createPinia } from "pinia";
+
+        import { ref } from "vue";
+
+        // the example
+        const foo = ref("hi i am foo");
+
+        const pinia = createPinia();
+        const app = createApp(App);
+
+        app.use(router);
+
+        // app level provide
+        app.provide("foo", about);
+        app.use(pinia);
+        app.mount("#app");
+        ```
+
+        Defining setup store
+
+        ```js
+        // SampleStore.ts
+        import { defineStore } from "pinia";
+        import { ref } from "vue";
+
+        export const useSampleStore = defineStore("sample", () => {
+          // state
+          const accessFoo = inject("foo"); // the same key as app level provide
+
+          // methods or actions
+          function increment() {
+            accessFoo.value++;
+          }
+
+          // getters or computed
+          const doubleCount = computed(() => accessFoo.value * 2);
+
+          // need to return it
+          return {
+            accessFoo,
+            increment,
+            doubleCount,
+          };
+        });
+        ```
+
+        ```vue
+        // view or component that have access to pinia store
+        <script setup lang="ts">
+        import { useSampleStore } from "@/stores/SampleStore";
+
+        const sample = useSampleStore();
+
+        setTimeout(() => {
+          sample.accessFoo = "im baz now";
+        }, 2000);
+        </script>
+
+        <template>
+          <div>
+            <p>{{ sample.accessFoo }}</p>
+          </div>
+        </template>
+        ```
+
+    **Example**:
+
+    ```js
+    // main.js
+    import { createApp } from "vue";
+    import { createPinia } from "pinia";
+    import App from "./App.vue";
+
+    const pinia = createPinia();
+    const app = createApp(App);
+
+    app.use(pinia);
+    app.mount("#app");
+    ```
+
+    Using Setup store.
+
+    ```js
+    // CounterStore.ts
+    import { defineStore } from "pinia";
+
+    export const useCounterStore = defineStore("counter", () => {
+      // state
+      const count = ref(0);
+
+      // methods or actions
+      function increment() {
+        count.value++;
+      }
+
+      // getters or computed
+      const doubleCount = computed(() => count.value * 2);
+
+      // need to return it
+      return {
+        count,
+        increment,
+        doubleCount,
+      };
+    });
+    ```
+
+    then to use it in another component:
 
     ```vue
     <script setup>
-    import { useCount } from "./count";
+    import { useCounterStore } from "./CounterStore";
 
-    const { count, increment } = useCount();
+    const count = useCounterStore();
     </script>
+
+    <template>
+      <div>
+        <p>Count: {{ count.count.value }}</p>
+        <button @click="count.increment">Increment</button>
+        <p>Double Count: {{ count.doubleCount }}</p>
+      </div>
+    </template>
     ```
-
-  - #### `Mixins`
-
-    - although not recommended in composition API(vue3), mixins is another way to reuse reactive code.
-      [docs fot mixins](https://vuejs.org/api/options-composition.html#mixins)
 
 ### Utility Functions and Helpers
 
@@ -1377,8 +2030,6 @@ But the distinct difference between the two is how they re-render
       bar.value++;
       console.log(foo.value); // 2 and vice versa
       ```
-
-    <!-- TODO: understand this more -->
 
     - if the value passed is a prop, it will create a read only ref of that prop.
 

@@ -19,13 +19,17 @@ slug: php-js
   - [Basic data types](#basic-data-types)
     - [String](#string)
       - [helper methods and functions](#helper-methods-and-functions)
-- [Concat](#concat) - [Boolean and Conditionals](#boolean-and-conditionals) - [if-else statement](#if-else-statement) - [ternary operator](#ternary-operator) - [Equality](#equality)
+    - [Concat](#concat)
+    - [Boolean and Conditionals](#boolean-and-conditionals)
+      - [if-else statement](#if-else-statement)
+      - [ternary operator](#ternary-operator)
+    - [Equality](#equality)
   - [Complex data types](#complex-data-types)
     - [Array](#array)
       - [Iteration](#iteration)
         - [Caveat of looping](#caveat-of-looping)
       - [built ins](#built-ins)
-      - [Iteration](#iteration)
+      - [Iteration-js](#iteration-js)
       - [Built-in filter](#built-in-filter)
     - [Associative array](#associative-array)
       - [array_key_exists()](#arraykeyexists)
@@ -826,7 +830,7 @@ composer require --dev barryvdh/laravel-ide-helper
 - Javascript
   Javascript array also behaves like an Array List where you can grow the length of the array and do a shift and unshift operations
 
-  - #### Iteration
+  - #### Iteration-js
 
     There are several ways to loop through an array and these are:
 

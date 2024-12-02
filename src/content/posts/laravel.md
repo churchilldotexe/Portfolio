@@ -7,6 +7,33 @@ slug: laravel
 
 # All About Laravel
 
+<!--toc:start-->
+
+- [All About Laravel](#all-about-laravel)
+  - [Blade templating](#blade-templating)
+    - [$slot](#slot)
+    - [name $slot](#name-slot)
+    - [$attributes](#attributes)
+    - [$props](#props)
+      - [:](#)
+    - [$props vs $attributes](#props-vs-attributes)
+  - [Helpers](#helpers)
+    - [request](#request)
+      - [is method](#is-method)
+  - [Eloquent](#eloquent)
+  - [Terminal Php artisan](#terminal-php-artisan)
+  - [model](#model)
+    - [Syntax /method of model class](#syntax-method-of-model-class)
+      - [**HasFactory**](#hasfactory)
+      - [**$table**](#table)
+      - [**$fillable**](#fillable)
+      - [**guarded**](#guarded)
+      - [**hidden**](#hidden)
+      - [**Cast**](#cast)
+    - [Binding](#binding)
+  - [Authenticaton](#authenticaton)
+  <!--toc:end-->
+
 ## Blade templating
 
 Blade templating is a way to write php code with html in a clean and readable manner.
@@ -374,3 +401,41 @@ Example:
 ```
 
 ## Authenticaton
+
+<!-- NOTE: -->
+
+For redirect:
+redirect()->guest('login');
+redirect()->intended();//home page default
+
+## authorization
+
+Add can(gate) to as a prop for your frontend to receive
+or fine grained control (like only for admin)
+
+Things to note:
+
+- to access the gate pass it as a prop
+
+```php
+<?php
+
+// pass the prop like this
+
+'can' => [
+'createUser': Auth::user()->email === 'admin@admin.com'
+]
+```
+
+or create a policy
+
+```php
+<?php
+
+// pass the prop like this
+
+'can' => [
+'createUser': Auth::user()->can('create', User::class)
+  //                               ^ this is the gate from policy
+]
+```

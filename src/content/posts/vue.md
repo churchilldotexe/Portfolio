@@ -7,8 +7,9 @@ slug: "vue"
 
 # Vue starting from the basic
 
-<!--toc:start-->
+<!--prettier-ignore-start-->
 
+<!--toc:start-->
 - [Vue starting from the basic](#vue-starting-from-the-basic)
   - [Access Point](#access-point)
   - [Syntaxes and concepts](#syntaxes-and-concepts)
@@ -25,6 +26,11 @@ slug: "vue"
       - [Vue `v-for` , `v-if`,`v-show`, `:key` and `computed()`](#vue-v-for-v-ifv-show-key-and-computed)
       - [React `map`, `ternary operator`, `key`, `show/hide` and `useMemo`](#react-map-ternary-operator-key-showhide-and-usememo)
   - [Components, events and props](#components-events-and-props)
+    - [Built-in Components](#built-in-components)
+      - [Transition](#transition)
+      - [Transition Group](#transition-group)
+      - [Teleport](#teleport)
+      - [KeepAlive](#keepalive)
     - [Custom components](#custom-components)
       - [Vue `custom components` , `template` , `slot`, `named slots` and `flags`](#vue-custom-components-template-slot-named-slots-and-flags)
       - [React `components`, `JSX`, and `children`](#react-components-jsx-and-children)
@@ -32,7 +38,8 @@ slug: "vue"
       - [Vue `props`](#vue-props)
       - [React `props`](#react-props)
     - [Event Handling and Passing data from child to parent](#event-handling-and-passing-data-from-child-to-parent)
-      - [Vue `v-on` , `this.$emit` and `$event`](#vue-v-on-thisemit-and-event)
+      - [Vue `v-on` and Event Hanling](#vue-v-on-and-event-hanling)
+      - [**emit**](#emit)
         - [Take Note:](#take-note)
       - [React `onClick` and `props` Callback Functions](#react-onclick-and-props-callback-functions)
   - [Lifecycles](#lifecycles)
@@ -40,11 +47,14 @@ slug: "vue"
   - [About Files and Routing](#about-files-and-routing)
     - [Vue `single file components`](#vue-single-file-components)
     - [Vue `routing`](#vue-routing)
-
-<!-- prettier-ignore -->
   - [📝 Vue 3 Composition API](#📝-vue-3-composition-api)
     - [Syntax and changes vs options API](#syntax-and-changes-vs-options-api)
       - [**setup()**](#setup)
+    - [script setup macro](#script-setup-macro)
+    - [Dynamic Component](#dynamic-component)
+    - [defineProps, defineEmits](#defineprops-defineemits)
+      - [Typing **defineProps**](#typing-defineprops)
+      - [typing defineEmits](#typing-defineemits)
     - [Reactivity Fundamentals and core](#reactivity-fundamentals-and-core)
       - [**ref**](#ref)
         - [Typing `ref`](#typing-ref)
@@ -69,6 +79,8 @@ slug: "vue"
       - [toRef](#toref)
       - [toValue](#tovalue)
 <!--toc:end-->
+
+<!--prettier-ignore-end-->
 
 Vue is a js framework that is like react.
 But the distinct difference between the two is how they re-render
@@ -205,7 +217,7 @@ app.mount("#app");
   - ##### V-model for parent-child component syncing
 
     - v-model can also be use to create a communicate between parent and its child component.
-    - [this is the implementation without using v-model](#vue-v-on-thisemit-and-event)
+    - [this is the implementation without using v-model](#vue-v-on-and-event-hanling)
 
     - Usage:
 
@@ -580,6 +592,155 @@ app.mount("#app");
 
 ## Components, events and props
 
+### Built-in Components
+
+Vue Integrated Components that can be used without importing them.
+It is a helper component that is modified to its speicific needs.
+
+> ⚠️
+> Transition and transition group will not work if using Display:none
+> But will work with [v-show](#vue-v-for-v-ifv-show-key-and-computed)
+
+- #### Transition
+
+  [in depth explanation here](https://vuejs.org/guide/built-ins/transition.html#transition)
+
+  Is helper that is use to animate **1** Children Element.
+
+  [available attributes here](https://vuejs.org/api/built-in-components.html#transition)
+
+  Example:
+
+  ```vue
+  <template>
+    <transition
+      onBeforeEnter="opacity-0"
+      onAfterEnter="opacity-100"
+      onBeforeLeave="opacity-100"
+      onAfterLeave="opacity-0"
+    >
+      <div v-show="show">
+        <p>Im transitioning</p>
+      </div>
+    </transition>
+  </template>
+  ```
+
+- #### Transition Group
+
+  Is a helper that is the same with [transition](#transition) but it can be used with multiple elements.
+
+  [available attributes here](https://vuejs.org/api/built-in-components.html#transitiongroup)
+  Example:
+
+  ```vue
+  <template>
+    <transition-group tag="ul" name="list">
+      <li v-for="item in items" :key="item.id">
+        {{ item.text }}
+      </li>
+    </transition-group>
+  </template>
+  ```
+
+- #### Teleport
+
+  Is a helper to render the component in the selected DOM element. (normally in body)
+
+  It is really useful for z-index stacking context where you want it to be on top of other elements.
+  If used to where it is located as long as it is a child of a element z-index is problem will likely to affect
+  because it is bound to its parent element. Which makes debugging of z-index stacking context difficult.
+
+  **Syntax**:
+
+  - to : String (required) the selector of the element to teleport to.
+
+  - disabled : Boolean (optional) if true, the element will be render back to where it is originally located.
+    (can be dynamically activated)
+
+  - defer: Boolean (optional) it will render only after all other elements have been mounted.
+
+  Example:
+
+  ```vue
+  <template>
+    <div id="app">
+      <Teleport to="body">
+        <p>I'm in the body</p>
+      </Teleport>
+    </div>
+  </template>
+  ```
+
+- #### KeepAlive
+
+  Is a helper to cache the elements/components of its child
+
+  Really useful to preserve the state of [dynamic Components](#dynamic-component) and [transitions](#transition)
+
+  By default, `component` and `v-if/v-else` components when swtiching states are not being presserved,
+  Unless, you are using v-show , because of destroy/create of DOM.
+  This resolves the issue of maintaining state for those elements.
+
+  ⚠️ when used inside the `v-if/v-else` component, **1** component must be rendered to cache it..
+  It wont work with multiple components.
+
+  **Attributes**
+
+  - include - String | RegExp : A string or regular expression that matches the **name of component**
+
+  - exclude - String | RegExp : the opposite with include but the same matching usage.
+
+  - max - Number | string : The maximum number of components to cache
+
+  Example:
+
+  Using `component`
+
+  ```vue
+  <script setup>
+  import Foo from "./FooComponent.vue";
+  import Bar from "./BarComponent.vue";
+  import { ref } from "vue";
+
+  const currentComponent = ref(Foo);
+  </script>
+
+  <template>
+    <keep-alive exclude="Bar">
+      <component :is="currentComponent" />
+    </keep-alive>
+
+    <button @click="currentComponent = Foo">Show Foo</button>
+    <button @click="currentComponent = Bar">Show Bar</button>
+  </template>
+  ```
+
+  Using v-if/v-else
+
+  ```vue
+  <script setup>
+  import Foo from "./FooComponent.vue";
+  import Bar from "./BarComponent.vue";
+  import Baz from "./BazComponent.vue";
+  import { ref } from "vue";
+
+  const currentComponent = ref("FooComponent");
+  </script>
+
+  <template>
+    <keep-alive include="Foo">
+      <Foo v-if="currentComponent === 'FooComponent'" />
+      <Bar v-else-if="currentComponent === 'BarComponent'" />
+      <Baz v-if="currentComponent === 'BazComponent'" />
+    </keep-alive>
+
+    <button @click="currentComponent = 'FooComponent'">Show Foo</button>
+    <button @click="currentComponent = 'BarComponent'">Show Bar</button>
+    <button @click="currentComponent = 'BazComponent'">Show Baz</button>
+  </template>
+  ```
+
 ### Custom components
 
 - #### Vue `custom components` , `template` , `slot`, `named slots` and `flags`
@@ -911,20 +1072,23 @@ app.mount("#app");
 
 ### Event Handling and Passing data from child to parent
 
-- #### Vue `v-on` , `this.$emit` and `$event`
+- #### Vue `v-on` and Event Hanling
 
-  - Vue uses `v-on` to attach event handlers to component or html elements.
-    is for event handlers to connect the handlers and make it dynamic
+  - `v-on`
 
-  - `@` -shorthand
+  to attach event handlers to component or html elements.
+  is for event handlers to connect the handlers and make it dynamic
 
-  - Usaged:
+  `@` -shorthand
 
-    - `v-on:click` or `@click`
-    - `$event` ,when used _inline_, it is the event object that can be use to access the DOM event properties and can also be use to access the data that came from $emit component instance of the child component.
+  Usage:
 
-  - must be defined under the `methods` object.
-    - inside the `methods` object, you can define the event handler the same way as you define a function.
+  - `v-on:click` or `@click`
+  - `$event` ,when used _inline_, it is the event object that can be use to access the DOM event properties and can also be use to access the data that came from $emit component instance of the child component.
+
+  must be defined under the `methods` object.
+
+  - inside the `methods` object, you can define the event handler the same way as you define a function.
 
   ```js
 
@@ -938,91 +1102,111 @@ app.mount("#app");
 
   ```
 
-  - **$emit** - is a special component instance that can pass an event and a payload(data) to the parent component. [more of component instance here](https://vuejs.org/api/component-instance.html#component-instance)
+  **Event Modifiers**
 
-    - by doing this, it allows communication between parent and child components very easily.
+  [official Docs](https://vuejs.org/guide/essentials/event-handling.html#event-modifiers)
 
-      - when used inline in the attribute.
+  A helper to lessen a use of `e.preventDefault()` and `e.stopPropagation()` in event handlers.
 
-        - **syntax**: `$emit('eventName', payload)` ,
+  - **syntax** : `v-on:click.prevent="handleClick"`
 
-      - when used inside the method object
+    This will do preventDefault
 
-        - **syntax**: `this.$emit('eventName', payload)`
+  ⚠️ When using modifiers **sequence matters**. For example,
 
-      - the `eventName` (**`string`**) representing the name of the function/method/event that will be called/passed in the parent component.
-      - `payload` (**`optional`**): Data passed with the event. This can be any data type—string, number, object, etc.
-      - it can be one or multiple arguments. separated by a comma.
+  `@click.self.prevent` - will only prevent the click event on the element itself, not on its children.
 
-    - **Accessing the event in the parent component**
+  `@click.prevent.self` - will include the children.
 
-      - when used inline in the attribute.
+- #### **emit**
 
-        - **syntax**: `<div @eventName="foo = $event"></div>`
+  is a special component instance that can pass an event and a payload(data) to the parent component. [more of component instance here](https://vuejs.org/api/component-instance.html#component-instance)
 
-          - assuming _foo_ here is a variable in data property of the parent component.
-          - the `$event` is the accessible data(payload) that was defined in the `$emit` component instance that came from child component.
+  by doing this, it allows communication between parent and child components very easily.
 
-      - when used inside the method object
+  - when used inline in the attribute.
 
-        - **syntax**: `<div @eventName="funcFoo"></div>`
+    - **syntax**: `$emit('eventName', payload)` ,
 
-          - assuming _funcFoo_ here is a function in methods property of the parent component
+  - when used inside the method object
 
-  ##### Take Note:
+    - **syntax**: `this.$emit('eventName', payload)`
 
-  > [!NOTE]
-  > The `eventName` must be **`CamelCase`** and when used in the parent component, it must be **`kebab-case`**. **The same way with props and components**
+  - the `eventName` (**`string`**) representing the name of the function/method/event that will be called/passed in the parent component.
 
-  example:
+  - `payload` (**`optional`**): Data passed with the event. This can be any data type—string, number, object, etc.
 
-  - in the child component
+  - it can be one or multiple arguments. separated by a comma.
 
-  ```js
-   <template>
-      <button @click="handleClick">Click Me</button>
-   </template>
+  **Accessing the event in the parent component**
 
-   <script>
-   export default {
-   methods: {
-      handleClick() {
-         this.$emit('custom-event', 'Hello from Child');
-      },
-   },
-   };
-   </script>
-  ```
+  - when used inline in the attribute.
 
-  or directly in the html
+    **syntax**: `<div @eventName="foo = $event"></div>`
 
-  ```vue
-  <button @click="$emit('custom-event', 'Hello from Child')">Click Me</button>
-  ```
+    - assuming _foo_ here is a variable in data property of the parent component.
+    - the `$event` is the accessible data(payload) that was defined in the `$emit` component instance that came from child component.
 
-  - in the parent component
+  - when used inside the method object
 
-  ```vue
-  <template>
-    <div>
-      <ChildComponent @custom-event="handleCustomEvent" />
-    </div>
-  </template>
+    **syntax**: `<div @eventName="funcFoo"></div>`
 
-  <script>
-  import ChildComponent from "./ChildComponent.vue";
+    - assuming _funcFoo_ here is a function in methods property of the parent component
 
-  export default {
-    components: { ChildComponent },
-    methods: {
-      // or can be any name other than payload.
-      handleCustomEvent(payload) {
-        console.log(payload); // Logs: "Hello from Child"
-      },
+##### Take Note:
+
+> [!NOTE]
+> The `eventName` must be **`CamelCase`** and when used in the parent component, it must be **`kebab-case`**. **The same way with props and components**
+
+example:
+
+- in the child component
+
+```js
+ <template>
+    <button @click="handleClick">Click Me</button>
+ </template>
+
+ <script>
+ export default {
+ methods: {
+    handleClick() {
+       this.$emit('custom-event', 'Hello from Child');
     },
-  };
-  </script>
-  ```
+ },
+ };
+ </script>
+```
+
+or directly in the html
+
+```vue
+<button @click="$emit('custom-event', 'Hello from Child')">Click Me</button>
+```
+
+- in the parent component
+
+```vue
+<template>
+  <div>
+    <ChildComponent @custom-event="handleCustomEvent" />
+  </div>
+</template>
+
+<script>
+import ChildComponent from "./ChildComponent.vue";
+
+export default {
+  components: { ChildComponent },
+  methods: {
+    // or can be any name other than payload.
+    handleCustomEvent(payload) {
+      console.log(payload); // Logs: "Hello from Child"
+    },
+  },
+};
+</script>
+```
 
 - #### React `onClick` and `props` Callback Functions
 
@@ -1318,6 +1502,224 @@ It can receive two arguments:
   </template>
   ```
 
+### script setup macro
+
+A macro for [setup](#setup) function.
+
+By adding **setup** in the <script> the code inside it will
+automatically become a composition api function.
+
+This means, you wont have to export default and call [setup](#setup) function.
+
+and you wont have to declare [components](#custom-components)
+so you can use it as it is or directly
+
+```vue
+<script setup>
+import FooBar from "vue";
+</script>
+```
+
+### Dynamic Component
+
+Using the script setup macro tag, will give you this benefit,
+**Dynamic Components**
+
+It is a way to display a component base on a certain condition or logic.
+
+- **Using `<component/>`**
+
+  Renders the component base on the condition.
+
+  It destroys/create the component when switching between them.
+  Meaning, It will not preserve the state by default so if you
+  have ,for example, an input and then the condition triggered
+  to switch to another component and you switch back the input resets.
+
+  ✅ Good for complex logic of dynamic components.
+  Like having a lookup logic on which a component to render.
+  That is in [computed](#computed) then display depending on the state of reactive.
+
+  Example:
+
+  ```vue
+  <template>
+    <component
+      :is="someCondition ? FooBar : BarFoo"
+      v-bind="someCondition ? { foo: 'foo' } : { bar: 'bar' }"
+    />
+  </template>
+  ```
+
+- **Using [ v-if/v-else ](#vue-v-for-v-ifv-show-key-and-computed) **
+
+  The same with _dynamic component_ but different syntax
+  and have a better readability
+
+  Example:
+
+  ```vue
+  <template>
+    <h2>2. v-if/v-else Rendering</h2>
+
+    <FooBar v-if="someCondition" foo="foo" />
+    <BarFoo v-else bar="bar" />
+  </template>
+  ```
+
+- **Using [v-show](#vue-v-for-v-ifv-show-key-and-computed)**
+
+  ✅ Better in terms of performance as it taking advantage of css `display:none` to hide the element.
+
+  ✅ It can **retain state** since the component is just hidden, hence, it is not unmounted, destroyed, and recreated.
+
+  ⚠️ If there are multiple components that needs to be conditionally rendered,
+  It might cause a first page load issue since those components are being loaded as well.
+  But for the most part, if you can leverage lazy loading, or even using prefetching which Renders
+  the page first then render in low priority the other components, this is going to be a better approach.
+
+  Example:
+
+  ```vue
+  <template>
+    <h2>3. v-show</h2>
+
+    <FooBar v-show="someCondition" foo="foo" />
+    <BarFoo v-show="!someCondition" bar="bar" />
+  </template>
+  ```
+
+### defineProps, defineEmits
+
+⚠️ Both of these are only usable in **script setup** tag.
+
+- **defineProps**
+
+  Works the same with options api [props](#vue-props)
+
+  But the syntax is more flexible.
+
+  after `vue3.5` and under **script setup** tag,
+  it is now possible to destructure props.
+
+  And when destructured you can define a defaults there too.
+
+  **Syntax**:
+
+  ```js
+  defineProps({ key: value });
+
+  // with defaults for 3.5 and up
+  const {key = default} = defineProps({ key: value });
+
+  ```
+
+  #### Typing **defineProps**
+
+  It is also possible to set **defineProps** in purely typed way.
+
+  **Syntax**:
+
+  ```js
+  defineProps<{ key: value }>();
+
+  // destructured with defaults
+  const {key = default} = defineProps<{ key: value }>();
+
+   // 3.4 and below
+  const props = withDefaults(defineProps<{ key: value }>(),
+     {key = default});
+  ```
+
+  **Example**:
+
+  ```vue
+  <script setup>
+  const props = defineProps({
+    foo: String,
+    bar: Number,
+  });
+
+  // works the same for 3.5 and above
+
+  const { foo, bar } = defineProps({
+    foo: String,
+    bar: Number,
+  });
+  </script>
+  ```
+
+- **defineEmits**
+
+  Works the same with options api version [emits](#vue-v-on-and-event-hanling)
+
+  The syntax is also the same with **defineProps** with minor changes.
+  First , you need to declare your emits/events .
+  Then, you can use it the same way as options api.
+
+  **Syntax**
+
+  ```js
+   // ** <eventName> string name of event/s
+  defineEmits([<eventName>]);
+  ```
+
+- #### typing defineEmits
+
+  Same with **defineProps** it is possible to define it as purely typed emits
+
+  but there are two ways to do it:
+
+  **Syntax**
+
+  1.  ```js
+         const emit = defineEmits<{
+           (e: "<event>", value: string): void;
+         }>();
+      ```
+
+  2.  ```js
+         const emit = defineEmits<{
+            <event>: [key: type] //tupple of payload
+         }>();
+      ```
+
+      **event** - name of the event
+
+      **key** - name of the payload
+
+      **type** - type of the payload
+
+  **Example**:
+
+  ```vue
+  <script setup>
+  // declare emit for v-model bar and custom event foo
+  const emit = defineEmits(["update:bar", "foo"]);
+
+  const handleEvent = (e) => {
+    emit("update:bar", e.target.value);
+  };
+
+  const handleOther = (e) => {
+    emit("foo");
+  };
+
+  // purely type equivalent
+
+  // 1.
+  const emit = defineEmits<{ ( e:"update:bar", event: string ):void,
+       ( e:"foo"):void
+  }>();
+
+  // 2.
+  const emit = defineEmits<{
+   'update:bar': [event: string],
+   'foo': []
+  }>();
+  </script>
+  ```
+
 ### Reactivity Fundamentals and core
 
 - #### **ref**
@@ -1561,6 +1963,15 @@ It can receive two arguments:
   **Syntax**:
 
   ```js
+  const { stop, resume, pause } = watch(source, callback, { options });
+
+  // or
+
+  const watcher = watch(source, callback, { options });
+  //     ^ this is the same as stop. usage:
+  watcher.stop();
+
+  // can also be void
   watch(source, callback, { options });
   ```
 
@@ -1613,6 +2024,8 @@ It can receive two arguments:
 
     _cleanup_ is supported for async/propmises tasks
 
+  **return value**: <object> the return value of the watch.
+
   Example:
 
   ```js
@@ -1633,6 +2046,18 @@ It can receive two arguments:
   - **immediate**: <boolean> if it is true, it will run the watch immediately. Good for initialization
 
   - **flush**: <'sync' | 'post' | 'pre'> if it is true, it will trigger the watch immediately.
+
+  - **once**: <boolean> if it is true, it will stop the watch() after the first time it is called.
+
+  **return value**: <object> the return value of the watch.
+
+  - **stop()**: <function> stop the watch when called.
+
+  - **pause()**: <function> pause the watch when called.
+
+  - **resume()**: <function> resume the watch when called.
+
+  - **variable assignment**: the same as stop()
 
 - ##### watchEffect()
 
@@ -1673,6 +2098,12 @@ It can receive two arguments:
   Is a helper from vue that will trigger if [watchEffect](#watcheffect) or [watch](#watch) is **about to be called** called.
 
   This is good if you have to ensure that you'll get the latest value of the reactive.
+
+  This can be use for **side effects** like **DOM manipulation** or **fetching data**.
+
+  **Things to consider**:
+
+  - It must be in synchronous
 
 ### Reusable Reactive Code
 
@@ -2151,3 +2582,8 @@ When dealing with components especially with reusable one and most of the time y
 
   - syntax: `toValue(<value>)`
     the `<value>` can be refs,function, or just a value.
+
+    <!-- ❌ -->
+    <!-- ⚠️ --> // warning
+    <!-- ✅ -->
+    <!-- 📝 -->

@@ -741,6 +741,61 @@ It is a helper component that is modified to its speicific needs.
   </template>
   ```
 
+- #### Suspense
+
+  [In depth guide for suspense](https://vuejs.org/guide/built-ins/suspense.html)
+
+  A helper that wraps a async component and run it in memory/background,
+  while async component is being run a [slot#fallback](#vue-custom-components-template-slot-named-slots-and-flags)
+  is being run until the async component is loaded/resolved.
+
+  **Attributes/props**
+
+  **Timeout** `optional string|number` in milliseconds for the suspense to wait before showing the fallback slot.
+
+  **Suspensible** `optional boolean` to opt out of suspense component and let the child handle the loading/fallback.
+
+  It takes two slot which is the **default** slot and the **fallback** slot.(**required**)
+
+  **Suspense Events**
+
+  - **`pending`** - when it deems the default slot as async and resolve it on memory
+  - **`fallback`** - the loading state. will trigger when pending state triggers
+  - **`resolve`** - will run default slot during this event.
+
+  What it does is on _initial render_ it will run the default slot if it detects
+  that it is async _including the children_ it will become in **pending state** and run the _fallback slot_
+  once the async resolves it will now become **resolve event** and will render the default slot.
+
+  **Usage with [transition](#transition) and [keep-alive](#keepalive)**
+  
+  It can be use with transition and keep alive state for animation and caching of the components.
+  
+
+  But order is important to make it work. **Suspense** must be a child of **KeepAlive** .
+
+  **Example**
+
+  ```vue
+  <RouterView v-slot="{ Component }">
+  <template v-if="Component">
+    <Transition mode="out-in">
+      <KeepAlive>
+        <Suspense>
+          <!-- main content -->
+          <component :is="Component"></component>
+  
+          <!-- loading state -->
+          <template #fallback>
+            Loading...
+          </template>
+        </Suspense>
+      </KeepAlive>
+    </Transition>
+  </template>
+  </RouterView>
+  ```
+
 ### Custom components
 
 - #### Vue `custom components` , `template` , `slot`, `named slots` and `flags`

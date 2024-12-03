@@ -402,7 +402,31 @@ Example:
 
 ## Authenticaton
 
-<!-- NOTE: -->
+The most common process for authentication are as follows:
+
+1. Validate
+
+   checking the data/input that was sent to the server.
+
+   Example:
+
+   ```php
+   <?Php
+    $attributes = request()->validate([
+      'email' => ['email','required'],
+      'password' => ['required',Password::min(6)]
+    ]);
+   ```
+
+   This will check and validate the data and it returns the validated data
+   or the error message back to its source ,
+   then this is where you'll receive and display the error message.
+
+   ### Illuminate Password
+
+   `Password` came from `use Illuminate\Validation\Rules\Password;`
+
+2. Attempt to login
 
 For redirect:
 redirect()->guest('login');

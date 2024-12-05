@@ -7,8 +7,10 @@ slug: laravel
 
 # All About Laravel
 
-<!--toc:start-->
+<!--prettier-ignore-start-->
 
+
+<!--toc:start-->
 - [All About Laravel](#all-about-laravel)
   - [Blade templating](#blade-templating)
     - [$slot](#slot)
@@ -32,7 +34,24 @@ slug: laravel
       - [**Cast**](#cast)
     - [Binding](#binding)
   - [Authenticaton](#authenticaton)
-  <!--toc:end-->
+    - [Validation](#validation)
+      - [Illuminate Password](#illuminate-password)
+      - [Request validation](#request-validation)
+        - [Customizing validation message](#customizing-validation-message)
+    - [Attempt to login(Auth facade)](#attempt-to-loginauth-facade)
+  - [authorization](#authorization)
+    - [Gates](#gates)
+      - [Defining gates](#defining-gates)
+      - [Defining Gates using Responses](#defining-gates-using-responses)
+      - [Intercepting gate checks](#intercepting-gate-checks)
+      - [Accessing the gate](#accessing-the-gate)
+        - [Accessing gate in Route level through middleware](#accessing-gate-in-route-level-through-middleware)
+    - [Policies](#policies)
+    - [Authorization with Inertia](#authorization-with-inertia)
+<!--toc:end-->
+
+
+<!--prettier-ignore-end-->
 
 ## Blade templating
 
@@ -404,7 +423,7 @@ Example:
 
 The most common process for authentication are as follows:
 
-1. Validate
+1. ### Validation
 
    checking the data/input that was sent to the server.
 
@@ -416,23 +435,850 @@ The most common process for authentication are as follows:
       'email' => ['email','required'],
       'password' => ['required',Password::min(6)]
     ]);
+
+     // this will check two passwords against each other the input name should be
+     'password' => ['required',Password::min(6),'confirmed'],
+
+     // password_confirmation
    ```
 
    This will check and validate the data and it returns the validated data
    or the error message back to its source ,
    then this is where you'll receive and display the error message.
 
-   ### Illuminate Password
+   The pattern is
+
+   using assoc array:
+
+   - **`"name" => ['rule','rule',...]`** or
+
+   using regular expression:
+
+   - **`"name" => "'rule'|'rule'|rule..."`**
+
+   [List of rules](https://laravel.com/docs/11.x/validation#available-validation-rules)
+
+   `'confirmed'` is used if you have an input that needs to be repeated for validation.
+
+   **`<name>_confirmation`** must be the name so that laravel can check and validate both input against each other.
+
+   - **FAILED validation**
+
+   If the validation fails the user will be redirected to the source page and the message will be [flashed to session storage](https://laravel.com/docs/11.x/session#flash-data).
+
+   Which then you can access with blade helper @error()
+
+   e.g.
+
+   ```blade
+    @error("$name")
+        <p class="text-red-500  font-semibold text-xs line-clamp-1 ">{{ $message }}</p>
+    @enderror
+   ```
+
+   **XHR request** if the source request is an XHR request, then the validation will
+   **redirect and return a HTTP response of 422 status code with the json response containing the validation errors.**
+
+   This is useful for AJAX requests and this is what **inertia** uses for validation.
+
+   #### Illuminate Password
+
+   [docs here](https://laravel.com/docs/11.x/validation#validating-passwords)
 
    `Password` came from `use Illuminate\Validation\Rules\Password;`
 
-2. Attempt to login
+   A helper from laravel that validates the received data for passwords restrictions
+
+   - min : character length restriction
+   - max : character length restrictions
+   - mixedCase : uppercase and lowercase
+   - symbols : special characters
+   - uncompromised : will check if the password is exposed in [ haveibeenpwned ](https://haveibeenpwned.com/)
+     This will check if the data have been leaked in the said website once(or the amount that you put in the argument)
+
+   This validation can be **chained** with other validation rules.
+
+   Example:
+
+   ```php
+   <?php
+
+   $attributes = request()->validate([
+     'password' => ['required', Password::min(6)->symbols()->mixedCase()->uncompromised(3)]
+   ]);
+   // this will check for minimum 6 character that must have a symbol and a mixed mixedCase
+   // and that wasnt leaked 3 times.
+   ```
+
+   #### Request validation
+
+   Different ways to do validation:
+
+   - Manual validation `Validator::make`
+
+     [full docs for manual validation](https://laravel.com/docs/11.x/validation#manually-creating-validators)
+
+     This came from `Illuminate\Support\Facades\Validator;`
+
+     Where you can call and manually setup the validation
+     And you can also set a custom message for the validation
+
+     This is good if you want to fine tune the validation.
+
+   - Laravel helper `Request()->validate(['name'=>['rules'...]])`
+
+     The more straightforward validation where you can either get the validated data or redirected back to source with the flashed validation errors
+
+   - Own class validation (`php artisan make:request`)
+
+     That will be located in `app/Http/Requests` folder.
+
+     This folder is where requests take place its normally connected with the [ controller ](#controller).
+
+     By separating the validation , you have a dedicated class for handling requests like validation.
+     And to use it you just have to bind it to your controller and type hint it.
+
+   ##### Customizing validation message
+
+   [laravel docs for customizing validation message](https://laravel.com/docs/11.x/validation#manual-customizing-the-error-messages)
+   There are different ways to customize the error message, one of which is by creating a `public message` function in your Request class. (Example shown below)
+
+   This involves by creating a `public message` function in your Request class.
+
+   Example:
+
+   ```php
+
+    <?php
+
+    namespace App\Http\Requests;
+
+    use Illuminate\Foundation\Http\FormRequest;
+
+    class InfoRequest extends FormRequest
+    {
+      /**
+      * Determine if the user is authorized to make this request.
+      */
+      public function authorize(): bool
+      {
+          return true;
+      }
+
+      /**
+      * Get the validation rules that apply to the request.
+      *
+      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+      */
+      public function rules(): array
+      {
+          return [
+                'name' => ['required', 'min:3'],
+                'email' => ['required', 'email', 'unique:App\\Models\\User'],
+                'phone' => ['required', 'min:10'],
+
+          ];
+      }
+
+      public function messages(): array
+      {
+          return [
+                'required' => ':attribute field is required',
+                'min' => 'Atleast :min character is required',
+                'email.email' => 'Please provide a valid email',
+                'email.unique' => 'Email already taken',
+          ];
+      }
+    }
+
+   ```
+
+   Usage example:
+
+   ```php
+
+   <?php
+
+   namespace App\Http\Controllers;
+
+   use App\Enums\FormSection;
+   use App\Http\Requests\InfoRequest;
+   use App\Traits\HandlesFormSessions;
+   use Illuminate\Contracts\View\View;
+   use Illuminate\Http\RedirectResponse;
+
+   class InfoController extends Controller
+   {
+      use HandlesFormSessions;
+
+      public function store(InfoRequest $request): RedirectResponse
+      {
+         // this will validate all the inputs and return the value if success, redirect to source if fails
+         $validatedData = $request->validated();
+
+         //you can also FILTER the validation data
+         $validatedData = $request->safe()->only(['name', 'email']);
+
+         // you can also exclude some
+         $validatedData = $request->safe()->except(['name', 'email']);
+
+         $this->storeFormSessionData(FormSection::INFO, $validatedData);
+
+         return redirect('/plans');
+      }
+   }
+   ```
+
+2. creating and storing user
+
+This is only necessary for user registration.
+
+After validation, we can interact to the User model(for eloquent), to create a user.
+
+The faster/easier way is to get the returned value from the validation and use it to create a user.
+
+```php
+<?php
+$validatedData = $this->validate($request, [
+   'name' => 'required|string|max:255',
+   'email' => 'required|string|email|max:255|unique:users',
+   'password' => 'required|string|min:8|confirmed',
+]);
+$user = User::create($validatedData);
+```
+
+3. ### Attempt to login(Auth facade)
+
+[detailed documentation about Authentication](https://laravel.com/docs/11.x/authentication)
+
+[Auth facade api docs](https://laravel.com/api/11.x/Illuminate/Support/Facades/Auth.html)
+
+After a successful validation, **Auth** facade `Illuminate\Support\Facades\Auth`
+can be use to login.
+
+**Auth facade** is a static class from laravel service container.
+That can help you interact with the currently Authenticated User.
+
+The recommended process are the following:
+
+- For registration process:
+
+  - validate the User and store data to database
+
+  - `Auth::login($user)` to login the user, where `$user` is the user returned data.
+
+- For login process:
+
+  ⚠️ It is important to set the logout to `POST` method not a `GET` method like an anchor tag.
+
+  - after validation, you can use attempt to login using `Auth::attempt($attributes)`
+    This attempt will return a boolean
+
+    **handling failed login**
+
+    When failed login occurs, like wrong password, email not found, etc,.
+    `Auth::attempt($attributes)` will return false and with this you can
+    throw an exception like `throw ValidationException::withMessages(['email' => 'Invalid Credentials, Please Try again']);`
+    and redirect the user back to login page
+
+    📝 Note: if you use `ValidationException::withMessages`,
+    it will redirect you back to the source url including the message
+
+  - once the user is logged in, it is important to
+    [regenerate the session](https://laravel.com/docs/11.x/session#regenerating-the-session-id) id
+    to avoid session hijacking.
+
+  - then redirect to the desired page.
+    `redirect()->intended();` : home page default
+
+  Simple example for **login authentication**:
+
+  ```php
+  <?php
+  public function store(Request $request): RedirectResponse
+  {
+      //validate
+      $attributes = $request->validate([
+          'email' => ['email','required'],
+          'password' => ['required',Password::min(6)]
+      ]);
+      //attempt to login
+      if (! Auth::attempt($attributes)) {
+          //throw exception
+          throw ValidationException::withMessages(['email' => 'Invalid Credentials, Please Try again']);
+      }
+      //regenerate session id
+      $request->session()->regenerate();
+      //redirect
+
+      return redirect('/jobs');
+  }
+  ```
+
+- For Logout Process:
+
+  ⚠️ It is important to set the logout to `POST` method not a `GET` method like an anchor tag.
+
+  Logging out is a two step process:
+
+  - first, you need to destroy the session
+    `Auth::logout();`
+
+  - then redirect to the desired page.
+    `redirect()->intended();` : home page default
 
 For redirect:
 redirect()->guest('login');
 redirect()->intended();//home page default
 
 ## authorization
+
+There are two ways to control authorization in Laravel.
+
+**Policies** is the way to control authorization that is coupled with a model or resource.
+
+> **Gates and Policies** can worked together.
+>
+> You can use **gates** to control authorization that is simple and not models related like viewing certain authorized pages
+>
+> and use **policies** to control authorization that is tightly coupled with a model or resource like editing a data in the dashboard or deleting entry.
+
+**NOTE 📝**
+
+> Map only works for the table that has a relationship with the user table.
+> In order for laravel to know and compare the currently authenticated user with the column data . That column data must be connected to user or its related table is connected to a user.
+
+<!-- defined by relationship between the user and the model -->
+
+Example of simple Authorization:
+
+```Php
+<?php
+
+// assuming this in a method in the Controller
+public function edit(Job $job){ //binding the job
+
+   //will check if the user is logged in
+   if(Auth::guest()){
+      return redirect()->guest('login');
+   }
+
+   // the autohorization
+   // will check if the logged in user is the same to the jobs user(relationship)
+   if(! $job->user->is(Auth::user())){ // will check if the  user column data(e.g. id) will match with Auth::user()
+      abort(403); // will display a forbidden error page
+   }
+}
+```
+
+As mentioned that this is simple because it only belongs to the controller so if you need to do some logic elsewhere you need to recreate this logic again, so its better to use [gate](#gates).
+
+### Gates
+
+**Gates** is the simpler way to control authorization. It is mostly used for authorization that is not tightly coupled with a model. Although you can, Policies is probably the best approach for that
+
+#### Defining gates
+
+Gates can be defined in the `app/Providers/AuthServiceProvider` file so that it initializes on boot and be ready to use.
+
+Gate::define() takes two parameters:
+
+1. name: the name of the gate to be **accessed globally** in the application
+2. a callback that determines whether the action is authorized or not.(will return boolean)
+
+Example:
+
+```php
+<?php
+    public function boot(): void
+    {
+                     //name          |callback  User  Model , Post Model
+        Gate::define('update-post', function (User $user, Post $post) {
+            return $user->id === $post->user_id;
+        });
+
+         // or with more arguments for more context on logic
+        Gate::define('foo', function (User $user, Post $post, bool $bar) {
+            if($user->id === $post->user_id){
+               return true;
+            } if ($bar) {
+               return false;
+            }
+        });
+
+         // alternatively you can use class callback array
+
+         Gate::define('update-post', [PostPolicy::class, 'update']); // will use the update method from the PostPolicy class
+    }
+```
+
+- User: the binded model for the logins
+- Post: the binded model that you want to check against the user
+- Return: bool, the callback will return truthy or falsy depending on the matching logic.
+  or a class callback array where you can use the [policy](#policies) method name instead of a closure.
+
+> ✅ Good to know .
+>
+> If you have a [policy](#policies) created for autorization, you can use to define your gates
+> this way you can access it using `Gate::authorize` , `Gate::allows` , `Gate::denies` and some others.
+
+> 📝 **NOTE**
+>
+> the **User** in the closure will always check for the authenticated user.
+> Means if the user is not logged in and the gate is called
+> it will not hit the gate logic and will automatically return false
+> ✅ To Fix it you can make the `$user=null` or make it optional `?User $user`
+
+If the user is not logged in and will try to access the gate it will redirect it to the named login route.
+
+#### Defining Gates using Responses
+
+This is useful if you want to return a more detailed response then a boolean.
+
+You can use the `Response` static class from `Illuminate\Auth\Access\Response`
+
+Where you can pass a message together with the HTTP status response.
+
+Example:
+
+```php
+<?php
+
+use Illuminate\Auth\Access\Response
+
+    public function boot(): void
+    {
+                     //name          |callback  User  Model , Post Model
+        Gate::define('update-post', function (User $user, Post $post) {
+            return $user->id === $post->user_id  ? Response::allow() : Response::deny('You are not authorized to update this post');
+        });
+    }
+```
+
+Alternatively, it is a best security practice to return a 404 instead a 403 to hide the existence of a resource.
+
+Here is why:
+
+- to avoid enumeration attacks, if the response is 403 it will hint the attacker that the resource exists just dont have enough authorization instead of 404 it will hint that the page doesnt exist even if it may does.
+
+- for better ux, it will avoid confusion to the user.
+
+laravel provides a helper function to return a 404 response using `Response`
+
+```php
+<?php
+
+use Illuminate\Auth\Access\Response
+
+    public function boot(): void
+    {
+                     //name          |callback  User Model , Post Model
+        Gate::define('update-post', function (User $user, Post $post) {
+            return $user->id === $post->user_id  ? Response::allow() : Response::denyWithStatsus(404, "Post not Found"); // you can customize the message too
+        });
+
+         // or laravel helper
+        Gate::define('update-post', function (User $user, Post $post) {
+            return $user->id === $post->user_id  ? Response::allow() : Response::denyAsNotFound();
+        });
+    }
+```
+
+#### Intercepting gate checks
+
+[laravel docs for Intercepting gate checks](https://laravel.com/docs/11.x/authorization#intercepting-gate-checks)
+
+If you need to intercept the authorization before the [defined gates](#defining-gates) you can use:
+`Gate::before` where you can bypadd the gate checks. This is useful if for admins that needs access to all the routes.
+
+You can define `Gate::before` in the `app/Providers/AuthServiceProvider` file so that it initializes on boot and can be access globally.
+
+Example:
+
+```php
+<?php
+    public function boot(): void
+    {
+        Gate::before(function (User $user,string $ability) {
+            if ($user->isAdmin()) {
+                return true;
+            }
+        });
+    }
+```
+
+Alternatively you can use `Gate::after` to run after the gate checks. This is useful if you want to do a logging for successful or failed authorization.
+
+Example:
+
+```php
+<?php
+public function boot(): void
+{
+   Gate::after(function (User $user, string $ability, bool|null $result) {
+      \Log::info("User {$user->id} attempted {$ability}: " . ($result ? 'Success' : 'Failure'));
+   });
+}
+```
+
+📝 Note:
+
+> Both `Gate::before` and `Gate::after` will be called for all gates.
+
+#### Accessing the gate
+
+There are several ways to access the gates.
+
+1. Accessing directly in the controller
+
+   - Directly in the controller
+
+     ```php
+     <?php
+     public function edit(Post $post){
+        //gates can be used in the controller
+        if(Authh::user()->cannot('update-post',$post)){
+           abort(403);
+        }
+
+        // or
+        Gate::authorize('update-post',$post);
+        Gate::allows('update-post',$post);
+        Gate::denies('update-post',$post);
+        Gate::any(['update-post','foo'],[$post,$bar]);
+        Gate::none(['update-post','foo'],[$post,$bar]);
+
+        // or accessing gate with multiple arguments
+        Gate::any('foo',[$post,$bar]);
+        Gate::none('foo',[$post,$bar]);
+     }
+     ```
+
+     **Gate::authorize** - will run the action and will check if the user is authorized for that action.
+     if not it will **throw an instance of AuthorizationException** from `Illuminate\Auth\Access\AuthorizationException` which will throw an **HTTP response of 403(forbidden)**
+
+     **Gate::allows** - will run the action and will check if the user is authorized for that action.
+     this will return a `boolean` instead of `Exception`.
+     False if not allowed to the such action else true.
+
+     **Gate::denies** - the opposite of **Gate::allows**
+
+     **Gate::any** - is like **Gate::allows** but it will check if the user is authorized for _any or either_ of the actions. So it is a gate for multiple actions.
+
+     **Gate::none** - is like **Gate::denies** but it will check if the user is authorized for _none or neither_ of the actions.
+
+   - using Gate defined through [ Responses ](#defining-gates-using-responses)
+
+     Accessing using **Gate::inspect**
+
+     ```php
+     <?php
+     public function edit(Post $post){
+
+        $result = Gate::inspect('update-post',$post);
+
+        // will return a boolean
+        if($result->allowed()){
+           // now authorized do something..
+           // like updating the db and redirecting
+        } else {
+           echo $result->message();
+           // inertia you can pass the message as a prop
+            return back()->with([
+                'message' => $result->message(),
+            ]);
+        }
+     }
+     ```
+
+     or using **Gate::authorize**
+
+     ```php
+     <?php
+     public function edit(Post $post){
+        Gate::authorize('update-post',$post);
+       // if fails will throw 403 forbidden with the custom message from the Response->deny()
+      // which is : You are not authorized to update this post
+     }
+     ```
+
+     [check inertia error handling ](https://inertiajs.com/error-handling)
+
+   - using Can for `Auth::user()` facade
+
+     ```php
+     <?php
+     public function edit(Post $post){
+        if(Auth::user()->cannot('update-post',$post)){
+           abort(403); // or fail the request
+        }
+     }
+     ```
+
+2. using blade
+
+   you can use `@can` blade directive to check if the user is authorized for the action.
+
+   You need to match the gate name (first argument) with the data it needs to check against.
+
+   ```blade
+   // gates can be used in blade template
+   @can('update-post',$post)
+      <button>Update</button>
+   @endcan
+   ```
+
+   If you have [policies](#policies), there is no change in the syntax.
+   But you might want to update your `can` directive to match to the policy method name.
+
+   ```blade
+   @can('update',$post)
+      <button>Update</button>
+   @endcan
+   ```
+
+3. ##### Accessing gate in Route level through middleware
+
+   The problem with accessing the gate in controller is that you have to define it in the controller everytime you need it.
+
+   Middleware solves this instead of accessing gate in the controller it self you can do a gate check in the route level where controllers are connected.
+
+   There are different ways to do it.
+
+   ```php
+   <?php
+      Route::get('/edit/{post}', [JobController::class, 'edit'])->middleware(['auth','can:update-post,post']);
+   ```
+
+   the `can:update-post,post` , the **post** here represents the wildcard from the first argument for **Route::get**
+
+   alternatively you can use `can` method for better readability
+
+   ```php
+   <?php
+      //                                                                                   gate name , wildcard
+      Route::get('/edit/{post}', [JobController::class, 'edit'])->middleware('auth')->can('update-post','post');
+   ```
+
+   **using [Policy](#policies)**
+
+   if youre using policy you can access it through middleware just like gate but with a little different syntax
+
+   ```php
+   <?php
+      Route::get('/edit/{post}', [JobController::class, 'edit'])
+         ->middleware('auth')
+         ->can('update','post'); // no more update-post
+   ```
+
+   What this does under the hood is, it will check the JobController and its **binded** model then will check if a policy exists and finally it will then check and **run** the update method inside that policy.
+
+   That is why it is important to connect the policy to the model.
+
+   _alternatively_, you can group controller together like so:
+
+   ```Php
+    <?php
+
+   Route::controller(JobController::class)->group(function () {
+
+      // index
+      Route::get('/jobs', 'index');
+
+      //store
+      Route::post('/jobs', 'store')
+         ->middleware('auth');
+
+      //create
+      Route::get('/jobs/create', 'create')
+         ->middleware('auth');
+
+      //show
+      Route::get('/jobs/{job}', 'show');
+
+      //edit
+      Route::get('/jobs/{job}/edit', 'edit')
+         ->middleware('auth')
+         ->can('edit', 'job');
+
+      //update
+      Route::patch('/jobs/{job}', 'update')
+         ->middleware('auth')
+         ->can('edit', 'job');
+
+      // delete
+      Route::delete('/jobs/{job}', 'destroy')
+         ->middleware('auth')
+         ->can('edit', 'job');
+   });
+   ```
+
+   or
+
+   ```php
+   <?php
+      Route::middleware(['auth', 'can:edit,job'])->group(function () {
+         Route::get('/jobs/{job}/edit', 'edit');
+         Route::patch('/jobs/{job}', 'update');
+         Route::delete('/jobs/{job}', 'destroy');
+      });
+   ```
+
+   you can also create a middleware that will check for the gates and/or policies.
+
+   ```php
+      <?php
+      // In app/Http/Middleware/EnsureJobCanBeEdited.php
+      class EnsureJobCanBeEdited
+      {
+         public function handle($request, Closure $next)
+         {
+            $job = $request->route('job');
+
+            if (!Gate::allows('edit', $job)) {
+                  abort(403);
+            }
+
+            return $next($request);
+         }
+      }
+
+      // Then in routes
+      Route::patch('/jobs/{job}', 'update')
+         ->middleware(['auth', EnsureJobCanBeEdited::class]);
+   ```
+
+### Policies
+
+Policies is the way to control authorization that is tightly coupled with a model or resource.
+
+`php artisan make:policy` will scaffold a policy for you. To connect it to your model there will be a prompt that will ask you the model you want to connect it to.
+
+Connecting to the model is important because laravel is going to use it to check for the policy that is connected to your model, especially when run with `can` through **middleware**, there is a [demo example here.](#accessing-gate--route-level-through-middleware)
+
+- **Accessing policy methods through gates**
+
+  You can use the policy logic to your [gates](#gates) by adding the policy class instead of callables when defining the gates. [example shown here](#defining-gates)
+
+📝 **NOTE**
+
+> You can use use the logic from defining gates to your policies methods.
+> The logic/idea is just the same where the method from policy just need to return a boolean | [Response](#defining-gates-using-responses).
+> same with how you [define gates](#defining-gates)
+
+#### Policy Responses
+
+just like [gate responses](#defining-gates-using-responses) you can also use it in Policies method too.
+You can also create a custom response message.
+
+Example:
+
+```php
+<?php
+public function update(User $user, Post $post): Response
+{
+   return $user->id === $post->user_id  ? Response::allow() : Response::deny('You are not authorized to update this post');
+}
+```
+
+or use the `denyAsNotFound` helper or `denyWithStatus` helper.
+
+**Accessing the policy**
+
+As what mention above, you have to use the policy class instead of the callable when defining the gates.
+to be able to use it in through [gates](#gates) but if you're going to access it through [middleware](#accessing-gate-in-route-level-through-middleware) you can use it as it is.
+
+### Authorization with Inertia
+
+[docs regarding authorization with inertia](https://laravel.com/docs/11.x/authorization#authorization-and-inertia)
+
+you can use the **HandleInertiaRequests** middleware to use **can** method for authorization.
+
+example:
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+class HandleInertiaRequests extends Middleware
+{
+    // ...
+
+    /**
+     * Define the props that are shared by default.
+     *
+     * @return array<string, mixed>
+     */
+    public function share(Request $request)
+    {
+        return [
+            ...parent::share($request),
+            'auth' => [
+                'user' => $request->user(),
+                'permissions' => [
+                    'post' => [
+                                 // this is where you set the authorization through can.
+                        'create' => $request->user()->can('create', Post::class),
+                    ],
+                ],
+            ],
+        ];
+    }
+}
+
+```
+
+with this you can now access it in your frontend of choice Vue/React/svelte though grobal props.
+
+Example:
+
+```vue
+<template>
+  <div>
+    <h1>Create a Post</h1>
+
+    <!-- Conditionally show the create button if the user has permission -->
+    <div v-if="canCreatePost">
+      <button @click="createPost">Create New Post</button>
+    </div>
+
+    <div v-else>
+      <p>You do not have permission to create a post.</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from "vue";
+
+// Props from Inertia (automatically passed to every page)
+defineProps({
+  auth: Object, // Receiving the shared 'auth' object from Laravel middleware
+});
+
+// Computed property to check if the user can create a post
+const canCreatePost = computed(() => {
+  return auth?.permissions?.post?.create ?? false;
+});
+
+// Function to handle the "Create Post" button click
+const createPost = () => {
+  alert("Post creation logic goes here!");
+};
+</script>
+```
+
+**Another approach**
+
+This approach uses the `can` method directly at route level.
+This is good if you want to only access the autohorization per route and not globally through the middleware.
+
+_Steps_:
 
 Add can(gate) to as a prop for your frontend to receive
 or fine grained control (like only for admin)
@@ -446,9 +1292,15 @@ Things to note:
 
 // pass the prop like this
 
-'can' => [
-'createUser': Auth::user()->email === 'admin@admin.com'
-]
+Route::get('/', function () {
+    return Inertia::render('Home', [
+        'name' => 'ting',
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+        'can' => [ 'createUser': Auth::user()->email === 'admin@admin.com' ]
+    ]);
+});
+
 ```
 
 or create a policy
@@ -463,3 +1315,8 @@ or create a policy
   //                               ^ this is the gate from policy
 ]
 ```
+
+<!-- ❌ -->
+<!-- ⚠️ --> // warning
+<!-- ✅ -->
+<!-- 📝 -->

@@ -31,6 +31,7 @@ slug: "vue"
       - [Transition Group](#transition-group)
       - [Teleport](#teleport)
       - [KeepAlive](#keepalive)
+      - [Suspense](#suspense)
     - [Custom components](#custom-components)
       - [Vue `custom components` , `template` , `slot`, `named slots` and `flags`](#vue-custom-components-template-slot-named-slots-and-flags)
       - [React `components`, `JSX`, and `children`](#react-components-jsx-and-children)
@@ -745,6 +746,8 @@ It is a helper component that is modified to its speicific needs.
 
   [In depth guide for suspense](https://vuejs.org/guide/built-ins/suspense.html)
 
+  [also check async components from docs](https://vuejs.org/guide/components/async.html)
+
   A helper that wraps a async component and run it in memory/background,
   while async component is being run a [slot#fallback](#vue-custom-components-template-slot-named-slots-and-flags)
   is being run until the async component is loaded/resolved.
@@ -768,9 +771,8 @@ It is a helper component that is modified to its speicific needs.
   once the async resolves it will now become **resolve event** and will render the default slot.
 
   **Usage with [transition](#transition) and [keep-alive](#keepalive)**
-  
+
   It can be use with transition and keep alive state for animation and caching of the components.
-  
 
   But order is important to make it work. **Suspense** must be a child of **KeepAlive** .
 
@@ -817,7 +819,11 @@ It is a helper component that is modified to its speicific needs.
     ' } } }
     ```
 
-  - **`slot`** - is vue's way to dynamically render content inside a component or nest it.
+  - **`slot`**
+
+    [full docs about slot](https://vuejs.org/guide/components/slots#renderless-components)
+
+    - is vue's way to dynamically render content inside a component or nest it.
     - Purpose: Slots allow you to inject custom content into a component, making it highly reusable and flexible.
       Meaning you can use the component in a completely different way from one another.
     - it must be defined under the `template`

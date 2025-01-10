@@ -85,6 +85,12 @@ after pointing out it may take some time to propgate it.. you can check it if it
 nslookup <your website url>
 ```
 
+once confirmed you can try to ssh using the website url instead in this format: 
+```bash 
+ssh <username>@<websiteurl>
+# ssh foo@bar.sit
+```
+
 ## hardening ssh
 
 In order to avoid a bruteforce ssh attack, password must be disabled
@@ -134,4 +140,6 @@ you can change the port to something else to avoid the attacks from automated sc
 you can do this by finding and uncommenting the `port 22` to like `port 8000`
 
 > [!NOTE]
-> make sure to take note of the change port
+> make sure to take note of the changed port
+
+

@@ -3,14 +3,11 @@ import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel/serverless";
 
-import mdx from "@astrojs/mdx";
-
 // https://astro.build/config
 export default defineConfig({
   prefetch: true,
   adapter: vercel(),
-  integrations: [tailwind(), react(), mdx()],
-  output: "hybrid",
+  integrations: [tailwind(), react()],
   vite: {
     ssr: {
       external: ["node:buffer"],
@@ -22,3 +19,4 @@ export default defineConfig({
   },
   security: { checkOrigin: true },
 });
+

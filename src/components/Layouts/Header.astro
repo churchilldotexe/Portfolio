@@ -14,10 +14,6 @@ const pageLinks = [
     name: "Projects",
   },
   {
-    href: "notes.tingexe.cc",
-    name: "Notes",
-  },
-  {
     href: "/about/",
     name: "About",
   },
@@ -139,6 +135,19 @@ const isRouteActive = (linkHref: string, currentPath: string): boolean => {
         </li>
       ))
     }
+
+  <li
+      class="mt-1 w-full max-w-fit flex-1 px-2 pb-2 pt-1 tracking-wide transition-transform md:text-xl"
+    >
+      <a
+        rel="noopener noreferrer"
+        href="https://notes.tingexe.cc"
+        class="flex w-full items-center gap-1 hover:text-primary hover:underline"
+        data-astro-prefetch
+      >
+        Notes <ExternalLinkIcon className=" size-5  " /></a
+      >
+    </li>
 
     <li
       class="mt-1 w-full max-w-fit flex-1 px-2 pb-2 pt-1 tracking-wide transition-transform md:text-xl"

@@ -8,6 +8,7 @@ export default defineConfig({
   prefetch: true,
   adapter: vercel(),
   integrations: [tailwind(), react()],
+  output: "server",
   vite: {
     ssr: {
       external: ["node:buffer"],
